@@ -320,12 +320,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .mgmt-item .mi-count{color:var(--ink-soft);font-size:12px}
 
 /* ============ 查看器 ============ */
-.viewer{position:fixed;inset:0;z-index:9000;background:rgba(30,20,15,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:22px}
+.viewer{position:fixed;inset:0;z-index:9000;background:rgba(30,20,15,.72);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:22px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .viewer.open{display:flex;animation:fadeIn .22s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.viewer-box{background:var(--paper);border-radius:24px;max-width:1080px;width:100%;max-height:92vh;display:grid;grid-template-columns:1.3fr 1fr;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);animation:viewerPop .35s cubic-bezier(.34,1.56,.64,1)}
+.viewer-box{background:var(--paper);border-radius:24px;max-width:1080px;width:100%;max-height:92vh;display:grid;grid-template-columns:1.3fr 1fr;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);animation:viewerPop .35s cubic-bezier(.34,1.56,.64,1);margin:auto}
 @keyframes viewerPop{from{transform:scale(.85) rotate(-1deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-@media(max-width:760px){.viewer-box{grid-template-columns:1fr}}
+@media(max-width:760px){.viewer{padding:12px}.viewer-box{grid-template-columns:1fr;max-height:none;border-radius:20px}.viewer-imgwrap{min-height:auto;max-height:60vh}.viewer-imgwrap img{max-height:60vh}.viewer-info{max-height:none;overflow:visible;padding:18px}}
 .viewer-imgwrap{background:var(--bg-deep);display:flex;align-items:center;justify-content:center;min-height:300px;position:relative;overflow:hidden}
 .viewer-imgwrap img{max-width:100%;max-height:88vh;object-fit:contain;transition:transform .2s;cursor:grab}
 .viewer-info{padding:22px;overflow-y:auto;max-height:92vh}
@@ -1138,12 +1138,17 @@ function bytesToSize(b){
   if(b<1024*1024*1024) return (b/1024/1024).toFixed(1)+' MB';
   return (b/1024/1024/1024).toFixed(2)+' GB';
 }
+function imgBytes(i){
+  if(i.size && i.size>0) return i.size;
+  const d=i.dataUrl||''; const k=d.indexOf(','); const b64=k>=0?d.slice(k+1):d;
+  return Math.floor(b64.length*0.75);
+}
 function renderData(){
   const total = images.length;
   const fav = images.filter(i=>i.fav).length;
   const tagSet = new Set(); images.forEach(i=>(i.tags||[]).forEach(t=>tagSet.add(t)));
   const albumSet = new Set(); images.forEach(i=>albumSet.add(i.album||'未分类'));
-  const bytes = images.reduce((s,i)=> s + ((i.dataUrl||'').length * 1.3), 0);
+  const bytes = images.reduce((s,i)=> s + imgBytes(i), 0);
   document.getElementById('dataGrid').innerHTML = `
     <div class="data-card"><div class="d-emoji">🖼️</div><div class="d-num">${total}</div><div class="d-label">收录图片</div></div>
     <div class="data-card"><div class="d-emoji">💗</div><div class="d-num">${fav}</div><div class="d-label">收藏数量</div></div>
@@ -1292,7 +1297,7 @@ function refreshStats(){
   const fav = images.filter(i=>i.fav).length;
   const tagSet = new Set(); images.forEach(i=>(i.tags||[]).forEach(t=>tagSet.add(t)));
   const albumSet = new Set(); images.forEach(i=>albumSet.add(i.album||'未分类'));
-  const bytes = images.reduce((s,i)=> s + ((i.dataUrl||'').length * 1.3), 0);
+  const bytes = images.reduce((s,i)=> s + imgBytes(i), 0);
   document.getElementById('stCount').textContent = total;
   document.getElementById('stFav').textContent = fav;
   document.getElementById('stTag').textContent = tagSet.size;
