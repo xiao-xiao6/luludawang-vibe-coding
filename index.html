@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>噜噜大王の好图收纳屋 🧁</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧁%3C/text%3E%3C/svg%3E" />
 <style>
 /* ============ 主题皮肤 ============ */
 :root{
@@ -367,6 +368,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 @keyframes starFly{0%{transform:translate(-50%,-50%) scale(0) rotate(0)}40%{transform:translate(-50%,-50%) scale(1.4) rotate(20deg)}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.6) rotate(40deg);opacity:0}}
 .sparkle{position:fixed;pointer-events:none;z-index:9500;animation:sparkleTw 1s ease-out forwards}
 @keyframes sparkleTw{0%{transform:scale(0) rotate(0);opacity:1}100%{transform:scale(1.6) rotate(180deg);opacity:0}}
+/* 系统级「减少动效」偏好：自动关闭常驻动画（晕动症友好 + 省电） */
+@media (prefers-reduced-motion: reduce){.cloud,#sky{display:none}*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -419,7 +422,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <button class="candy gold" onclick="startSlideshow()"><span class="cb">🎬</span>幻灯片</button>
         <button class="candy ghost" id="selectBtn" onclick="toggleSelect()"><span class="cb">☑️</span>批量选择</button>
         <button class="candy ghost" onclick="switchView()" id="viewBtn"><span class="cb">🍱</span>切换视图</button>
-        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)" />
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files);this.value=''" />
       </div>
       <div class="dropzone" id="dropzone" onclick="pickFiles()">
         <div class="dz-emoji">🐻‍❄️</div>
@@ -427,7 +430,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <p>点击选择 · 多张批量 · 直接拖拽 · 甚至 Ctrl+V 粘贴都可以哦</p>
       </div>
       <div class="filters">
-        <input type="search" id="searchBox" placeholder="🔍 搜名字 / 标签 / 备注…" style="flex:1;min-width:180px" oninput="renderGallery()" />
+        <input type="search" id="searchBox" placeholder="🔍 搜名字 / 标签 / 备注…" style="flex:1;min-width:180px" oninput="searchDebounce()" />
         <button class="pill on" id="chipAll" onclick="setFilter('all')">全部</button>
         <button class="pill" id="chipFav" onclick="setFilter('fav')">💗 收藏</button>
         <select id="sortSel" onchange="renderGallery()" style="width:auto">
@@ -436,6 +439,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
           <option value="rate">⭐ 评分</option>
           <option value="name">🔤 名称</option>
         </select>
+        <button class="pill" id="compressToggle" onclick="toggleCompress()" title="入库时自动压缩超大图（长边超过2048px），节省存储空间">🗜️ 大图压缩</button>
       </div>
       <div class="album-bar" id="albumBar"></div>
       <div class="filters" id="tagFilter" style="margin-top:8px"></div>
@@ -482,7 +486,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <button class="candy gold" onclick="exportFav()"><span class="cb">🎁</span>导出收藏</button>
         <button class="candy sky" onclick="document.getElementById('importInput').click()"><span class="cb">📥</span>导入备份</button>
         <button class="candy danger" onclick="clearAll()"><span class="cb">🗑️</span>清空全部</button>
-        <input type="file" id="importInput" accept="application/json,.json" style="display:none" onchange="handleImport(this.files)" />
+        <input type="file" id="importInput" accept="application/json,.json" style="display:none" onchange="handleImport(this.files);this.value=''" />
       </div>
       <p class="desc" style="margin-top:14px">提示：备份是标准 JSON。「含图」备份体积大属正常；「元数据」备份不含图片像素，体积很小。</p>
     </div>
@@ -553,7 +557,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 const sky = document.getElementById('sky');
 const sctx = sky.getContext('2d');
 let SKY = [];
-function resizeSky(){ sky.width = innerWidth; sky.height = innerHeight; }
+const REDUCE_MOTION = (typeof matchMedia === 'function') ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+function resizeSky(){
+  // Retina / 高分屏适配：按 devicePixelRatio 缩放画布，装饰粒子不再模糊
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  sky.width = Math.round(innerWidth * dpr); sky.height = Math.round(innerHeight * dpr);
+  sky.style.width = innerWidth + 'px'; sky.style.height = innerHeight + 'px';
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
 resizeSky(); addEventListener('resize', resizeSky);
 const SKY_SHAPES = ['☁','♡','✦','✿','●','★','🍬'];
 const SKY_COLORS = ['#e8825a','#7fb89a','#7fa8d9','#e8b25a','#e56b8d','#c98fb8'];
@@ -568,11 +579,12 @@ function skySpawn(init){
 }
 for(let i=0;i<38;i++) skySpawn({init:true});
 (function skyLoop(){
-  sctx.clearRect(0,0,sky.width,sky.height);
+  if(REDUCE_MOTION && REDUCE_MOTION.matches){ requestAnimationFrame(skyLoop); return; }
+  sctx.clearRect(0,0,innerWidth,innerHeight);
   for(let i=0;i<SKY.length;i++){
     const p=SKY[i];
     p.y -= p.sp; p.x += p.drift; p.rot += p.vr;
-    if(p.y < -50 || p.x < -50 || p.x > sky.width+50){ SKY.splice(i,1); skySpawn(); i--; continue; }
+    if(p.y < -50 || p.x < -50 || p.x > innerWidth+50){ SKY.splice(i,1); skySpawn(); i--; continue; }
     sctx.save(); sctx.globalAlpha = p.a;
     sctx.translate(p.x,p.y); sctx.rotate(p.rot);
     sctx.fillStyle = p.col; sctx.font = p.s+'px serif';
@@ -585,6 +597,7 @@ for(let i=0;i<38;i++) skySpawn({init:true});
 // 鼠标尾迹：小糖豆
 let lastTrail = 0;
 addEventListener('mousemove', e => {
+  if(REDUCE_MOTION && REDUCE_MOTION.matches) return;
   const now = Date.now();
   if(now - lastTrail < 60) return; lastTrail = now;
   const s = document.createElement('span');
@@ -598,6 +611,7 @@ addEventListener('mousemove', e => {
 
 // 泡泡点击爆开
 document.addEventListener('click', e => {
+  if(REDUCE_MOTION && REDUCE_MOTION.matches) return;
   const btn = e.target.closest('.candy,.pill,.nav-item,.fav-pin,.album-chip,.src-card .s-actions button,.bb');
   if(!btn) return;
   const rect = btn.getBoundingClientRect();
@@ -621,6 +635,7 @@ document.addEventListener('click', e => {
 
 // 糖果雨
 function candyRain(n=60){
+  if(REDUCE_MOTION && REDUCE_MOTION.matches) return;
   const layer = document.getElementById('sparkleLayer');
   const emojis = ['🍬','🧁','🎀','💗','🍡','✨','🍓','⭐'];
   const colors = ['#e8825a','#7fb89a','#7fa8d9','#e8b25a','#e56b8d','#c98fb8'];
@@ -675,7 +690,7 @@ function toast(msg){
 /* ==================== 主题 ==================== */
 function applyTheme(t){
   document.body.setAttribute('data-theme', t);
-  localStorage.setItem('album_theme', t);
+  try{ localStorage.setItem('album_theme', t); }catch(e){}
   document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('on', d.dataset.theme===t));
 }
 document.getElementById('themePick').addEventListener('click', e => {
@@ -707,15 +722,70 @@ let currentAlbum = null;   // null = 全部
 let selecting = false;
 let selected = new Set();
 let currentVid = null;
-let zoom = 1;
+let zoom = 1, panX = 0, panY = 0;
 let ssTimer = null, ssList = [], ssIdx = 0, ssPaused = false;
 
 function uid(){ return 'img_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
 function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function getAlbums(){ try{ return JSON.parse(localStorage.getItem('album_list')||'[]'); }catch(e){ return []; } }
-function saveAlbums(list){ localStorage.setItem('album_list', JSON.stringify(list)); }
+function saveAlbums(list){ try{ localStorage.setItem('album_list', JSON.stringify(list)); }catch(e){} }
 function getRecent(){ try{ return JSON.parse(localStorage.getItem('src_recent')||'[]'); }catch(e){ return []; } }
-function saveRecent(list){ localStorage.setItem('src_recent', JSON.stringify(list)); }
+function saveRecent(list){ try{ localStorage.setItem('src_recent', JSON.stringify(list)); }catch(e){} }
+
+/* ==================== 工具：去重哈希 / 体积估算 / 大图压缩 / 安全写入 / 搜索防抖 ==================== */
+let compressOn = true;
+try{ compressOn = localStorage.getItem('compress_on') !== '0'; }catch(e){}
+function contentHash(s){
+  s = String(s||'');
+  let h = 5381, g = 52711;
+  const step = Math.max(1, Math.ceil(s.length / 200000));
+  for(let i=0;i<s.length;i+=step){ const c = s.charCodeAt(i); h = ((h<<5)+h+c)>>>0; g = (g*31+c)>>>0; }
+  return h.toString(36)+'.'+g.toString(36)+'.'+s.length;
+}
+function dataUrlBytes(d){ const s=String(d||''); const k=s.indexOf(','); return Math.floor((k>=0?s.slice(k+1):s).length*0.75); }
+function maybeCompress(dataUrl){
+  return new Promise(res=>{
+    if(!compressOn || /^data:image\/(gif|svg)/i.test(dataUrl)){ res(dataUrl); return; } // GIF/SVG 不压缩，保住动图与矢量
+    const im = new Image();
+    im.onload = ()=>{
+      try{
+        const maxEdge = 2048;
+        if(im.naturalWidth<=maxEdge && im.naturalHeight<=maxEdge){ res(dataUrl); return; }
+        const scale = maxEdge / Math.max(im.naturalWidth, im.naturalHeight);
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(im.naturalWidth*scale));
+        c.height = Math.max(1, Math.round(im.naturalHeight*scale));
+        const ctx = c.getContext('2d');
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(im, 0, 0, c.width, c.height);
+        let out = '';
+        try{ out = c.toDataURL('image/webp', .85); }catch(e){ out=''; }
+        if(!out || !out.startsWith('data:image/webp')){
+          try{ out = c.toDataURL('image/jpeg', .85); }catch(e){ out=''; }
+        }
+        res(out && out.length < dataUrl.length ? out : dataUrl);
+      }catch(e){ res(dataUrl); }
+    };
+    im.onerror = ()=>res(dataUrl);
+    im.src = dataUrl;
+  });
+}
+function toggleCompress(){
+  compressOn = !compressOn;
+  try{ localStorage.setItem('compress_on', compressOn?'1':'0'); }catch(e){}
+  renderCompressToggle();
+  toast(compressOn ? '大图入库自动压缩已开启 🗜️' : '自动压缩已关闭，原图直存 📦');
+}
+function renderCompressToggle(){
+  const b = document.getElementById('compressToggle');
+  if(b){ b.textContent = '🗜️ 大图压缩：'+(compressOn?'开':'关'); b.classList.toggle('on', compressOn); }
+}
+async function safePut(rec){
+  try{ await dbPut(rec); return true; }
+  catch(e){ console.warn('存储写入失败：', e); return false; }
+}
+let searchTimer = null;
+function searchDebounce(){ clearTimeout(searchTimer); searchTimer = setTimeout(renderGallery, 200); }
 
 /* ==================== 相册渲染 ==================== */
 function filtered(){
@@ -723,6 +793,8 @@ function filtered(){
   let list = images.slice();
   if(currentFilter==='fav') list = list.filter(i=>i.fav);
   if(currentAlbum) list = list.filter(i=>(i.album||'未分类')===currentAlbum);
+  const tag = activeTag();
+  if(tag) list = list.filter(i=>(i.tags||[]).some(t=>String(t)===tag)); // 标签筛选进 filtered：翻页/幻灯片不再串台
   if(q){
     list = list.filter(i =>
       (i.name||'').toLowerCase().includes(q) ||
@@ -742,22 +814,21 @@ function activeTag(){ const el = document.querySelector('#tagFilter .pill.on'); 
 function renderGallery(){
   const wrap = document.getElementById('galleryWrap');
   wrap.className = currentView==='grid' ? 'gridview' : 'waterfall';
-  let list = filtered();
-  const tag = activeTag();
-  if(tag) list = list.filter(i=>(i.tags||[]).includes(tag));
+  let list = filtered(); // 标签/合集/收藏/搜索筛选统一在这里，翻页与幻灯片永远同步
   document.getElementById('emptyState').style.display = list.length ? 'none' : 'block';
   if(!list.length){ wrap.innerHTML=''; return; }
   const tilts = [-1.6,-0.8,0,0.8,1.6,1.2,-1.2,0.4];
   wrap.innerHTML = list.map((im,idx)=>{
-    const stars = '★'.repeat(im.rating||0) + '☆'.repeat(5-(im.rating||0));
+    const rt = Math.min(5, Math.max(0, Math.round(+im.rating)||0)); // 恶意 rating 防崩
+    const stars = '★'.repeat(rt) + '☆'.repeat(5-rt);
     const tags = (im.tags||[]).slice(0,3).map(t=>`<span class="tag-mini">${escapeHtml(t)}</span>`).join('');
     const checked = selected.has(im.id) ? 'checked' : '';
     const sel = selecting ? 'selecting' : '';
     const tilt = tilts[idx % tilts.length];
-    return `<div class="polaroid ${sel} ${checked}" data-id="${im.id}" style="--tilt:${tilt}deg;animation-delay:${Math.min(idx*40,560)}ms" onclick="cardClick(event,'${im.id}')">
+    return `<div class="polaroid ${sel} ${checked}" data-id="${escapeHtml(im.id)}" style="--tilt:${tilt}deg;animation-delay:${Math.min(idx*40,560)}ms">
       <span class="tape tl"></span><span class="tape br"></span>
       <span class="pin p1"></span><span class="pin p2"></span>
-      <button class="fav-pin ${im.fav?'on':''}" onclick="event.stopPropagation();toggleFav('${im.id}')">${im.fav?'💗':'🤍'}</button>
+      <button class="fav-pin ${im.fav?'on':''}" data-fav="${escapeHtml(im.id)}">${im.fav?'💗':'🤍'}</button>
       <div class="sel-mark">✓</div>
       <div class="ph-frame"><img src="${im.dataUrl}" loading="lazy" alt="${escapeHtml(im.name)}" /></div>
       <div class="ph-name">${escapeHtml(im.name||'未命名')}</div>
@@ -766,42 +837,62 @@ function renderGallery(){
   }).join('');
   renderTagFilter();
 }
-function cardClick(e, id){
+function cardEl(id){
+  try{ return document.querySelector('.polaroid[data-id="'+CSS.escape(id)+'"]'); }
+  catch(e){ return document.querySelector('.polaroid[data-id="'+id+'"]'); }
+}
+function cardClick(id){
   if(selecting){
-    const card = e.currentTarget;
-    if(selected.has(id)){ selected.delete(id); card.classList.remove('checked'); }
-    else { selected.add(id); card.classList.add('checked'); }
+    const card = cardEl(id);
+    if(selected.has(id)){ selected.delete(id); if(card) card.classList.remove('checked'); }
+    else { selected.add(id); if(card) card.classList.add('checked'); }
     updateBatchbar(); return;
   }
   openViewer(id);
 }
+/* 画廊事件委托：id 走 data 属性，不再拼进 JS 字符串 */
+document.getElementById('galleryWrap').addEventListener('click', e=>{
+  const fav = e.target.closest('.fav-pin');
+  if(fav && fav.dataset.fav){ toggleFav(fav.dataset.fav); return; }
+  const card = e.target.closest('.polaroid');
+  if(card && card.dataset.id) cardClick(card.dataset.id);
+});
 function renderTagFilter(){
   const box = document.getElementById('tagFilter');
   const tagCount = {};
   images.forEach(i=> (i.tags||[]).forEach(t=> tagCount[t]=(tagCount[t]||0)+1));
   const tags = Object.keys(tagCount).sort((a,b)=>tagCount[b]-tagCount[a]);
   const cur = activeTag();
-  box.innerHTML = tags.slice(0,30).map(t=>`<button class="pill ${cur===t?'on':''}" data-tag="${escapeHtml(t)}" onclick="setTag('${escapeHtml(t)}')">${escapeHtml(t)} · ${tagCount[t]}</button>`).join('');
+  let show = tags.slice(0,30);
+  if(cur && !show.includes(cur)) show = show.concat([cur]); // 激活中的标签永远保持在列，不会「消失」
+  box.innerHTML = show.map(t=>`<button class="pill ${cur===t?'on':''}" data-tag="${escapeHtml(t)}">${escapeHtml(t)} · ${tagCount[t]}</button>`).join('');
 }
 function setTag(t){
-  const chips = document.querySelectorAll('#tagFilter .pill');
-  const cur = activeTag();
-  chips.forEach(c=> c.classList.toggle('on', c.dataset.tag===t && cur!==t));
+  document.querySelectorAll('#tagFilter .pill').forEach(c=> c.classList.toggle('on', t!=null && c.dataset.tag===t));
   renderGallery();
 }
+document.getElementById('tagFilter').addEventListener('click', e=>{
+  const p = e.target.closest('.pill'); if(!p) return;
+  if(p.classList.contains('on')) setTag(null); // 再点一次 = 取消该标签筛选
+  else setTag(p.dataset.tag || null);
+});
 function renderAlbumBar(){
   const bar = document.getElementById('albumBar');
   const albums = getAlbums();
   const counts = {};
   images.forEach(i=>{ const a=i.album||'未分类'; counts[a]=(counts[a]||0)+1; });
-  let html = `<button class="album-chip ${!currentAlbum?'on':''}" onclick="setAlbum(null)">🗂️ 全部 · ${images.length}</button>`;
-  html += `<button class="album-chip ${currentAlbum==='未分类'?'on':''}" onclick="setAlbum('未分类')">📁 未分类 · ${counts['未分类']||0}</button>`;
+  let html = `<button class="album-chip ${!currentAlbum?'on':''}" data-album="">🗂️ 全部 · ${images.length}</button>`;
+  html += `<button class="album-chip ${currentAlbum==='未分类'?'on':''}" data-album="未分类">📁 未分类 · ${counts['未分类']||0}</button>`;
   albums.forEach(a=>{
-    html += `<button class="album-chip ${currentAlbum===a?'on':''}" onclick="setAlbum('${escapeHtml(a)}')">📚 ${escapeHtml(a)} · ${counts[a]||0}</button>`;
+    html += `<button class="album-chip ${currentAlbum===a?'on':''}" data-album="${escapeHtml(a)}">📚 ${escapeHtml(a)} · ${counts[a]||0}</button>`;
   });
   bar.innerHTML = html;
 }
 function setAlbum(a){ currentAlbum = a; renderAlbumBar(); renderGallery(); }
+document.getElementById('albumBar').addEventListener('click', e=>{
+  const c = e.target.closest('.album-chip'); if(!c) return;
+  setAlbum(c.dataset.album || null);
+});
 function setFilter(f){
   currentFilter = f;
   document.getElementById('chipAll').classList.toggle('on', f==='all');
@@ -821,18 +912,27 @@ async function handleFiles(files){
   const arr = Array.from(files||[]).filter(f=>f.type.startsWith('image/'));
   if(!arr.length){ toast('没有识别到图片哦～'); return; }
   toast('正在收下 '+arr.length+' 张…');
-  let ok = 0;
+  let ok = 0, dup = 0, fail = 0;
+  const seenHash = new Set(images.map(x=>x.hash).filter(Boolean));
   for(const f of arr){
     try{
-      const dataUrl = await readFileAsDataURL(f);
+      let dataUrl = await readFileAsDataURL(f);
+      const hash = contentHash(dataUrl);
+      if(seenHash.has(hash)){ dup++; continue; } // 内容去重：同一张图不收第二遍
+      seenHash.add(hash);
+      dataUrl = await maybeCompress(dataUrl);
       const dims = await readDims(dataUrl);
       const name = f.name.replace(/\.[^.]+$/,'');
-      await dbPut({ id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'本地上传', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:f.size, addedAt:Date.now() });
-      ok++;
-    }catch(e){ console.warn(e); }
+      const good = await safePut({ id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'本地上传', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:dataUrlBytes(dataUrl), addedAt:Date.now(), hash });
+      if(good) ok++; else fail++;
+    }catch(e){ fail++; console.warn(e); }
   }
-  await refresh(); candyRain(70); starBurst(innerWidth/2, innerHeight/2);
-  toast('成功收下 '+ok+' 张TA！🧁');
+  await refresh();
+  if(ok){ candyRain(70); starBurst(innerWidth/2, innerHeight/2); }
+  let msg = '成功收下 '+ok+' 张TA！🧁';
+  if(dup) msg += ' · 跳过重复 '+dup+' 张';
+  if(fail) msg += ' · '+fail+' 张没存进去（存储空间可能不足）🥺';
+  toast(msg);
 }
 async function importByUrl(){
   const url = prompt('粘贴图片「直链」地址（右键图片→复制图片地址，通常以 .jpg/.png/.webp/.gif 结尾）：');
@@ -844,10 +944,14 @@ async function importByUrl(){
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     const blob = await resp.blob();
     if(!blob.type.startsWith('image/')) throw new Error('not image');
-    const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(blob); });
+    let dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(blob); });
+    const hash = contentHash(dataUrl);
+    if(images.some(x=>x.hash===hash)){ toast('这张图已经收过啦，不重复收～'); return; }
+    dataUrl = await maybeCompress(dataUrl);
     const dims = await readDims(dataUrl);
     const name = (url.split('/').pop()||'').split('?')[0].replace(/\.[^.]+$/,'') || '来自链接';
-    await dbPut({ id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'链接导入', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:blob.size, addedAt:Date.now() });
+    const good = await safePut({ id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'链接导入', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:dataUrlBytes(dataUrl), addedAt:Date.now(), hash });
+    if(!good){ toast('存储失败：浏览器空间可能不足 🥺'); return; }
     await refresh(); candyRain(40); toast('链接图片收下啦～💕');
   }catch(e){
     toast('抓取失败：该图站可能开了防盗链(CORS)。请右键图片「另存为」到本地，再上传吧～🥺');
@@ -863,31 +967,32 @@ document.addEventListener('paste', e => {
 
 /* ==================== 查看器 ==================== */
 function openViewer(id){
-  currentVid = id; zoom = 1;
+  currentVid = id; zoom = 1; panX = 0; panY = 0;
   const im = images.find(x=>x.id===id); if(!im) return;
   const img = document.getElementById('vImg');
-  img.src = im.dataUrl; img.style.transform = 'scale(1)';
+  img.src = im.dataUrl; applyZoom();
   const dims = (im.w&&im.h) ? `${im.w}×${im.h}px` : '尺寸未知';
   const sizeStr = im.size ? bytesToSize(im.size) : '大小未知';
   document.getElementById('vInfo').innerHTML = `
     <h2>${escapeHtml(im.name||'未命名')}</h2>
     <div class="viewer-src">📎 来源：${escapeHtml(im.source||'未知')}<br>📐 ${dims} · 💾 ${sizeStr}<br>🗓️ 加入于 ${new Date(im.addedAt).toLocaleString('zh-CN')}</div>
-    <div class="star-row" id="starRow">${[1,2,3,4,5].map(n=>`<button class="${(im.rating||0)>=n?'on':''}" onclick="setRating(${n})">★</button>`).join('')}</div>
+    <div class="star-row" id="starRow">${[1,2,3,4,5].map(n=>`<button class="${Math.min(5,Math.max(0,Math.round(+im.rating)||0))>=n?'on':''}" onclick="setRating(${n})">★</button>`).join('')}</div>
     <div class="field"><label>名字</label><input type="text" id="vName" value="${escapeHtml(im.name||'')}" /></div>
     <div class="field"><label>标签（逗号/空格分隔）</label><input type="text" id="vTags" value="${escapeHtml((im.tags||[]).join('、'))}" /></div>
     <div class="field"><label>合集</label><select id="vAlbum">${albumOptions(im.album)}</select></div>
     <div class="field"><label>备注</label><textarea id="vNote" rows="3">${escapeHtml(im.note||'')}</textarea></div>
     <div class="viewer-actions">
-      <button class="candy" onclick="saveViewer()"><span class="cb">💾</span>保存</button>
-      <button class="candy ${im.fav?'mint':'ghost'}" onclick="favFromViewer('${im.id}')">${im.fav?'💗 已收藏':'🤍 收藏'}</button>
-      <button class="candy sky" onclick="downloadOne('${im.id}')"><span class="cb">⬇️</span>下载</button>
-      <button class="candy gold" onclick="copyImage('${im.id}')"><span class="cb">📋</span>复制图片</button>
-      <button class="candy danger" onclick="deleteOne('${im.id}')"><span class="cb">🗑️</span>删除</button>
+      <button class="candy" data-act="vsave"><span class="cb">💾</span>保存</button>
+      <button class="candy ${im.fav?'mint':'ghost'}" data-act="vfav" data-id="${escapeHtml(im.id)}">${im.fav?'💗 已收藏':'🤍 收藏'}</button>
+      <button class="candy sky" data-act="vdownload" data-id="${escapeHtml(im.id)}"><span class="cb">⬇️</span>下载</button>
+      <button class="candy gold" data-act="vcopy" data-id="${escapeHtml(im.id)}"><span class="cb">📋</span>复制图片</button>
+      <button class="candy danger" data-act="vdelete" data-id="${escapeHtml(im.id)}"><span class="cb">🗑️</span>删除</button>
     </div>`;
   document.getElementById('viewer').classList.add('open');
 }
 function albumOptions(cur){
   const albums = getAlbums();
+  if(cur && cur!=='未分类' && !albums.includes(cur)) albums.push(cur); // 孤儿合集兑底：不存在的合集也出现在下拉里，保存时不会被悄悄改掉
   const opts = ['未分类', ...albums].map(a=>`<option value="${escapeHtml(a)}" ${a===cur?'selected':''}>${escapeHtml(a)}</option>`).join('');
   return opts;
 }
@@ -913,26 +1018,58 @@ function vNav(d){
   if(idx<0) return;
   openViewer(list[(idx+d+list.length)%list.length].id);
 }
-function zoomImg(dz){
+function applyZoom(){
   const img = document.getElementById('vImg');
-  zoom = dz===0 ? 1 : Math.min(4, Math.max(0.4, zoom+dz));
-  img.style.transform = `scale(${zoom})`;
+  if(!img) return;
+  img.style.transform = `translate(${panX}px,${panY}px) scale(${zoom})`;
+  const wrap = document.getElementById('vImgwrap');
+  if(wrap) wrap.style.touchAction = zoom>1 ? 'none' : '';
 }
+function zoomImg(dz){
+  if(dz===0){ zoom = 1; panX = 0; panY = 0; }
+  else { zoom = Math.min(4, Math.max(0.4, zoom+dz)); if(zoom<=1){ panX=0; panY=0; } }
+  applyZoom();
+}
+/* 放大后可拖拽平移 + 双击快速缩放（鼠标/触屏都支持） */
+(function(){
+  const wrap = document.getElementById('vImgwrap');
+  const img = document.getElementById('vImg');
+  let drag = null;
+  wrap.addEventListener('pointerdown', e=>{
+    if(e.target.closest('button') || zoom<=1) return;
+    drag = { x:e.clientX-panX, y:e.clientY-panY };
+    img.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+  addEventListener('pointermove', e=>{ if(!drag) return; panX = e.clientX-drag.x; panY = e.clientY-drag.y; applyZoom(); });
+  addEventListener('pointerup', ()=>{ if(drag){ drag = null; img.style.cursor = 'grab'; } });
+  img.addEventListener('dblclick', ()=>{ zoom = zoom>1 ? 1 : 2; panX = 0; panY = 0; applyZoom(); });
+})();
 function favFromViewer(id){ toggleFav(id); openViewer(id); }
 async function toggleFav(id){
   const im = images.find(x=>x.id===id); if(!im) return;
   im.fav = !im.fav;
   await dbPut(im);
-  const b = document.querySelector(`.fav-pin[onclick*="${id}"]`);
+  let b = null;
+  try{ b = document.querySelector('.fav-pin[data-fav="'+CSS.escape(id)+'"]'); }catch(e){}
   if(b){ b.classList.toggle('on', im.fav); b.textContent = im.fav?'💗':'🤍'; }
   if(im.fav){ const r=b?b.getBoundingClientRect():{x:innerWidth/2,y:innerHeight/2,width:38,height:38}; starBurst(r.x+r.width/2, r.y+r.height/2); }
   await refreshStats();
   toast(im.fav?'收藏成功，好好珍藏他 💗':'取消收藏啦 🤍');
 }
+function extFromDataUrl(d){
+  const m = /^data:image\/([\w+.-]+)[;,]/.exec(String(d||''));
+  if(!m) return 'png';
+  const t = m[1].toLowerCase();
+  return t==='jpeg' ? 'jpg' : (t==='svg+xml' ? 'svg' : t);
+}
+function safeFileName(s){
+  return String(s||'可爱男孩').replace(/[\\\/:*?"<>|\s]+/g,'_').slice(0,80) || '可爱男孩';
+}
 async function downloadOne(id){
   const im = images.find(x=>x.id===id); if(!im) return;
   const a = document.createElement('a');
-  a.href = im.dataUrl; a.download = (im.name||'可爱男孩')+'.png';
+  a.href = im.dataUrl; a.download = safeFileName(im.name)+'.'+extFromDataUrl(im.dataUrl);
   document.body.appendChild(a); a.click(); a.remove();
   toast('开始下载～ ⬇️');
 }
@@ -960,6 +1097,7 @@ function startSlideshow(){
   ssList = filtered();
   if(!ssList.length){ toast('没有可播放的图片哦～'); return; }
   ssIdx = 0; ssPaused = false;
+  document.getElementById('ssPauseBtn').textContent = '⏸ 暂停';
   document.getElementById('slideshow').classList.add('open');
   showSs();
   ssTimer = setInterval(()=>{ if(!ssPaused) ssNext(); }, 3200);
@@ -978,11 +1116,24 @@ function ssToggle(){
 }
 function stopSlideshow(){ document.getElementById('slideshow').classList.remove('open'); clearInterval(ssTimer); }
 addEventListener('keydown', e => {
-  if(!document.getElementById('slideshow').classList.contains('open')) return;
-  if(e.key==='ArrowRight') ssNext();
-  else if(e.key==='ArrowLeft') ssPrev();
-  else if(e.key===' ') { e.preventDefault(); ssToggle(); }
-  else if(e.key==='Escape') stopSlideshow();
+  const ssOpen = document.getElementById('slideshow').classList.contains('open');
+  if(ssOpen){
+    if(e.key==='ArrowRight') ssNext();
+    else if(e.key==='ArrowLeft') ssPrev();
+    else if(e.key===' ') { e.preventDefault(); ssToggle(); }
+    else if(e.key==='Escape') stopSlideshow();
+    return;
+  }
+  // 查看器键盘操作：Esc 关闭 / ←→ 翻页 / +-0 缩放
+  if(!document.getElementById('viewer').classList.contains('open')) return;
+  const t = e.target;
+  if(t && t.closest && t.closest('input,textarea,select')) return; // 输入框里的按键不拦截
+  if(e.key==='ArrowRight') vNav(1);
+  else if(e.key==='ArrowLeft') vNav(-1);
+  else if(e.key==='Escape') closeViewer();
+  else if(e.key==='+'||e.key==='=') zoomImg(0.2);
+  else if(e.key==='-') zoomImg(-0.2);
+  else if(e.key==='0') zoomImg(0);
 });
 
 /* ==================== 批量选择 ==================== */
@@ -1068,9 +1219,9 @@ function renderSources(){
         <div class="s-name">${s.name}</div>
         <div class="s-desc">${s.desc}</div>
         <div class="s-actions">
-          <button class="candy sm" onclick="openUrl('${encodeURIComponent(s.home)}','${escapeHtml(s.name)}')">🏠 直达</button>
-          <button class="candy mint sm" onclick="searchSrc('${encodeURIComponent(s.search)}','${escapeHtml(s.name)}')">🔍 搜索</button>
-          <button class="candy ghost sm" onclick="copyUrl('${encodeURIComponent(s.home)}')">📋 复制</button>
+          <button class="candy sm" data-act="open" data-url="${encodeURIComponent(s.home)}" data-name="${escapeHtml(s.name)}">🏠 直达</button>
+          <button class="candy mint sm" data-act="search" data-url="${encodeURIComponent(s.search)}" data-name="${escapeHtml(s.name)}">🔍 搜索</button>
+          <button class="candy ghost sm" data-act="copy" data-url="${encodeURIComponent(s.home)}">📋 复制</button>
         </div>
       </div>`;
     });
@@ -1087,19 +1238,19 @@ function renderRecent(){
   const row = document.getElementById('recentRow');
   const list = getRecent();
   if(!list.length){ row.innerHTML = '<span class="desc">还没有访问记录，去点开一个图站试试吧～</span>'; return; }
-  row.innerHTML = list.map(r=>`<button class="pill" onclick="openUrl('${encodeURIComponent(r.url)}','${escapeHtml(r.name)}')">🕘 ${escapeHtml(r.name)}</button>`).join('');
+  row.innerHTML = list.map(r=>`<button class="pill" data-act="open" data-url="${encodeURIComponent(r.url)}" data-name="${escapeHtml(r.name)}">🕘 ${escapeHtml(r.name)}</button>`).join('');
 }
 function openUrl(u, name){
   u = decodeURIComponent(u);
   recordRecent(name, u);
-  window.open(u, '_blank');
+  window.open(u, '_blank', 'noopener,noreferrer'); // 防 tabnabbing
 }
 function searchSrc(tpl, name){
   const kw = prompt('想搜什么关键词？（例如：ぽっちゃり 男 / chubby boy / 胖男孩）');
   if(!kw) return;
   const url = decodeURIComponent(tpl).replace('{q}', encodeURIComponent(kw.trim()));
   recordRecent(name+'·搜索', url);
-  window.open(url, '_blank');
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 function copyUrl(u){
   navigator.clipboard.writeText(decodeURIComponent(u)).then(()=>toast('链接已复制 📋')).catch(()=>toast('复制失败，请手动复制 🥺'));
@@ -1114,9 +1265,9 @@ function renderCustomSources(){
     <div class="s-name">${escapeHtml(s.name)}</div>
     <div class="s-desc" style="word-break:break-all">${escapeHtml(s.url)}</div>
     <div class="s-actions">
-      <button class="candy sm" onclick="openUrl('${encodeURIComponent(s.url.replace('{q}',''))}','${escapeHtml(s.name)}')">🏠 直达</button>
-      <button class="candy mint sm" onclick="searchSrc('${encodeURIComponent(s.url)}','${escapeHtml(s.name)}')">🔍 搜索</button>
-      <button class="candy danger sm" onclick="delCustomSrc(${i})">🗑️</button>
+      <button class="candy sm" data-act="open" data-url="${encodeURIComponent(s.url.replace('{q}',''))}" data-name="${escapeHtml(s.name)}">🏠 直达</button>
+      <button class="candy mint sm" data-act="search" data-url="${encodeURIComponent(s.url)}" data-name="${escapeHtml(s.name)}">🔍 搜索</button>
+      <button class="candy danger sm" data-act="delsrc" data-i="${i}">🗑️</button>
     </div>
   </div>`).join('') || '<p class="desc" style="grid-column:1/-1;text-align:center;padding:12px">还没有自定义图源，添加一个吧～</p>';
 }
@@ -1130,6 +1281,22 @@ function addCustomSrc(){
   renderCustomSources(); toast('图源添加好啦 🌐');
 }
 function delCustomSrc(i){ const list=getCustomSrc(); list.splice(i,1); saveCustomSrc(list); renderCustomSources(); toast('图源已删除'); }
+/* 图源/标签管理：全局事件委托，参数走 data 属性，杜绝引号注入 */
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const act = b.dataset.act;
+  if(act==='open') openUrl(b.dataset.url, b.dataset.name||'');
+  else if(act==='search') searchSrc(b.dataset.url, b.dataset.name||'');
+  else if(act==='copy') copyUrl(b.dataset.url);
+  else if(act==='delsrc') delCustomSrc(+b.dataset.i);
+  else if(act==='renametag') renameTag(b.dataset.tag);
+  else if(act==='deltag') delTag(b.dataset.tag);
+  else if(act==='vsave') saveViewer();
+  else if(act==='vfav') favFromViewer(b.dataset.id);
+  else if(act==='vdownload') downloadOne(b.dataset.id);
+  else if(act==='vcopy') copyImage(b.dataset.id);
+  else if(act==='vdelete') deleteOne(b.dataset.id);
+});
 
 /* ==================== 数据管理 ==================== */
 function bytesToSize(b){
@@ -1197,6 +1364,7 @@ async function delAlbum(i){
   const name = albums[i];
   if(!confirm('删除合集「'+name+'」？其中的图片会移到「未分类」。')) return;
   albums.splice(i,1); saveAlbums(albums);
+  if(currentAlbum===name) currentAlbum = null; // 正在浏览被删合集时回到「全部」，避免假空白
   for(const im of images){ if(im.album===name){ im.album='未分类'; await dbPut(im); } }
   await refresh(); renderData(); toast('合集已删除，图片移到未分类 🗑️');
 }
@@ -1208,8 +1376,8 @@ function renderTagList(){
   box.innerHTML = tags.map(t=>`<div class="mgmt-item">
     <span class="mi-name">🏷️ ${escapeHtml(t)}</span>
     <span class="mi-count">${tagCount[t]} 张</span>
-    <button class="candy ghost sm" onclick="renameTag('${escapeHtml(t)}')">✏️</button>
-    <button class="candy danger sm" onclick="delTag('${escapeHtml(t)}')">🗑️</button>
+    <button class="candy ghost sm" data-act="renametag" data-tag="${escapeHtml(t)}">✏️</button>
+    <button class="candy danger sm" data-act="deltag" data-tag="${escapeHtml(t)}">🗑️</button>
   </div>`).join('');
 }
 async function renameTag(old){
@@ -1233,6 +1401,8 @@ function downloadText(name, text){
 }
 function exportAll(){
   if(!images.length){ toast('还没有图片可以导出～'); return; }
+  const est = images.reduce((s,i)=>s+dataUrlBytes(i.dataUrl),0);
+  if(est > 150*1024*1024 && !confirm('图库约 '+bytesToSize(est)+'，导出文件会很大，生成时页面可能卡顿几秒～ 继续吗？')) return;
   downloadText('胖男孩图片_完整备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images}));
   candyRain(55); toast('全部 '+images.length+' 张已导出 📤');
 }
@@ -1255,14 +1425,43 @@ async function handleImport(files){
     const data = JSON.parse(text);
     const arr = Array.isArray(data.images) ? data.images : (Array.isArray(data)?data:[]);
     if(!arr.length){ toast('备份文件里没有找到图片数据 🥺'); return; }
-    let added = 0;
+    let added = 0, fail = 0, skip = 0;
+    const albums = getAlbums();
+    const seen = new Set(images.map(x=>x.id));
     for(const im of arr){
-      if(!im || !im.dataUrl) continue;
-      if(images.find(x=>x.id===im.id)) continue;
-      await dbPut(Object.assign({ tags:[], note:'', rating:0, fav:false, source:'导入', album:'未分类', addedAt:Date.now() }, im, { id: im.id || uid() }));
-      added++;
+      try{
+        if(!im || typeof im.dataUrl!=='string' || !/^data:image\//.test(im.dataUrl)) continue;
+        const idOk = typeof im.id==='string' && /^[\w-]{1,64}$/.test(im.id);
+        if(idOk && seen.has(im.id)){ skip++; continue; }
+        const id = idOk ? im.id : uid();
+        seen.add(id);
+        const album = (typeof im.album==='string' && im.album.trim()) ? im.album.trim().slice(0,40) : '未分类';
+        if(album!=='未分类' && !albums.includes(album)) albums.push(album); // 备份里的合集自动并入列表，归属不再悄悄丢失
+        const good = await safePut({
+          id,
+          name: (typeof im.name==='string' && im.name.trim()) ? im.name.trim().slice(0,80) : '未命名',
+          tags: Array.isArray(im.tags) ? im.tags.filter(t=>typeof t==='string' && t.trim()).map(t=>t.trim().slice(0,30)).slice(0,30) : [],
+          note: typeof im.note==='string' ? im.note.slice(0,500) : '',
+          rating: Math.min(5, Math.max(0, Math.round(+im.rating)||0)),
+          fav: !!im.fav,
+          source: (typeof im.source==='string' && im.source.trim()) ? im.source.trim().slice(0,60) : '导入',
+          album,
+          dataUrl: im.dataUrl,
+          w: (+im.w>0 ? Math.round(+im.w) : 0),
+          h: (+im.h>0 ? Math.round(+im.h) : 0),
+          size: (+im.size>0 ? +im.size : dataUrlBytes(im.dataUrl)),
+          addedAt: (+im.addedAt>0 ? +im.addedAt : Date.now()),
+          hash: contentHash(im.dataUrl)
+        });
+        if(good) added++; else fail++;
+      }catch(e){ fail++; }
     }
-    await refresh(); candyRain(70); toast('导入完成，新增 '+added+' 张 📥');
+    saveAlbums(albums);
+    await refresh(); candyRain(70);
+    let msg = '导入完成，新增 '+added+' 张 📥';
+    if(skip) msg += ' · 跳过已有 '+skip+' 张';
+    if(fail) msg += ' · '+fail+' 张写入失败（空间不足？）';
+    toast(msg);
   }catch(e){ toast('导入失败：文件格式不对 🥺'); }
 }
 async function clearAll(){
@@ -1272,6 +1471,18 @@ async function clearAll(){
 }
 
 /* ==================== 拖拽上传 ==================== */
+/* 全局拦截：文件拖到页面任何角落都不让浏览器「跳走」直接打开图片 */
+document.addEventListener('dragover', e=>{
+  if(!e.dataTransfer) return;
+  if(Array.from(e.dataTransfer.types||[]).includes('Files')) e.preventDefault();
+});
+document.addEventListener('drop', e=>{
+  if(!e.dataTransfer) return;
+  if(!Array.from(e.dataTransfer.types||[]).includes('Files')) return;
+  e.preventDefault(); // 拖到页面任何角落，都不许浏览器跳走打开图片
+  if(e.target.closest && e.target.closest('#dropzone')) return; // dropzone 自己处理
+  if(e.dataTransfer.files && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); // 松手落在哪都直接收图
+});
 const dz = document.getElementById('dropzone');
 dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('drag'); });
 dz.addEventListener('dragleave', ()=>{ dz.classList.remove('drag'); });
@@ -1288,6 +1499,12 @@ function switchTab(name, btn){
 }
 
 /* ==================== 刷新 ==================== */
+function repairAlbums(){
+  // 自愈：图片里引用了合集列表外的名字（旧版导入遗留）时自动补回，三处统计不再打架
+  const albums = getAlbums(); let changed = false;
+  images.forEach(i=>{ const a=i.album; if(a && a!=='未分类' && !albums.includes(a)){ albums.push(a); changed=true; } });
+  if(changed){ saveAlbums(albums); renderAlbumBar(); }
+}
 async function refresh(){
   images = await dbGetAll();
   renderGallery(); renderAlbumBar(); refreshStats();
@@ -1307,10 +1524,19 @@ function refreshStats(){
 
 /* ==================== 启动 ==================== */
 (async function init(){
-  const savedTheme = localStorage.getItem('album_theme') || '';
+  let savedTheme = '';
+  try{ savedTheme = localStorage.getItem('album_theme') || ''; }catch(e){}
   applyTheme(savedTheme);
-  await openDB();
+  renderCompressToggle();
+  try{ await openDB(); }
+  catch(e){
+    console.warn(e);
+    document.getElementById('emptyState').style.display = 'block';
+    toast('浏览器限制了本地存储（无痕/隐私模式？），暂时收不了图 🥺');
+    return;
+  }
   await refresh();
+  repairAlbums();
   renderSources(); renderData();
   setTimeout(()=>{ candyRain(36); toast('欢迎来到噜噜大王の好图收纳屋 🧁'); }, 300);
 })();
