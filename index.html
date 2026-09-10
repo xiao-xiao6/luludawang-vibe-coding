@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>噜噜大王の好图收纳屋 🧁</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧁%3C/text%3E%3C/svg%3E" />
+<script>
+/* 首帧防闪：在样式表之前就把上次的风格写进 <html>，刷新时不再「先亮色再跳变」 */
+(function(){try{
+  var V=['cafe','pixel','win','mag','hud'];
+  var M={strawberry:'cafe',matcha:'mag',starry:'hud',blueberry:'hud',lemon:'cafe',peach:'cafe',mint:'cafe',chocolate:'mag','':'cafe'};
+  var s=localStorage.getItem('album_theme')||'cafe';
+  if(V.indexOf(s)<0) s=M[s]||'cafe';
+  document.documentElement.setAttribute('data-style',s);
+}catch(e){document.documentElement.setAttribute('data-style','cafe')}})();
+</script>
 <style>
 /* ============ 主题皮肤 ============ */
 :root{
@@ -19,94 +29,171 @@
   --shadow-hover:0 16px 40px rgba(180,140,100,.26);
   --radius:20px;
 }
-[data-theme="strawberry"]{
-  --bg:#fdf0f2; --bg-deep:#fbe0e6;
-  --paper:#fffafb; --card:#ffffff;
-  --ink:#6b3a48; --ink-soft:#b5808e; --ink-faint:#d9b3bd;
-  --accent:#e56b8d; --accent-deep:#cf4e74; --accent-soft:#fbe1e8;
-  --accent2:#c98fb8; --accent2-soft:#f4e4f0;
-  --accent3:#e7a1b0; --accent3-soft:#fbe7ec;
-  --gold:#e8b25a; --gold-soft:#fdf0d5;
-  --line:#f4dce2; --shadow:0 8px 24px rgba(200,120,140,.16);
-  --shadow-hover:0 16px 40px rgba(200,120,140,.26);
+/* ============================================================
+   5 套「整合式风格皮肤」：属性挂在 <html data-style="…"> 上
+   每套 = 20 个变量全量覆盖 + 一组布局覆盖 + 可选装饰伪元素
+   不动 DOM 结构 / 不动 IndexedDB / 不动任何业务函数
+   值域：cafe | pixel | win | mag | hud
+   ============================================================ */
+
+/* ── ☕ cafe 甜品小屋：沿用上面 :root 的暖色，只补瀑布流列数 ── */
+[data-style="cafe"]{--wf-cols:4;--wf-cols-sm:3;--wf-cols-xs:2}
+
+/* ── 🎮 pixel 图鉴终端 ── */
+[data-style="pixel"]{
+  color-scheme:dark;
+  --bg:#0d1420; --bg-deep:#080d16; --paper:#111a28; --card:#16202f;
+  --ink:#d8e8f0; --ink-soft:#8aa7bd; --ink-faint:#4a6076;
+  --accent:#4ade80; --accent-deep:#22b45f; --accent-soft:#16321f;
+  --accent2:#fbbf24; --accent2-soft:#3a2f10;
+  --accent3:#38bdf8; --accent3-soft:#0d2a3a;
+  --gold:#fbbf24; --gold-soft:#3a2f10;
+  --line:#25374d;
+  --shadow:0 0 0 2px #060b13, 0 4px 0 rgba(0,0,0,.5);
+  --shadow-hover:0 0 0 2px var(--accent), 0 6px 0 rgba(0,0,0,.55);
+  --radius:4px; --wf-cols:4; --wf-cols-sm:3; --wf-cols-xs:2;
 }
-[data-theme="matcha"]{
-  --bg:#f3f7ec; --bg-deep:#e6efd9;
-  --paper:#fbfdf6; --card:#ffffff;
-  --ink:#46503a; --ink-soft:#87927b; --ink-faint:#c2c9b7;
-  --accent:#6fae6f; --accent-deep:#4f944f; --accent-soft:#e0f0dc;
-  --accent2:#d9a05b; --accent2-soft:#f6ecda;
-  --accent3:#7fa8d9; --accent3-soft:#e2edf9;
-  --gold:#e8b25a; --gold-soft:#fdf0d5;
-  --line:#dfe8d5; --shadow:0 8px 24px rgba(130,150,110,.16);
-  --shadow-hover:0 16px 40px rgba(130,150,110,.26);
+[data-style="pixel"] body{background-image:none}
+[data-style="pixel"] .cloud{display:none}
+[data-style="pixel"] *{font-family:ui-monospace,"Courier New",Consolas,monospace;letter-spacing:.06em}
+[data-style="pixel"] .brand h1,[data-style="pixel"] .sheet h2{text-transform:uppercase}
+[data-style="pixel"] .candy,[data-style="pixel"] .nav-item{border-radius:2px;text-transform:uppercase}
+[data-style="pixel"] .candy::after{display:none}
+[data-style="pixel"] .nav-item.active::after{content:"◂";margin-left:8px}
+[data-style="pixel"] .sticky{border-radius:2px;transform:none;border:2px solid var(--line)}
+[data-style="pixel"] .sticky:hover{transform:none;border-color:var(--accent)}
+[data-style="pixel"] .polaroid{transform:none;border-radius:4px;padding:6px}
+[data-style="pixel"] .polaroid:hover{transform:none;box-shadow:var(--shadow-hover)}
+[data-style="pixel"] .tape,[data-style="pixel"] .pin{display:none}
+[data-style="pixel"] .polaroid .ph-frame{border-radius:0}
+[data-style="pixel"] .polaroid img{image-rendering:pixelated;aspect-ratio:1/1;object-fit:cover}
+[data-style="pixel"] .ph-name{text-transform:uppercase;text-align:left}
+/* 深色风格下气泡/批量条反色，避免「浅底白字」看不清 */
+[data-style="pixel"] .bubble,[data-style="hud"] .bubble,[data-style="pixel"] .batchbar,[data-style="hud"] .batchbar{background:rgba(8,13,20,.94);color:var(--accent);border:1px solid var(--accent)}
+[data-style="pixel"] .bubble::after,[data-style="hud"] .bubble::after{background:rgba(8,13,20,.94)}
+/* CRT 扫描线：纯伪元素，z-index 低于查看器/幻灯片，不遮弹层 */
+[data-style="pixel"] body::after{content:"";position:fixed;inset:0;z-index:400;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px)}
+
+/* ── 🗂 win 资源管理器（等价于「详细信息列表」视图） ── */
+[data-style="win"]{
+  --bg:#3b6ea5; --bg-deep:#2f5b8a; --paper:#ece9d8; --card:#ffffff;
+  --ink:#1b1b1b; --ink-soft:#4a4a4a; --ink-faint:#8b8b8b;
+  --accent:#0a246a; --accent-deep:#001a4d; --accent-soft:#cfe0f5;
+  --accent2:#316ac5; --accent2-soft:#dbe7f7;
+  --accent3:#7ba2d6; --accent3-soft:#e8f0fa;
+  --gold:#e3b04b; --gold-soft:#fdf3d9;
+  --line:#aca899;
+  --shadow:0 0 0 1px #7a7568, inset 1px 1px 0 #ffffff, inset -1px -1px 0 #d4d0c8;
+  --shadow-hover:0 0 0 1px #316ac5, inset 1px 1px 0 #ffffff, inset -1px -1px 0 #d4d0c8;
+  --radius:0px; --wf-cols:1; --wf-cols-sm:1; --wf-cols-xs:1;
 }
-[data-theme="starry"]{
-  --bg:#2a2440; --bg-deep:#1f1b31;
-  --paper:#34304e; --card:#3a3557;
-  --ink:#ece7f7; --ink-soft:#a89fc9; --ink-faint:#6b6390;
-  --accent:#b89ae8; --accent-deep:#a07fd6; --accent-soft:#3d3660;
-  --accent2:#9ad0e8; --accent2-soft:#2e3d55;
-  --accent3:#e8b25a; --accent3-soft:#4a3d2a;
-  --gold:#e8b25a; --gold-soft:#4a3d2a;
-  --line:#4a4470; --shadow:0 8px 24px rgba(10,8,20,.5);
-  --shadow-hover:0 16px 40px rgba(10,8,20,.6);
+[data-style="win"] body{background-image:none}
+[data-style="win"] .cloud{display:none}
+[data-style="win"] *{font-family:Tahoma,"MS Sans Serif","Microsoft YaHei",sans-serif}
+[data-style="win"] .topbar{background:linear-gradient(180deg,#0a75e0,#0a246a);color:#fff;padding:6px 10px;border-radius:4px 4px 0 0;margin-bottom:0;box-shadow:inset 1px 1px 0 rgba(255,255,255,.5)}
+[data-style="win"] .brand h1,[data-style="win"] .brand .sub{color:#fff}
+[data-style="win"] .logo{border-radius:0;background:#fff;animation:none}
+[data-style="win"] .logo::after{display:none}
+/* 两栏：左「文件夹面板」+ 右「内容」——只作用于相册页，其余页面保持单栏 */
+[data-style="win"] #tab-gallery.active{display:grid;grid-template-columns:264px minmax(0,1fr);gap:12px;align-items:start}
+[data-style="win"] #emptyState{grid-column:2}
+@media(max-width:760px){[data-style="win"] #tab-gallery.active{display:block}}
+[data-style="win"] .sheet{background:var(--paper);border:2px groove #ffffff;border-radius:0}
+[data-style="win"] .nav-item{border-radius:4px 4px 0 0;background:var(--paper);box-shadow:none;border:1px solid var(--line);border-bottom:none}
+[data-style="win"] .nav-item.active{background:var(--paper);color:var(--ink);box-shadow:inset 1px 1px 0 #fff}
+[data-style="win"] .nav-item.active .nb{color:var(--ink)}
+[data-style="win"] .candy{background:linear-gradient(180deg,#fdfdfd,#d8d8d8);color:#1b1b1b;border:1px solid #003c74;border-radius:2px}
+[data-style="win"] .candy::after{display:none}
+[data-style="win"] .sticky{transform:none;border-radius:0;border:none;background:var(--paper)}
+[data-style="win"] .sticky:hover{transform:none}
+/* 瀑布流 → 详细信息列表（纯 CSS，无 DOM 改动） */
+[data-style="win"] .waterfall{column-count:1}
+[data-style="win"] .polaroid{display:flex;align-items:center;gap:12px;transform:none;border-bottom:1px solid var(--line);box-shadow:none;margin-bottom:0;animation:none;padding:6px 42px 6px 8px}
+[data-style="win"] .polaroid:hover{transform:none;background:var(--accent2-soft);box-shadow:none}
+[data-style="win"] .polaroid .ph-frame{flex:0 0 84px;width:84px;height:64px;background:none}
+[data-style="win"] .polaroid img{height:100%;object-fit:cover}
+[data-style="win"] .ph-name{text-align:left;padding:0;min-width:150px;margin-top:0}
+[data-style="win"] .ph-meta{justify-content:flex-start;margin-top:0}
+[data-style="win"] .fav-pin{top:50%;right:6px;transform:translateY(-50%);width:30px;height:30px;font-size:16px}
+[data-style="win"] .fav-pin:hover{transform:translateY(-50%) scale(1.15)}
+[data-style="win"] .sel-mark{top:50%;left:6px;transform:translateY(-50%);width:26px;height:26px;font-size:14px}
+[data-style="win"] .tape,[data-style="win"] .pin{display:none}
+
+/* ── 📖 mag 收藏画册 ── */
+[data-style="mag"]{
+  --bg:#faf8f4; --bg-deep:#f2efe8; --paper:#ffffff; --card:#ffffff;
+  --ink:#1f1c18; --ink-soft:#6b6459; --ink-faint:#b3ab9d;
+  --accent:#9c4a2f; --accent-deep:#7d3a24; --accent-soft:#f3e7e0;
+  --accent2:#5b6b52; --accent2-soft:#e9ede5;
+  --accent3:#3f5d7a; --accent3-soft:#e6ebf1;
+  --gold:#a8832f; --gold-soft:#f7f0dd;
+  --line:#e5e0d6;
+  --shadow:0 1px 0 rgba(0,0,0,.04);
+  --shadow-hover:0 12px 30px rgba(0,0,0,.10);
+  --radius:2px; --wf-cols:2; --wf-cols-sm:2; --wf-cols-xs:1;
 }
-[data-theme="blueberry"]{
-  --bg:#eef2fb; --bg-deep:#e0e7f7;
-  --paper:#fbfcff; --card:#ffffff;
-  --ink:#3d4368; --ink-soft:#7c84a8; --ink-faint:#b6bcd6;
-  --accent:#6c7fd6; --accent-deep:#5264c4; --accent-soft:#e4e9fb;
-  --accent2:#9a8fd6; --accent2-soft:#efeafb;
-  --accent3:#7fb8d9; --accent3-soft:#e2f1f9;
-  --gold:#e8b25a; --gold-soft:#fdf0d5;
-  --line:#dde3f2; --shadow:0 8px 24px rgba(110,130,190,.16);
-  --shadow-hover:0 16px 40px rgba(110,130,190,.26);
+[data-style="mag"] body{background-image:none}
+[data-style="mag"] .cloud{display:none}
+[data-style="mag"] *{font-family:"Songti SC","Noto Serif SC",Georgia,"SimSun",serif}
+[data-style="mag"] .wrap{max-width:1040px}
+[data-style="mag"] .brand h1{letter-spacing:.14em;font-weight:400}
+/* 统计条 → 报头 */
+[data-style="mag"] .sticky-row{gap:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:16px 0}
+[data-style="mag"] .sticky{background:none;border:none;border-radius:0;box-shadow:none;transform:none;padding:0 26px;flex-direction:column;align-items:flex-start}
+[data-style="mag"] .sticky:hover{transform:none}
+[data-style="mag"] .sticky b{font-size:26px;order:-1}
+[data-style="mag"] .candy{background:none;color:var(--ink);border:1px solid var(--ink);border-radius:0;letter-spacing:.1em;box-shadow:none}
+[data-style="mag"] .candy::after{display:none}
+[data-style="mag"] .nav-item{background:none;box-shadow:none;border-radius:0;padding:8px 0;margin-right:22px;color:var(--ink-soft)}
+[data-style="mag"] .nav-item.active{background:none;color:var(--ink);box-shadow:none;border-bottom:2px solid var(--ink)}
+[data-style="mag"] .nav-item.active .nb{color:var(--ink)}
+[data-style="mag"] .sheet{border:none;box-shadow:none;padding:0 0 28px}
+[data-style="mag"] .dropzone{border-width:1px;border-color:var(--line);padding:56px 20px}
+[data-style="mag"] .polaroid{transform:none;padding:0;background:none;box-shadow:none;margin-bottom:34px}
+[data-style="mag"] .polaroid:hover{transform:none;box-shadow:none}
+[data-style="mag"] .tape,[data-style="mag"] .pin{display:none}
+[data-style="mag"] .polaroid .ph-frame{background:none;border-radius:0}
+[data-style="mag"] .polaroid img{filter:saturate(.96)}
+[data-style="mag"] .ph-name{font-style:italic;text-align:left;padding:12px 0 0;font-size:15px}
+[data-style="mag"] .ph-meta{justify-content:flex-start}
+
+/* ── 🚀 hud 归档终端 ── */
+[data-style="hud"]{
+  color-scheme:dark;
+  --bg:#04070d; --bg-deep:#02040a;
+  --paper:rgba(12,22,34,.72); --card:rgba(14,26,40,.66);
+  --ink:#cfeaf5; --ink-soft:#7ea3b8; --ink-faint:#3c5768;
+  --accent:#22d3ee; --accent-deep:#0891b2; --accent-soft:rgba(34,211,238,.14);
+  --accent2:#a855f7; --accent2-soft:rgba(168,85,247,.16);
+  --accent3:#f472b6; --accent3-soft:rgba(244,114,182,.14);
+  --gold:#facc15; --gold-soft:rgba(250,204,21,.14);
+  --line:rgba(34,211,238,.28);
+  --shadow:0 0 0 1px rgba(34,211,238,.22), 0 0 22px rgba(34,211,238,.10);
+  --shadow-hover:0 0 0 1px rgba(34,211,238,.55), 0 0 34px rgba(34,211,238,.22);
+  --radius:10px; --wf-cols:5; --wf-cols-sm:3; --wf-cols-xs:2;
 }
-[data-theme="lemon"]{
-  --bg:#fdf8e3; --bg-deep:#f9f0c8;
-  --paper:#fffef6; --card:#ffffff;
-  --ink:#6a5c2e; --ink-soft:#a39658; --ink-faint:#d2c796;
-  --accent:#e8c14f; --accent-deep:#cfa52e; --accent-soft:#fbf0cc;
-  --accent2:#d9a05b; --accent2-soft:#f6ecda;
-  --accent3:#8fbf6f; --accent3-soft:#e6f2dc;
-  --gold:#e8b25a; --gold-soft:#fdf0d5;
-  --line:#efe6bf; --shadow:0 8px 24px rgba(200,170,60,.16);
-  --shadow-hover:0 16px 40px rgba(200,170,60,.26);
-}
-[data-theme="peach"]{
-  --bg:#fdf1e4; --bg-deep:#fbe4cf;
-  --paper:#fffaf4; --card:#ffffff;
-  --ink:#7a5235; --ink-soft:#b08768; --ink-faint:#d8b9a0;
-  --accent:#f09a6a; --accent-deep:#d67f4a; --accent-soft:#fbe7d8;
-  --accent2:#e8a06f; --accent2-soft:#f7e9dc;
-  --accent3:#7fb89a; --accent3-soft:#e2f2ea;
-  --gold:#e8b25a; --gold-soft:#fdf0d5;
-  --line:#f2dfca; --shadow:0 8px 24px rgba(210,140,90,.16);
-  --shadow-hover:0 16px 40px rgba(210,140,90,.26);
-}
-[data-theme="mint"]{
-  --bg:#e9f6f0; --bg-deep:#d8eee3;
-  --paper:#f6fdf9; --card:#ffffff;
-  --ink:#335a4c; --ink-soft:#6f9486; --ink-faint:#b2cfc3;
-  --accent:#4cb897; --accent-deep:#349b7c; --accent-soft:#dcf3ea;
-  --accent2:#7fb8d9; --accent2-soft:#e2f1f9;
-  --accent3:#d9b86f; --accent3-soft:#f7efd6;
-  --gold:#e8b25a; --gold-soft:#fdf0d5;
-  --line:#d3e9df; --shadow:0 8px 24px rgba(80,160,130,.16);
-  --shadow-hover:0 16px 40px rgba(80,160,130,.26);
-}
-[data-theme="chocolate"]{
-  --bg:#f5ead9; --bg-deep:#eadbc4;
-  --paper:#fdf8ef; --card:#fffdf8;
-  --ink:#5a4128; --ink-soft:#9a7f5f; --ink-faint:#cbb592;
-  --accent:#a9744a; --accent-deep:#8b5a33; --accent-soft:#f0e2d0;
-  --accent2:#c98f6b; --accent2-soft:#f4e7dc;
-  --accent3:#8fa86a; --accent3-soft:#e9f0dd;
-  --gold:#c9994a; --gold-soft:#f6e8ce;
-  --line:#e6d6bf; --shadow:0 8px 24px rgba(160,120,80,.16);
-  --shadow-hover:0 16px 40px rgba(160,120,80,.26);
-}
+[data-style="hud"] body{background-image:linear-gradient(rgba(34,211,238,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.05) 1px,transparent 1px);background-size:34px 34px}
+[data-style="hud"] .wrap{max-width:1400px}
+[data-style="hud"] *{font-family:ui-monospace,"SF Mono",Consolas,monospace;letter-spacing:.04em}
+[data-style="hud"] .cloud{display:none}
+/* 玻璃面板 + 四角括号（伪元素，零 DOM 改动；模糊只给 .sheet，不铺到卡片） */
+[data-style="hud"] .sheet{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:10px;position:relative}
+[data-style="hud"] .sheet::before,[data-style="hud"] .sheet::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;border-color:var(--accent);border-style:solid}
+[data-style="hud"] .sheet::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
+[data-style="hud"] .sheet::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+[data-style="hud"] .candy{background:rgba(34,211,238,.10);color:var(--accent);border:1px solid var(--accent);box-shadow:none}
+[data-style="hud"] .candy::after{display:none}
+[data-style="hud"] .nav-item{background:transparent;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+[data-style="hud"] .nav-item.active{background:linear-gradient(135deg,rgba(34,211,238,.22),rgba(168,85,247,.22));box-shadow:0 0 20px rgba(34,211,238,.28);color:#eafcff}
+[data-style="hud"] .sticky{background:rgba(34,211,238,.06);border:1px solid var(--line);transform:none;border-radius:8px}
+[data-style="hud"] .sticky:hover{transform:none;box-shadow:0 0 18px rgba(34,211,238,.2)}
+[data-style="hud"] .polaroid{transform:none;border-radius:8px;padding:6px}
+[data-style="hud"] .polaroid:hover{transform:translateY(-4px)}
+[data-style="hud"] .tape,[data-style="hud"] .pin{display:none}
+[data-style="hud"] .gridview{gap:10px}
+/* HUD 扫描带 */
+[data-style="hud"] body::after{content:"";position:fixed;left:0;right:0;height:120px;z-index:400;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(34,211,238,.06),transparent);animation:hudScan 7s linear infinite}
+@keyframes hudScan{from{top:-120px}to{top:100%}}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
@@ -150,10 +237,13 @@ body{
 @keyframes logoWiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-3px)}}
 .brand h1{font-size:24px;font-weight:900;letter-spacing:1px;color:var(--accent-deep)}
 .brand .sub{font-size:13px;color:var(--ink-soft);margin-top:2px}
-.theme-pick{display:grid;grid-template-columns:repeat(3,30px);gap:7px;margin-left:auto;align-content:start}
-.theme-dot{width:30px;height:30px;border-radius:50%;border:3px solid #fff;cursor:pointer;box-shadow:var(--shadow);transition:.2s;position:relative}
-.theme-dot:hover{transform:scale(1.2)}
-.theme-dot.on{outline:3px solid var(--accent);outline-offset:2px}
+.style-pick{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap;align-items:center}
+.style-btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:800;color:var(--ink-soft);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:7px 13px;box-shadow:var(--shadow);transition:.2s}
+.style-btn:hover{transform:translateY(-2px);color:var(--accent-deep)}
+.style-btn.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.style-btn .sb-ico{font-size:15px}
+.style-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+@media(max-width:620px){.style-btn .sb-txt{display:none}.style-btn{padding:7px 10px}}
 
 /* 统计便签 */
 .sticky-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
@@ -248,10 +338,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .album-chip:hover{transform:translateY(-2px)}
 
 /* 拍立得卡片 */
-.waterfall{column-count:4;column-gap:18px;margin-top:18px}
+.waterfall{column-count:var(--wf-cols,4);column-gap:18px;margin-top:18px}
 .gridview{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;margin-top:18px}
-@media(max-width:900px){.waterfall{column-count:3}}
-@media(max-width:620px){.waterfall{column-count:2}}
+@media(max-width:900px){.waterfall{column-count:var(--wf-cols-sm,3)}}
+@media(max-width:620px){.waterfall{column-count:var(--wf-cols-xs,2)}}
 .polaroid{
   position:relative;break-inside:avoid;margin-bottom:20px;background:var(--card);
   padding:10px 10px 12px;border-radius:6px;box-shadow:var(--shadow);
@@ -385,16 +475,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       <h1>噜噜大王の好图收纳屋</h1>
       <div class="sub"> ✿ 这里是噜噜大王制作的图片收藏小窝，你喜欢的任何图片都可以存在这里哦~✿</div>
     </div>
-    <div class="theme-pick" id="themePick">
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf3e7,#e8825a)" data-theme="" title="奶油"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf0f2,#e56b8d)" data-theme="strawberry" title="草莓"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#f3f7ec,#6fae6f)" data-theme="matcha" title="抹茶"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#2a2440,#b89ae8)" data-theme="starry" title="星空"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#eef2fb,#6c7fd6)" data-theme="blueberry" title="蓝莓"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf8e3,#e8c14f)" data-theme="lemon" title="柠檬"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf1e4,#f09a6a)" data-theme="peach" title="蜜桃"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#e9f6f0,#4cb897)" data-theme="mint" title="薄荷"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#f5ead9,#a9744a)" data-theme="chocolate" title="巧克力"></button>
+    <div class="style-pick" id="stylePick" role="group" aria-label="界面风格">
+      <button class="style-btn on" data-style="cafe"  aria-pressed="true"  title="甜品小屋"><span class="sb-ico">☕</span><span class="sb-txt">甜品小屋</span></button>
+      <button class="style-btn" data-style="pixel" aria-pressed="false" title="图鉴终端"><span class="sb-ico">🎮</span><span class="sb-txt">图鉴终端</span></button>
+      <button class="style-btn" data-style="win"   aria-pressed="false" title="资源管理器"><span class="sb-ico">🗂</span><span class="sb-txt">资源管理器</span></button>
+      <button class="style-btn" data-style="mag"   aria-pressed="false" title="收藏画册"><span class="sb-ico">📖</span><span class="sb-txt">收藏画册</span></button>
+      <button class="style-btn" data-style="hud"   aria-pressed="false" title="归档终端"><span class="sb-ico">🚀</span><span class="sb-txt">归档终端</span></button>
+    </div>
     </div>
   </div>
 
@@ -566,15 +653,25 @@ function resizeSky(){
   sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 resizeSky(); addEventListener('resize', resizeSky);
-const SKY_SHAPES = ['☁','♡','✦','✿','●','★','🍬'];
-const SKY_COLORS = ['#e8825a','#7fb89a','#7fa8d9','#e8b25a','#e56b8d','#c98fb8'];
+/* 背景粒子按当前风格取形取色（切风格时 applyStyle 会清空重播） */
+const SKY_PALETTE = {
+  cafe:  { shapes:['☁','♡','✦','✿','●','★','🍬'], colors:['#e8825a','#7fb89a','#7fa8d9','#e8b25a','#e56b8d','#c98fb8'] },
+  pixel: { shapes:['▮','▯','◆','▣','+','▲'],                 colors:['#4ade80','#fbbf24','#38bdf8'] },
+  win:   { shapes:['📁','📄','🗂','💾','🖱'],                 colors:['#316ac5','#e3b04b','#7ba2d6'] },
+  mag:   { shapes:['✦','❋','❦','◦','·'],                     colors:['#9c4a2f','#5b6b52','#a8832f'] },
+  hud:   { shapes:['+','×','◇','▹','▚'],                     colors:['#22d3ee','#a855f7','#f472b6'] }
+};
+function skyPalette(){
+  return SKY_PALETTE[document.documentElement.dataset.style] || SKY_PALETTE.cafe;
+}
 function skySpawn(init){
+  const pal = skyPalette();
   SKY.push(Object.assign({
     x:Math.random()*innerWidth, y: init?Math.random()*innerHeight:innerHeight+40,
     s: 9+Math.random()*16, sp: .3+Math.random()*1.1, drift:(Math.random()-.5)*.5,
     a: .22+Math.random()*.4, rot:Math.random()*Math.PI, vr:(Math.random()-.5)*.015,
-    ch: SKY_SHAPES[Math.floor(Math.random()*SKY_SHAPES.length)],
-    col: SKY_COLORS[Math.floor(Math.random()*SKY_COLORS.length)]
+    ch: pal.shapes[Math.floor(Math.random()*pal.shapes.length)],
+    col: pal.colors[Math.floor(Math.random()*pal.colors.length)]
   }, init||{}));
 }
 for(let i=0;i<38;i++) skySpawn({init:true});
@@ -637,8 +734,17 @@ document.addEventListener('click', e => {
 function candyRain(n=60){
   if(REDUCE_MOTION && REDUCE_MOTION.matches) return;
   const layer = document.getElementById('sparkleLayer');
-  const emojis = ['🍬','🧁','🎀','💗','🍡','✨','🍓','⭐'];
-  const colors = ['#e8825a','#7fb89a','#7fa8d9','#e8b25a','#e56b8d','#c98fb8'];
+  const curStyle = document.documentElement.dataset.style || 'cafe';
+  const PAL = {
+    cafe:  { e:['🍬','🧁','🎀','💗','🍡','✨','🍓','⭐'], c:['#e8825a','#7fb89a','#7fa8d9','#e8b25a','#e56b8d','#c98fb8'] },
+    pixel: { e:['▮','▯','◆','▣','+','▲'],                c:['#4ade80','#fbbf24','#38bdf8'] },
+    win:   { e:['📁','📄','🗂','💾','🖱'],                c:['#316ac5','#e3b04b','#7ba2d6'] },
+    mag:   { e:['✦','❋','❦','◦','·'],                    c:['#9c4a2f','#5b6b52','#a8832f'] },
+    hud:   { e:['+','×','◇','▹','▚'],                    c:['#22d3ee','#a855f7','#f472b6'] }
+  };
+  const _p = PAL[curStyle] || PAL.cafe;
+  const emojis = _p.e;
+  const colors = _p.c;
   for(let i=0;i<n;i++){
     const c = document.createElement('span');
     c.style.cssText = 'position:absolute;top:-30px;pointer-events:none;animation:candyFall linear forwards;';
@@ -688,15 +794,43 @@ function toast(msg){
 }
 
 /* ==================== 主题 ==================== */
-function applyTheme(t){
-  document.body.setAttribute('data-theme', t);
-  try{ localStorage.setItem('album_theme', t); }catch(e){}
-  document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('on', d.dataset.theme===t));
+/* ==================== 界面风格（5 套整合式皮肤） ==================== */
+const STYLES = ['cafe','pixel','win','mag','hud'];
+const STYLE_LABEL = { cafe:'甜品小屋 ☕', pixel:'图鉴终端 🎮', win:'资源管理器 🗂', mag:'收藏画册 📖', hud:'归档终端 🚀' };
+function applyStyle(s, silent){
+  if(STYLES.indexOf(s) < 0) s = 'cafe';
+  document.documentElement.setAttribute('data-style', s);
+  try{ localStorage.setItem('album_theme', s); }catch(e){}
+  document.querySelectorAll('.style-btn').forEach(b=>{
+    const on = b.dataset.style === s;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  if(!silent) toast('已切换到 ' + STYLE_LABEL[s]);
+  // 背景粒子跟着换色换形，立即生效（旧粒子不清会残留上一套风格的颗粒）
+  try{ if(typeof skySpawn === 'function'){ SKY.length = 0; for(let i=0;i<38;i++) skySpawn({init:true}); } }catch(e){}
+  // 没手动切过视图时，视图跟随风格默认值（pixel / hud = 网格，其余 = 瀑布流）
+  try{
+    if(!window.__viewTouched){
+      const nv = (s==='pixel' || s==='hud') ? 'grid' : 'waterfall';
+      if(currentView !== nv){ currentView = nv; if(typeof renderGallery === 'function') renderGallery(); }
+    }
+  }catch(e){}
 }
-document.getElementById('themePick').addEventListener('click', e => {
-  const d = e.target.closest('.theme-dot'); if(!d) return;
-  applyTheme(d.dataset.theme);
-  toast('换上新皮肤啦～ 🎨');
+/* 兼容旧函数名：万一还有遗留调用点也不会报错 */
+function applyTheme(t){ applyStyle(t, true); }
+const _stylePick = document.getElementById('stylePick');
+if(_stylePick) _stylePick.addEventListener('click', e => {
+  const b = e.target.closest('.style-btn'); if(!b) return;
+  applyStyle(b.dataset.style);
+});
+/* 手动点过「切换视图」后，视图不再被风格默认值覆盖 */
+(function(){ const b = document.getElementById('viewBtn'); if(b) b.addEventListener('click', ()=>{ window.__viewTouched = true; }); })();
+/* 彩蛋：Alt+1..5 快捷切换风格 */
+addEventListener('keydown', e => {
+  if(!e.altKey) return;
+  const i = ['1','2','3','4','5'].indexOf(e.key);
+  if(i >= 0){ e.preventDefault(); applyStyle(STYLES[i]); }
 });
 
 /* ==================== IndexedDB ==================== */
@@ -1524,9 +1658,9 @@ function refreshStats(){
 
 /* ==================== 启动 ==================== */
 (async function init(){
-  let savedTheme = '';
-  try{ savedTheme = localStorage.getItem('album_theme') || ''; }catch(e){}
-  applyTheme(savedTheme);
+  let savedTheme = 'cafe';
+  try{ savedTheme = localStorage.getItem('album_theme') || 'cafe'; }catch(e){}
+  applyStyle(savedTheme, true);
   renderCompressToggle();
   try{ await openDB(); }
   catch(e){
