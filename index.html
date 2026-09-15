@@ -261,8 +261,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 }
 @keyframes stickerIn{from{opacity:0;transform:translateY(30px) scale(.7) rotate(var(--tilt,0deg))}to{opacity:1;transform:translateY(0) scale(1) rotate(var(--tilt,0deg))}}
 .polaroid:hover{transform:rotate(0) translateY(-8px) scale(1.03);box-shadow:var(--shadow-hover);z-index:4}
-.polaroid .ph-frame{position:relative;background:#efe6db;border-radius:3px;overflow:hidden}
-.polaroid img{width:100%;display:block;background:var(--bg-deep)}
+.polaroid .ph-frame{position:relative;background:#efe6db;border-radius:3px;overflow:hidden;min-height:96px}
+.polaroid .ph-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:var(--bg-deep);opacity:0;transition:opacity .25s}
+.polaroid .ph-frame.ready img{opacity:1}
+/* B 方案：原图住在文件夹里，卡片滚到附近才去磁盘取图；还没取到时先给个占位标记 */
+.polaroid .ph-frame:not(.ready)::after{content:'🖼️';position:absolute;inset:0;display:grid;place-items:center;font-size:24px;opacity:.22}
+.polaroid .ph-frame.lock::after{content:'🔒';opacity:.6}
 .polaroid .ph-name{margin-top:9px;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px;text-align:center}
 .polaroid .ph-meta{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;flex-wrap:wrap}
 .stars{color:var(--gold);font-size:13px;letter-spacing:1px}
@@ -315,6 +319,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .data-card .d-emoji{font-size:34px}
 .data-card .d-num{font-size:28px;font-weight:900;margin:5px 0;color:var(--accent-deep)}
 .data-card .d-label{font-size:13px;color:var(--ink-soft)}
+.folder-status{display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:14px;font-size:13px}
+.folder-status .fs-dot{width:10px;height:10px;border-radius:50%;background:var(--ink-faint);flex:none;margin-top:4px}
+.folder-status.on .fs-dot{background:var(--accent2);box-shadow:0 0 0 3px var(--accent2-soft)}
+.folder-status.warn .fs-dot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.folder-status .fs-text{flex:1;color:var(--ink-soft);line-height:1.65;word-break:break-all}
+.folder-status .fs-text b{color:var(--ink)}
 .mgmt-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;max-height:280px;overflow-y:auto}
 .mgmt-item{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font-size:13px}
 .mgmt-item .mi-name{font-weight:800;flex:1}
@@ -403,7 +413,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
     <div class="sticky" style="--r:1deg">💗 收藏 <b id="stFav">0</b> 张</div>
     <div class="sticky" style="--r:-1deg">🏷️ 标签 <b id="stTag">0</b> 个</div>
     <div class="sticky" style="--r:1.5deg">📚 合集 <b id="stAlbum">0</b> 个</div>
-    <div class="sticky" style="--r:-2deg">📦 占用 <b id="stSize">0 KB</b></div>
+    <div class="sticky" style="--r:-2deg">📦 原图 <b id="stSize">0 KB</b></div>
   </div>
 
   <nav class="nav">
@@ -428,6 +438,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <div class="dz-emoji">🐻‍❄️</div>
         <h3>把TA贴进来吧</h3>
         <p>点击选择 · 多张批量 · 直接拖拽 · 甚至 Ctrl+V 粘贴都可以哦</p>
+      </div>
+      <div class="folder-status warn" id="permHint" style="display:none;cursor:pointer" onclick="folderHintClick()" title="点一下处理图库文件夹">
+        <span class="fs-dot"></span><span class="fs-text">正在检查图库文件夹…</span>
       </div>
       <div class="filters">
         <input type="search" id="searchBox" placeholder="🔍 搜名字 / 标签 / 备注…" style="flex:1;min-width:180px" oninput="searchDebounce()" />
@@ -477,8 +490,23 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
   <!-- 数据管理 -->
   <section id="tab-data">
     <div class="sheet">
+      <h2>📁 图库文件夹（原图主库）</h2>
+      <p class="desc">原图<b>只存</b>在你指定的盘（D:\ / E:\ / 移动硬盘都行），浏览器里只留名字 / 标签 / 评分这些「文字索引」。图库再大，C 盘也只占几 MB。缓存被清空也不怕，扫描文件夹就能把整个图库恢复回来。</p>
+      <div class="folder-status" id="folderStatus"><span class="fs-dot"></span><span class="fs-text">正在检查…</span></div>
+      <div class="toolbar" style="margin-top:16px">
+        <button class="candy" onclick="pickFolder()"><span class="cb">📁</span>选择图库文件夹</button>
+        <button class="candy mint" onclick="reGrantFolder()"><span class="cb">🔓</span>重新授权</button>
+        <button class="candy sky" onclick="pushAllToFolder()"><span class="cb">⬆️</span>迁入文件夹并释放C盘</button>
+        <button class="candy gold" onclick="scanFolderRestore()"><span class="cb">🔄</span>扫描文件夹恢复</button>
+        <button class="candy ghost" onclick="reloadThumbs()"><span class="cb">🖼️</span>重新读取原图</button>
+        <button class="candy danger" onclick="forgetFolder()"><span class="cb">🔌</span>断开文件夹</button>
+      </div>
+      <p class="desc" style="margin-top:14px">文件夹里会有 <b>images</b>（原图）和 <b>_meta.json</b>（名字 / 标签 / 评分 / 合集）。删除不会硬删，而是移进 <b>_trash</b>，手滑也还有救。⚠️ 浏览器重启后授权会过期（安全设计，原图主库唯一的代价）：点一次「🔓 重新授权」，就能继续看图与写入。</p>
+    </div>
+
+    <div class="sheet">
       <h2>🗃️ 数据管理</h2>
-      <p class="desc">所有图片都存在浏览器本地数据库里，随时备份、迁移、还原。</p>
+      <p class="desc">原图在文件夹里，浏览器只存索引。随时备份、迁移、还原。</p>
       <div class="data-grid" id="dataGrid"></div>
       <div class="toolbar" style="margin-top:20px">
         <button class="candy" onclick="exportAll()"><span class="cb">📤</span>导出全部(含图)</button>
@@ -700,19 +728,412 @@ document.getElementById('themePick').addEventListener('click', e => {
 });
 
 /* ==================== IndexedDB ==================== */
-const DB_NAME='soft-gallery', DB_VER=1, STORE='images';
+const DB_NAME='soft-gallery', DB_VER=2, STORE='images', HSTORE='handles'; // v2：新增 handles 仓，用来记住主人选定的图库文件夹
 let db=null;
 function openDB(){ return new Promise((res,rej)=>{
   const req = indexedDB.open(DB_NAME, DB_VER);
-  req.onupgradeneeded = e => { const d=e.target.result; if(!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE,{keyPath:'id'}); };
+  req.onupgradeneeded = e => { const d=e.target.result;
+    if(!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE,{keyPath:'id'});
+    if(!d.objectStoreNames.contains(HSTORE)) d.createObjectStore(HSTORE); // 存文件夹句柄，旧库升级时自动补上
+  };
   req.onsuccess = e => { db=e.target.result; res(db); };
   req.onerror = e => rej(e);
 });}
 function st(mode){ return db.transaction(STORE, mode).objectStore(STORE); }
-function dbPut(rec){ return new Promise((res,rej)=>{ const r=st('readwrite').put(rec); r.onsuccess=()=>res(); r.onerror=e=>rej(e); }); }
+/* B 方案核心：原图已经落到文件夹（file 有值）时，索引里不再留像素 —— C 盘几乎不占空间。
+   还没拿到文件夹授权时保留 dataUrl，保证图一张都不会丢。 */
+function metaOnly(rec){
+  const slim = Object.assign({}, rec);
+  delete slim.imgUrl; delete slim.loading; delete slim.failed;
+  if(slim.file) delete slim.dataUrl;
+  return slim;
+}
+function dbPut(rec){ return new Promise((res,rej)=>{ const r=st('readwrite').put(metaOnly(rec)); r.onsuccess=()=>{ scheduleMetaWrite(); res(); }; r.onerror=e=>rej(e); }); }
+/* 兜底用：浏览器不支持文件夹时，才把原图留在浏览器里（旧模式） */
+function dbPutRaw(rec){ return new Promise((res,rej)=>{ const r=st('readwrite').put(rec); r.onsuccess=()=>{ scheduleMetaWrite(); res(); }; r.onerror=e=>rej(e); }); }
 function dbGetAll(){ return new Promise((res,rej)=>{ const r=st('readonly').getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=e=>rej(e); }); }
-function dbDel(id){ return new Promise((res,rej)=>{ const r=st('readwrite').delete(id); r.onsuccess=()=>res(); r.onerror=e=>rej(e); }); }
-function dbClear(){ return new Promise((res,rej)=>{ const r=st('readwrite').clear(); r.onsuccess=()=>res(); r.onerror=e=>rej(e); }); }
+async function dbDel(id){
+  const rec = images.find(x=>x.id===id);
+  dropImg(id); // 内存里的预览地址也一起放掉
+  await flushMeta();                   // 先把还挂着的元数据落盘，再动索引
+  if(rec) await trashFromFolder(rec);  // 文件夹里的原图先搬进 _trash，而不是直接抹掉
+  return new Promise((res,rej)=>{ const r=st('readwrite').delete(id); r.onsuccess=()=>res(); r.onerror=e=>rej(e); });
+}
+async function dbClear(){
+  await flushMeta();                    // 清空前先存一份，元数据不会跟着一起消失
+  for(const im of images){ dropImg(im.id); await trashFromFolder(im); } // 清空时同样先搬进 _trash
+  IMG_CACHE.forEach((u,k)=>dropImg(k));
+  return new Promise((res,rej)=>{ const r=st('readwrite').clear(); r.onsuccess=()=>res(); r.onerror=e=>rej(e); });
+}
+
+/* ==================== 本地文件夹存档（File System Access API） ==================== */
+/* 图片的「原图」只住在主人指定的盘（D:\ / E:\ …），浏览器里只留文字索引。
+   即使浏览器数据被清空，也能用「扫描文件夹恢复」把整个图库找回来。 */
+let galleryDir = null;   // 已授权的根文件夹句柄（原图主库）
+let metaTimer = null;
+
+function folderSupported(){ return typeof window.showDirectoryPicker === 'function'; }
+function hst(mode){ return db.transaction(HSTORE, mode).objectStore(HSTORE); }
+function hPut(k,v){ return new Promise((res,rej)=>{ const r=hst('readwrite').put(v,k); r.onsuccess=()=>res(); r.onerror=e=>rej(e); }); }
+function hGet(k){ return new Promise((res,rej)=>{ const r=hst('readonly').get(k); r.onsuccess=()=>res(r.result||null); r.onerror=e=>rej(e); }); }
+function hDel(k){ return new Promise((res,rej)=>{ const r=hst('readwrite').delete(k); r.onsuccess=()=>res(); r.onerror=e=>rej(e); }); }
+
+/* data:URL → Blob（写文件用，避免把 base64 原样塞进磁盘） */
+function dataUrlToBlob(d){
+  const s = String(d||''); const k = s.indexOf(',');
+  if(k < 0) return new Blob([]);
+  const head = s.slice(0,k), body = s.slice(k+1);
+  const m = /data:([^;]+)/.exec(head);
+  const type = m ? m[1] : 'image/png';
+  const bin = /;base64/i.test(head) ? atob(body) : decodeURIComponent(body);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type});
+}
+function fileToDataUrl(file){
+  return new Promise((res,rej)=>{ const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+}
+/* 文件名带 id 前缀，扫描恢复时才能把图和标签信息对上号 */
+function folderFileName(rec, ext){ return rec.id + '__' + safeFileName(rec.name || '可爱男孩') + '.' + (ext || 'png'); }
+
+/* 授权检查：needGrant=false 时只问不回弹（用于后台自动写入） */
+async function verifyPermission(handle, needGrant){
+  if(!handle) return false;
+  const opt = {mode:'readwrite'};
+  try{
+    if(await handle.queryPermission(opt) === 'granted') return true;
+    if(!needGrant) return false;
+    return (await handle.requestPermission(opt)) === 'granted';
+  }catch(e){ return false; }
+}
+async function ensureSubdir(){ return galleryDir ? await galleryDir.getDirectoryHandle('images', {create:true}) : null; }
+
+/* ==================== 原图按需读取（B 方案：原图只住在文件夹里） ==================== */
+const IMG_CACHE = new Map();    // id → blob: 地址（只活在内存里，浏览器重启就没了）
+const IMG_PENDING = new Map();  // id → 正在读盘的 Promise，避免同一张重复读
+const MAX_CACHE = 100;          // 内存里最多留 100 张预览，超了就回收最早的那张
+
+function dropImg(id){
+  const u = IMG_CACHE.get(id);
+  if(u){ try{ URL.revokeObjectURL(u); }catch(e){} IMG_CACHE.delete(id); }
+}
+function trimCache(){
+  while(IMG_CACHE.size > MAX_CACHE){
+    const k = IMG_CACHE.keys().next().value;
+    if(k === currentVid) break; // 正在看的那张先留着
+    dropImg(k);
+  }
+}
+/* 旧版（镜像备份方案）留在浏览器里的原图：迁移前也能照常显示 */
+function legacyDataUrl(rec){ return /^data:image\//.test(String((rec && rec.dataUrl) || '')) ? rec.dataUrl : ''; }
+/* 文件夹里是不是真的还有这张原图 */
+async function folderHasFile(path){
+  if(!path || !galleryDir || !folderSupported()) return false;
+  const base = String(path).split('/').pop();
+  if(!base) return false;
+  try{
+    if(!await verifyPermission(galleryDir, false)) return false;
+    const dir = await ensureSubdir();
+    await dir.getFileHandle(base); // 文件不存在会直接抛错
+    return true;
+  }catch(e){ return false; }
+}
+async function readFromFolder(rec){
+  if(!rec || !rec.file || !galleryDir || !folderSupported()) return '';
+  if(!await verifyPermission(galleryDir, false)) throw new Error('permission');
+  const base = String(rec.file).split('/').pop();
+  if(!base) return '';
+  const dir = await ensureSubdir();
+  const fh = await dir.getFileHandle(base);
+  return URL.createObjectURL(await fh.getFile());
+}
+/* 取一张图的显示地址：内存缓存 → 文件夹原图 → 旧版浏览器里的原图（迁移前的兜底） */
+async function loadImg(id, force){
+  const rec = images.find(x=>x.id===id);
+  if(!rec) return '';
+  if(!force && IMG_CACHE.has(id)) return IMG_CACHE.get(id);
+  if(IMG_PENDING.has(id)) return IMG_PENDING.get(id);
+  const job = (async ()=>{
+    try{ const u = await readFromFolder(rec); if(u){ IMG_CACHE.set(id, u); trimCache(); return u; } }catch(e){}
+    return legacyDataUrl(rec);
+  })();
+  IMG_PENDING.set(id, job);
+  try{ return await job; } finally{ IMG_PENDING.delete(id); }
+}
+/* 没有授权时给首页顶一条提示，点一下就能就地处理 */
+function folderHintClick(){
+  if(!folderSupported()){ toast('这个浏览器不支持文件夹读写，建议用 Chrome / Edge 打开～ 🥺'); return; }
+  if(!galleryDir){ pickFolder(); return; }
+  reGrantFolder();
+}
+function setPermHint(mode, html){
+  const el = document.getElementById('permHint');
+  if(!el) return;
+  if(!mode){ el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.className = 'folder-status ' + (mode === 'warn' ? 'warn' : '');
+  const txt = el.querySelector('.fs-text');
+  if(txt) txt.innerHTML = html;
+}
+/* 从文件夹把原图读回 dataURL（导出打包 / 迁移旧图用） */
+async function dataUrlFromFolder(rec){
+  try{
+    if(!rec || !rec.file || !galleryDir || !folderSupported()) return legacyDataUrl(rec);
+    if(!await verifyPermission(galleryDir, false)) return legacyDataUrl(rec);
+    const base = String(rec.file).split('/').pop();
+    if(!base) return legacyDataUrl(rec);
+    const dir = await ensureSubdir();
+    const f = await (await dir.getFileHandle(base)).getFile();
+    return await fileToDataUrl(f);
+  }catch(e){ return legacyDataUrl(rec); }
+}
+/* B 方案入库：原图写进文件夹 → IndexedDB 只留索引；没有可用文件夹时先原样留在浏览器，绝不丢图 */
+async function persistRec(rec){
+  const archived = await archiveToFolder(rec);
+  if(archived){
+    try{ IMG_CACHE.set(rec.id, URL.createObjectURL(dataUrlToBlob(rec.dataUrl))); trimCache(); }catch(e){}
+    rec.dataUrl = '';               // 像素已经落盘，索引里不再留第二份
+    return await safePut(rec);
+  }
+  if(galleryDir && folderSupported()) notifyNeedGrant();
+  return await safePutRaw(rec);     // 兜底：浏览器不支持 / 未选文件夹 / 授权过期
+}
+/* 还没拿到授权时，先把图安全地存在浏览器里，同时催一下主人重新授权 */
+function notifyNeedGrant(){
+  setPermHint('warn', '原图暂时存在浏览器里（<b>未拿到文件夹授权</b>）。点这里「重新授权」，再点「⬆️ 迁入文件夹并释放C盘」，就能全部搬到 D 盘 / E 盘～');
+}
+
+/* 把一条记录的原图写进文件夹；成功后在记录上记下相对路径 */
+async function archiveToFolder(rec){
+  if(!rec) return false;
+  rec.file = rec.file || '';
+  if(!galleryDir || !folderSupported()) return false;   // B 方案：文件夹就是主库，不再看「自动写入」开关
+  if(!/^data:image\//.test(String(rec.dataUrl||''))) return false;
+  try{
+    if(!await verifyPermission(galleryDir, false)) return false;
+    const dir = await ensureSubdir();
+    const fname = folderFileName(rec, extFromDataUrl(rec.dataUrl));
+    const fh = await dir.getFileHandle(fname, {create:true});
+    const w = await fh.createWritable();
+    await w.write(dataUrlToBlob(rec.dataUrl));
+    await w.close();
+    rec.file = 'images/' + fname;
+    return true;
+  }catch(e){ console.warn('写入本地文件夹失败：', e); return false; }
+}
+/* 删除时把原图搬进 _trash\，绝不硬删——手滑也还有救 */
+async function trashFromFolder(rec){
+  if(!rec || !rec.file || !galleryDir || !folderSupported()) return false;
+  try{
+    if(!await verifyPermission(galleryDir, false)) return false;
+    const base = String(rec.file).split('/').pop();
+    if(!base) return false;
+    const dir = await ensureSubdir();
+    const src = await dir.getFileHandle(base);
+    const f = await src.getFile();
+    const trash = await galleryDir.getDirectoryHandle('_trash', {create:true});
+    const dst = await trash.getFileHandle(base, {create:true});
+    const w = await dst.createWritable();
+    await w.write(f);
+    await w.close();
+    await dir.removeEntry(base);
+    rec.file = '';
+    return true;
+  }catch(e){ console.warn('移入 _trash 失败：', e); return false; }
+}
+
+/* _meta.json：把标签 / 评分 / 合集这些「数据库里才有」的信息也落到磁盘，扫描时才能完整还原 */
+function scheduleMetaWrite(){
+  if(!galleryDir || !folderSupported()) return;
+  clearTimeout(metaTimer);
+  metaTimer = setTimeout(()=>{ metaTimer = null; writeMetaFile().catch(()=>{}); }, 900);
+}
+/* 把还挂着的防抖写入立刻落盘（删除 / 清空前先存一份，元数据不会跟着消失） */
+async function flushMeta(){
+  if(!metaTimer) return;
+  clearTimeout(metaTimer); metaTimer = null;
+  try{ await writeMetaFile(); }catch(e){}
+}
+async function writeMetaFile(force){
+  if(!galleryDir || !folderSupported()) return;
+  if(!await verifyPermission(galleryDir, false)) return;
+  // 以 IndexedDB（真正的主索引）为源头，绝不用内存里的临时数组 —— 否则「还没载入」会被误当成「已清空」
+  let rows;
+  try{ rows = await dbGetAll(); }catch(e){ rows = images; }
+  // 索引为空就一律不写：宁可保留旧元数据，也不能把标签 / 评分抹成空
+  // （只有「清空全部」这种主人明确意图才用 force=true 写空表）
+  if(!force && !rows.length) return;
+  const meta = rows.map(i=>({ id:i.id, name:i.name, tags:i.tags||[], note:i.note||'', rating:Math.min(5, Math.max(0, Math.round(+i.rating)||0)), fav:!!i.fav, source:i.source||'', album:i.album||'未分类', w:+i.w||0, h:+i.h||0, size:+i.size||0, addedAt:+i.addedAt||0, file:i.file||'' }));
+  const payload = JSON.stringify({version:1, app:'好图收纳屋', savedAt:new Date().toISOString(), count:meta.length, images:meta}, null, 1);
+  const fh = await galleryDir.getFileHandle('_meta.json', {create:true});
+  const w = await fh.createWritable();
+  await w.write(new Blob([payload], {type:'application/json'}));
+  await w.close();
+}
+
+/* 选择图库文件夹（必须由点击触发，浏览器安全规定） */
+async function pickFolder(){
+  if(!folderSupported()){ toast('这个浏览器不支持文件夹读写，请用 Chrome 或 Edge 打开～ 🥺'); return; }
+  let h = null;
+  try{
+    try{ h = await window.showDirectoryPicker({id:'soft-gallery-dir', mode:'readwrite', startIn:'pictures'}); }
+    catch(e1){
+      if(e1 && e1.name === 'AbortError') throw e1;
+      h = await window.showDirectoryPicker(); // 退回最简参数再试一次
+    }
+  }catch(e){
+    if(e && e.name === 'AbortError'){ toast('取消选择啦～'); return; }
+    toast('打不开文件夹选择器：' + ((e && e.message) || e));
+    return;
+  }
+  galleryDir = h;
+  try{ await hPut('galleryDir', h); }catch(e){}
+  try{ await ensureSubdir(); }catch(e){}
+  await refreshFolderUI();
+  renderGallery();          // 授权好了，卡片马上开始从文件夹读原图
+  candyRain(45);
+  toast('图库文件夹已设定：' + h.name + ' 📁');
+  scheduleMetaWrite();
+}
+async function reGrantFolder(){
+  if(!galleryDir){ toast('先「选择图库文件夹」吧～'); return; }
+  const ok = await verifyPermission(galleryDir, true);
+  await refreshFolderUI();
+  toast(ok ? '授权成功，原图可以正常显示啦 🔓' : '还是没有拿到授权 🥺');
+  if(ok){ renderGallery(); scheduleMetaWrite(); }
+}
+/* 把旧版留在浏览器里的原图迁进文件夹，并从 IndexedDB 里放掉（这一步才真正释放 C 盘） */
+async function pushAllToFolder(){
+  if(!galleryDir){ toast('先「选择图库文件夹」吧～'); return; }
+  if(!images.length){ toast('还没有图片可以迁移哦～'); return; }
+  if(!await verifyPermission(galleryDir, true)){ toast('没有拿到文件夹授权 🥺'); return; }
+  const targets = images.filter(im=>legacyDataUrl(im)); // 还留在浏览器里的旧版原图
+  if(!targets.length){ toast('浏览器里已经没有原图啦，C 盘很干净 ✨'); return; }
+  toast('正在把 ' + targets.length + ' 张迁进文件夹…');
+  let ok = 0, fail = 0;
+  for(const im of targets){
+    const good = await archiveToFolder(im);      // 写盘，并把路径记到 im.file
+    if(good){ im.dataUrl = ''; await safePut(im); dropImg(im.id); ok++; } else fail++;
+  }
+  try{ await writeMetaFile(); }catch(e){}
+  await refresh(); await refreshFolderUI();
+  toast('迁移完成：成功 ' + ok + ' 张' + (fail ? (' · 失败 ' + fail + ' 张') : '') + '，C 盘已释放 📂');
+  if(ok) candyRain(50);
+}
+/* 扫描文件夹把图库整个恢复回来（清缓存 / 换浏览器 / 重装后都靠它） */
+async function scanFolderRestore(){
+  if(!galleryDir){ toast('先「选择图库文件夹」吧～'); return; }
+  if(!await verifyPermission(galleryDir, true)){ toast('没有拿到文件夹授权 🥺'); return; }
+  toast('正在扫描文件夹…');
+  const metaMap = {};
+  try{
+    const mf = await galleryDir.getFileHandle('_meta.json');
+    const md = JSON.parse(await (await mf.getFile()).text());
+    (Array.isArray(md && md.images) ? md.images : []).forEach(m=>{ if(m && m.id) metaMap[m.id] = m; });
+  }catch(e){ /* 没有 _meta.json 也照样能恢复，只是标签会丢 */ }
+  let dir = null;
+  try{ dir = await ensureSubdir(); }catch(e){}
+  if(!dir){ toast('文件夹里还没有 images 子目录 🥺'); return; }
+  const seenId = new Set(images.map(x=>x.id));
+  const seenHash = new Set(images.map(x=>x.hash).filter(Boolean));
+  const albums = getAlbums();
+  let added = 0, skip = 0, fail = 0;
+  for await (const h of dir.values()){
+    if(!h || h.kind !== 'file') continue;
+    if(!/\.(png|jpe?g|webp|gif|bmp|svg|avif)$/i.test(h.name)) continue;
+    try{
+      const m = /^([\w-]{1,64})__/.exec(h.name);
+      const id = m ? m[1] : uid();
+      if(seenId.has(id)){ skip++; continue; }
+      const f = await h.getFile();
+      const dataUrl = await fileToDataUrl(f);
+      const hash = contentHash(dataUrl);
+      if(seenHash.has(hash)){ skip++; continue; }
+      const old = metaMap[id] || {};
+      const album = (typeof old.album === 'string' && old.album.trim()) ? old.album.trim().slice(0,40) : '未分类';
+      if(album !== '未分类' && !albums.includes(album)) albums.push(album);
+      const dims = await readDims(dataUrl);
+      await safePut({
+        id, file: 'images/' + h.name,
+        name: (typeof old.name === 'string' && old.name.trim()) ? old.name.trim().slice(0,80) : (h.name.replace(/^[\w-]{1,64}__/, '').replace(/\.[^.]+$/, '') || '未命名'),
+        tags: Array.isArray(old.tags) ? old.tags.filter(t=>typeof t === 'string' && t.trim()).slice(0,30) : [],
+        note: typeof old.note === 'string' ? old.note.slice(0,500) : '',
+        rating: Math.min(5, Math.max(0, Math.round(+old.rating) || 0)),
+        fav: !!old.fav,
+        source: (typeof old.source === 'string' && old.source.trim()) ? old.source.trim().slice(0,60) : '文件夹恢复',
+        album,
+        w: (+old.w > 0 ? Math.round(+old.w) : dims.w),
+        h: (+old.h > 0 ? Math.round(+old.h) : dims.h),
+        size: f.size || dataUrlBytes(dataUrl),
+        addedAt: (+old.addedAt > 0 ? +old.addedAt : (f.lastModified || Date.now())),
+        hash
+      });
+      seenId.add(id); seenHash.add(hash); added++;
+    }catch(e){ fail++; }
+  }
+  saveAlbums(albums);
+  await refresh();
+  try{ await writeMetaFile(); }catch(e){}
+  await refreshFolderUI();
+  if(added) candyRain(60);
+  let msg = '扫描完成：恢复 ' + added + ' 张 🔄';
+  if(skip) msg += ' · 已有 ' + skip + ' 张';
+  if(fail) msg += ' · ' + fail + ' 张读取失败';
+  toast(msg);
+}
+/* 清掉内存预览，重新从文件夹读一遍（换过授权 / 手动动过文件夹之后点一下） */
+function reloadThumbs(){
+  IMG_CACHE.forEach((u,k)=>dropImg(k));
+  renderGallery();
+  toast(folderSupported() ? '正在从文件夹重新读取原图… 🖼️' : '这个浏览器不支持文件夹读写 🥺');
+}
+async function forgetFolder(){
+  if(!galleryDir) return;
+  if(!confirm('断开图库文件夹？已经写进去的文件不会被删除，只是不再自动同步。')) return;
+  galleryDir = null;
+  try{ await hDel('galleryDir'); }catch(e){}
+  await refreshFolderUI();
+  toast('已断开文件夹 🔌');
+}
+async function refreshFolderUI(){
+  const el = document.getElementById('folderStatus');
+  if(!folderSupported()){
+    setPermHint('warn', '<b>这个浏览器不支持文件夹读写</b>：请用 Chrome 或 Edge 打开，才能把原图存进 D 盘 / E 盘。');
+    if(el){ el.className = 'folder-status warn'; const t = el.querySelector('.fs-text'); if(t) t.innerHTML = '<b>当前浏览器不支持文件夹读写</b><br>请用 Chrome 或 Edge 打开这个页面，原图才有地方住。'; }
+    return;
+  }
+  if(!galleryDir){
+    setPermHint('warn', '还没选定图库文件夹。点这里挑一个 D 盘 / E 盘的目录当原图主库～');
+    if(el){ el.className = 'folder-status warn'; const t = el.querySelector('.fs-text'); if(t) t.innerHTML = '还没设定图库文件夹。<br>点下面的「选择图库文件夹」，挑一个 D 盘 / E 盘的目录当原图主库。'; }
+    return;
+  }
+  let state = 'denied';
+  try{ state = await galleryDir.queryPermission({mode:'readwrite'}); }catch(e){}
+  const ok = state === 'granted';
+  if(el){
+    el.className = 'folder-status' + (ok ? ' on' : ' warn');
+    const t = el.querySelector('.fs-text');
+    if(t) t.innerHTML = '当前图库文件夹：<b>' + escapeHtml(galleryDir.name) + '</b><br>' + (ok
+      ? '✅ 已授权。原图就住在这个文件夹的 <b>images</b> 里，浏览器只留索引（标签 / 评分写进 <b>_meta.json</b>）。'
+      : '⚠️ 授权已失效（浏览器重启后常见）。点「重新授权」确认一次，图片就能继续显示。');
+  }
+  if(ok) setPermHint(null);
+  else setPermHint('warn', '图库文件夹需要<b>重新授权</b>才能显示与写入原图，点这里确认一次～');
+}
+async function initFolder(){
+  if(!folderSupported()){ await refreshFolderUI(); return; }
+  try{
+    const h = await hGet('galleryDir');
+    if(h) galleryDir = h;
+  }catch(e){}
+  await refreshFolderUI();
+  // 授权还有效的话，立刻把卡片上的原图读出来
+  if(galleryDir){
+    let ok = false;
+    try{ ok = (await galleryDir.queryPermission({mode:'readwrite'})) === 'granted'; }catch(e){}
+    if(ok) renderGallery();
+  }
+}
 
 /* ==================== 状态 ==================== */
 let images = [];
@@ -784,6 +1205,10 @@ async function safePut(rec){
   try{ await dbPut(rec); return true; }
   catch(e){ console.warn('存储写入失败：', e); return false; }
 }
+async function safePutRaw(rec){
+  try{ await dbPutRaw(rec); return true; }
+  catch(e){ console.warn('存储写入失败：', e); return false; }
+}
 let searchTimer = null;
 function searchDebounce(){ clearTimeout(searchTimer); searchTimer = setTimeout(renderGallery, 200); }
 
@@ -811,6 +1236,11 @@ function filtered(){
   return list;
 }
 function activeTag(){ const el = document.querySelector('#tagFilter .pill.on'); return el?el.dataset.tag:null; }
+/* 用记录的宽高先把卡片占位算好，原图晚一点到也不会把版面抽动 */
+function ratioPct(im){
+  const w = +im.w || 0, h = +im.h || 0;
+  return (w > 0 && h > 0) ? ` style="padding-top:${(h / w * 100).toFixed(3)}%"` : '';
+}
 function renderGallery(){
   const wrap = document.getElementById('galleryWrap');
   wrap.className = currentView==='grid' ? 'gridview' : 'waterfall';
@@ -830,12 +1260,44 @@ function renderGallery(){
       <span class="pin p1"></span><span class="pin p2"></span>
       <button class="fav-pin ${im.fav?'on':''}" data-fav="${escapeHtml(im.id)}">${im.fav?'💗':'🤍'}</button>
       <div class="sel-mark">✓</div>
-      <div class="ph-frame"><img src="${im.dataUrl}" loading="lazy" alt="${escapeHtml(im.name)}" /></div>
+      <div class="ph-frame" data-id="${escapeHtml(im.id)}"${ratioPct(im)}><img alt="${escapeHtml(im.name)}" /></div>
       <div class="ph-name">${escapeHtml(im.name||'未命名')}</div>
       <div class="ph-meta"><span class="stars">${stars}</span>${tags}</div>
     </div>`;
   }).join('');
   renderTagFilter();
+  hydrateThumbs();
+}
+/* 卡片滚到附近才去文件夹把原图读出来：一次只读视野内的，几千张也不会卡 */
+let thumbObserver = null;
+function hydrateThumbs(){
+  const frames = document.querySelectorAll('.ph-frame[data-id]');
+  if(!frames.length) return;
+  if(thumbObserver){ try{ thumbObserver.disconnect(); }catch(e){} thumbObserver = null; }
+  if(typeof IntersectionObserver !== 'function'){ frames.forEach(f=>fillThumb(f)); return; }
+  thumbObserver = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(!en.isIntersecting) return;
+      try{ thumbObserver.unobserve(en.target); }catch(e){}
+      fillThumb(en.target);
+    });
+  }, {rootMargin:'320px 0px'});
+  frames.forEach(f=>thumbObserver.observe(f));
+}
+async function fillThumb(frame){
+  const id = frame.dataset.id;
+  const img = frame.querySelector('img');
+  if(!id || !img) return;
+  const url = await loadImg(id);
+  if(url){
+    img.onload = ()=>frame.classList.add('ready');
+    img.onerror = ()=>{ img.removeAttribute('src'); frame.classList.add('lock'); };
+    img.src = url;
+    if(img.complete && img.naturalWidth) frame.classList.add('ready');
+    return;
+  }
+  const rec = images.find(x=>x.id===id);
+  if(galleryDir && !await folderHasFile(rec && rec.file)) frame.classList.add('lock');
 }
 function cardEl(id){
   try{ return document.querySelector('.polaroid[data-id="'+CSS.escape(id)+'"]'); }
@@ -923,7 +1385,8 @@ async function handleFiles(files){
       dataUrl = await maybeCompress(dataUrl);
       const dims = await readDims(dataUrl);
       const name = f.name.replace(/\.[^.]+$/,'');
-      const good = await safePut({ id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'本地上传', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:dataUrlBytes(dataUrl), addedAt:Date.now(), hash });
+      const rec = { id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'本地上传', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:dataUrlBytes(dataUrl), addedAt:Date.now(), hash, file:'' };
+      const good = await persistRec(rec); // 原图落盘到文件夹，浏览器只留索引
       if(good) ok++; else fail++;
     }catch(e){ fail++; console.warn(e); }
   }
@@ -950,7 +1413,8 @@ async function importByUrl(){
     dataUrl = await maybeCompress(dataUrl);
     const dims = await readDims(dataUrl);
     const name = (url.split('/').pop()||'').split('?')[0].replace(/\.[^.]+$/,'') || '来自链接';
-    const good = await safePut({ id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'链接导入', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:dataUrlBytes(dataUrl), addedAt:Date.now(), hash });
+    const rec = { id:uid(), name, tags:[], note:'', rating:0, fav:false, source:'链接导入', album:'未分类', dataUrl, w:dims.w, h:dims.h, size:dataUrlBytes(dataUrl), addedAt:Date.now(), hash, file:'' };
+    const good = await persistRec(rec); // 原图落盘到文件夹，浏览器只留索引
     if(!good){ toast('存储失败：浏览器空间可能不足 🥺'); return; }
     await refresh(); candyRain(40); toast('链接图片收下啦～💕');
   }catch(e){
@@ -966,11 +1430,11 @@ document.addEventListener('paste', e => {
 });
 
 /* ==================== 查看器 ==================== */
-function openViewer(id){
+async function openViewer(id){
   currentVid = id; zoom = 1; panX = 0; panY = 0;
   const im = images.find(x=>x.id===id); if(!im) return;
   const img = document.getElementById('vImg');
-  img.src = im.dataUrl; applyZoom();
+  img.removeAttribute('src'); applyZoom();
   const dims = (im.w&&im.h) ? `${im.w}×${im.h}px` : '尺寸未知';
   const sizeStr = im.size ? bytesToSize(im.size) : '大小未知';
   document.getElementById('vInfo').innerHTML = `
@@ -989,6 +1453,10 @@ function openViewer(id){
       <button class="candy danger" data-act="vdelete" data-id="${escapeHtml(im.id)}"><span class="cb">🗑️</span>删除</button>
     </div>`;
   document.getElementById('viewer').classList.add('open');
+  const url = await loadImg(id);
+  if(currentVid !== id) return;      // 期间已切到别的图，就不要覆盖了
+  if(url) img.src = url;
+  else toast('原图读不出来：图库文件夹可能需要「重新授权」🥺');
 }
 function albumOptions(cur){
   const albums = getAlbums();
@@ -1066,17 +1534,48 @@ function extFromDataUrl(d){
 function safeFileName(s){
   return String(s||'可爱男孩').replace(/[\\\/:*?"<>|\s]+/g,'_').slice(0,80) || '可爱男孩';
 }
+/* 取原图 Blob：文件夹优先，旧版留在浏览器里的原图兜底 */
+async function blobOf(rec){
+  if(!rec) return null;
+  try{
+    if(rec.file && galleryDir && folderSupported() && await verifyPermission(galleryDir, false)){
+      const base = String(rec.file).split('/').pop();
+      if(base){
+        const dir = await ensureSubdir();
+        return await (await dir.getFileHandle(base)).getFile();
+      }
+    }
+  }catch(e){}
+  const d = legacyDataUrl(rec);
+  return d ? dataUrlToBlob(d) : null;
+}
+function extOf(blob, rec){
+  if(blob && blob.type) return extFromDataUrl('data:' + blob.type + ';');
+  const m = /\.([\w+]{1,5})$/.exec(String((rec && rec.file) || ''));
+  return m ? m[1].toLowerCase() : 'png';
+}
+/* 导出打包：把文件夹里的原图读回 dataURL（只给备份文件用，不会存回浏览器） */
+async function packWithImages(list){
+  const out = [];
+  for(const im of list){ out.push(Object.assign({}, metaOnly(im), { dataUrl: im.dataUrl || await dataUrlFromFolder(im) })); }
+  return out;
+}
 async function downloadOne(id){
   const im = images.find(x=>x.id===id); if(!im) return;
+  const blob = await blobOf(im);
+  if(!blob){ toast('读不到原图，请先「重新授权」图库文件夹 🥺'); return; }
   const a = document.createElement('a');
-  a.href = im.dataUrl; a.download = safeFileName(im.name)+'.'+extFromDataUrl(im.dataUrl);
+  a.href = URL.createObjectURL(blob);
+  a.download = safeFileName(im.name)+'.'+extOf(blob, im);
   document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>{ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 2000);
   toast('开始下载～ ⬇️');
 }
 async function copyImage(id){
   const im = images.find(x=>x.id===id); if(!im) return;
   try{
-    const blob = await (await fetch(im.dataUrl)).blob();
+    const blob = await blobOf(im);
+    if(!blob) throw new Error('no image');
     await navigator.clipboard.write([new ClipboardItem({[blob.type||'image/png']: blob})]);
     toast('图片已复制到剪贴板 📋');
   }catch(e){ toast('复制失败，浏览器可能不支持 🥺'); }
@@ -1102,9 +1601,11 @@ function startSlideshow(){
   showSs();
   ssTimer = setInterval(()=>{ if(!ssPaused) ssNext(); }, 3200);
 }
-function showSs(){
+async function showSs(){
   const im = ssList[ssIdx];
-  document.getElementById('ssImg').src = im.dataUrl;
+  const url = await loadImg(im.id);
+  if(ssList[ssIdx] !== im) return;   // 已经翻到下一张了，别覆盖
+  document.getElementById('ssImg').src = url || '';
   document.getElementById('ssName').textContent = im.name || '未命名';
   document.getElementById('ssMeta').textContent = `${(im.tags||[]).join(' · ')||'无标签'}  ·  ${im.album||'未分类'}`;
 }
@@ -1174,8 +1675,10 @@ async function batchFav(){
 async function batchExport(){
   const list = images.filter(i=>selected.has(i.id));
   if(!list.length) return;
-  downloadText('可爱男孩_选集备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:list}));
-  toast('导出 '+list.length+' 张备份 📤');
+  toast('正在把选中的原图打包…');
+  const packed = await packWithImages(list);
+  downloadText('可爱男孩_选集备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
+  toast('导出 '+packed.length+' 张备份 📤');
 }
 async function batchDelete(){
   if(!selected.size) return;
@@ -1307,7 +1810,8 @@ function bytesToSize(b){
 }
 function imgBytes(i){
   if(i.size && i.size>0) return i.size;
-  const d=i.dataUrl||''; const k=d.indexOf(','); const b64=k>=0?d.slice(k+1):d;
+  const d = legacyDataUrl(i); // 只有旧版遗留在浏览器里的原图才需要估算
+  const k=d.indexOf(','); const b64=k>=0?d.slice(k+1):d;
   return Math.floor(b64.length*0.75);
 }
 function renderData(){
@@ -1321,7 +1825,7 @@ function renderData(){
     <div class="data-card"><div class="d-emoji">💗</div><div class="d-num">${fav}</div><div class="d-label">收藏数量</div></div>
     <div class="data-card"><div class="d-emoji">🏷️</div><div class="d-num">${tagSet.size}</div><div class="d-label">标签种类</div></div>
     <div class="data-card"><div class="d-emoji">📚</div><div class="d-num">${albumSet.size}</div><div class="d-label">合集数量</div></div>
-    <div class="data-card"><div class="d-emoji">📦</div><div class="d-num">${bytesToSize(bytes)}</div><div class="d-label">存储占用(约)</div></div>`;
+    <div class="data-card"><div class="d-emoji">📦</div><div class="d-num">${bytesToSize(bytes)}</div><div class="d-label">原图总体积</div></div>`;
   renderAlbumList(); renderTagList();
 }
 function renderAlbumList(){
@@ -1399,12 +1903,14 @@ function downloadText(name, text){
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
 }
-function exportAll(){
+async function exportAll(){
   if(!images.length){ toast('还没有图片可以导出～'); return; }
-  const est = images.reduce((s,i)=>s+dataUrlBytes(i.dataUrl),0);
+  const est = images.reduce((s,i)=>s+(+i.size||0),0);
   if(est > 150*1024*1024 && !confirm('图库约 '+bytesToSize(est)+'，导出文件会很大，生成时页面可能卡顿几秒～ 继续吗？')) return;
-  downloadText('胖男孩图片_完整备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images}));
-  candyRain(55); toast('全部 '+images.length+' 张已导出 📤');
+  toast('正在把文件夹里的原图打包…');
+  const packed = await packWithImages(images);
+  downloadText('胖男孩图片_完整备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
+  candyRain(55); toast('全部 '+packed.length+' 张已导出 📤');
 }
 function exportMeta(){
   if(!images.length){ toast('还没有图片可以导出～'); return; }
@@ -1412,11 +1918,13 @@ function exportMeta(){
   downloadText('胖男孩图片_元数据.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), meta}));
   toast('导出元数据 '+meta.length+' 条 🗜️');
 }
-function exportFav(){
+async function exportFav(){
   const list = images.filter(i=>i.fav);
   if(!list.length){ toast('还没有收藏任何图片哦～'); return; }
-  downloadText('胖男孩图片_收藏备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:list}));
-  toast('导出收藏 '+list.length+' 张 🎁');
+  toast('正在把收藏的原图打包…');
+  const packed = await packWithImages(list);
+  downloadText('胖男孩图片_收藏备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
+  toast('导出收藏 '+packed.length+' 张 🎁');
 }
 async function handleImport(files){
   const f = files && files[0]; if(!f) return;
@@ -1437,7 +1945,7 @@ async function handleImport(files){
         seen.add(id);
         const album = (typeof im.album==='string' && im.album.trim()) ? im.album.trim().slice(0,40) : '未分类';
         if(album!=='未分类' && !albums.includes(album)) albums.push(album); // 备份里的合集自动并入列表，归属不再悄悄丢失
-        const good = await safePut({
+        const rec = {
           id,
           name: (typeof im.name==='string' && im.name.trim()) ? im.name.trim().slice(0,80) : '未命名',
           tags: Array.isArray(im.tags) ? im.tags.filter(t=>typeof t==='string' && t.trim()).map(t=>t.trim().slice(0,30)).slice(0,30) : [],
@@ -1451,8 +1959,10 @@ async function handleImport(files){
           h: (+im.h>0 ? Math.round(+im.h) : 0),
           size: (+im.size>0 ? +im.size : dataUrlBytes(im.dataUrl)),
           addedAt: (+im.addedAt>0 ? +im.addedAt : Date.now()),
-          hash: contentHash(im.dataUrl)
-        });
+          hash: contentHash(im.dataUrl),
+          file: ''
+        };
+        const good = await persistRec(rec); // 备份里的原图也写进文件夹，浏览器只留索引
         if(good) added++; else fail++;
       }catch(e){ fail++; }
     }
@@ -1467,7 +1977,10 @@ async function handleImport(files){
 async function clearAll(){
   if(!images.length){ toast('本来就已经空空如也啦～'); return; }
   if(!confirm('真的要清空全部 '+images.length+' 张图片吗？建议先导出备份！')) return;
-  await dbClear(); await refresh(); toast('已全部清空 🗑️');
+  await dbClear();
+  await refresh();
+  try{ await writeMetaFile(true); }catch(e){}   // 显式清空磁盘元数据（原图已进 _trash）
+  toast('已全部清空 🗑️');
 }
 
 /* ==================== 拖拽上传 ==================== */
@@ -1495,7 +2008,7 @@ function switchTab(name, btn){
   btn.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
   if(name==='sources') renderSources();
-  if(name==='data') renderData();
+  if(name==='data'){ renderData(); refreshFolderUI(); }
 }
 
 /* ==================== 刷新 ==================== */
@@ -1538,6 +2051,7 @@ function refreshStats(){
   await refresh();
   repairAlbums();
   renderSources(); renderData();
+  await initFolder(); // 取回上次设定的图库文件夹句柄（授权是否还有效由面板提示）
   setTimeout(()=>{ candyRain(36); toast('欢迎来到噜噜大王の好图收纳屋 🧁'); }, 300);
 })();
 </script>
