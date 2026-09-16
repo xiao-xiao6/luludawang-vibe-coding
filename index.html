@@ -204,7 +204,12 @@ section.active{display:block}
 .candy.ghost::after{background:rgba(255,255,255,.5)}
 .candy.ghost:hover{background:var(--accent-soft)}
 .candy.danger{background:linear-gradient(180deg,#e58a8a,#c95f5f)}
+.candy.plum{background:linear-gradient(180deg,#b98fdd,#8f63b8)}
+.candy.berry{background:linear-gradient(180deg,#ef97b6,#cf6f92)}
+.candy.leaf{background:linear-gradient(180deg,#a7c97f,#7ea457)}
+.candy.coral{background:linear-gradient(180deg,#f4a684,#dd7c57)}
 .candy.sm{padding:8px 14px;font-size:13px;border-radius:999px}
+.candy.sq{padding:8px 15px;font-size:15px;border-radius:999px;min-width:46px;justify-content:center}
 .candy .cb{font-size:16px}
 
 /* 泡泡爆开 */
@@ -237,19 +242,21 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 /* ============ 相册 ============ */
 .toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
-.pill{position:relative;overflow:hidden;cursor:pointer;background:var(--card);border:1.5px solid var(--line);color:var(--ink-soft);font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;transition:.2s;font-family:inherit}
+.pill{position:relative;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,var(--accent-soft),var(--accent2-soft));border:1.5px solid transparent;color:var(--accent-deep);font-size:13px;font-weight:800;padding:7px 14px;border-radius:999px;transition:.2s;font-family:inherit;box-shadow:0 3px 10px var(--shadow)}
+/* 只有「图源导航」那一行允许白底按钮，其余地方的按钮一律彩色 */
+#tab-sources .pill:not(.on){background:var(--card);border:1.5px solid var(--line);color:var(--ink-soft);box-shadow:0 3px 10px var(--shadow)}
 .pill.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
 .pill:hover{transform:translateY(-2px)}
 
 /* 合集栏 */
 .album-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
-.album-chip{cursor:pointer;background:var(--card);border:1.5px solid var(--line);color:var(--ink-soft);font-size:13px;font-weight:700;padding:7px 14px;border-radius:12px;transition:.2s;font-family:inherit}
+.album-chip{cursor:pointer;background:linear-gradient(180deg,var(--accent2-soft),var(--accent3-soft));border:1.5px solid transparent;color:var(--ink);font-size:13px;font-weight:800;padding:7px 14px;border-radius:12px;transition:.2s;font-family:inherit;box-shadow:0 3px 10px var(--shadow)}
 .album-chip.on{background:var(--accent2);color:#fff;border-color:transparent}
 .album-chip:hover{transform:translateY(-2px)}
 
 /* 拍立得卡片 */
 .waterfall{column-count:var(--wf-cols,4);column-gap:18px;margin-top:18px}
-.gridview{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min,190px),1fr));gap:18px;margin-top:18px}
+.gridview{display:grid;grid-template-columns:repeat(var(--grid-cols,4),var(--card-w,190px));gap:18px;margin-top:18px;justify-content:start}  /* start：网格永远从容器左边线开始，不会因为卡片变小而被居中推开 */
 @media(max-width:620px){.gridview{gap:12px}.waterfall{column-gap:12px}}
 /* 卡片大小与列数由 applyCardSize() 按窗口宽度 + 用户缩放实时计算 */
 .polaroid{
@@ -278,12 +285,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .pin.p2{top:6px;right:6px;background:var(--accent3)}
 .fav-pin{
   position:absolute;z-index:4;top:-6px;right:14px;width:38px;height:38px;border-radius:50%;
-  background:var(--card);display:grid;place-items:center;font-size:20px;cursor:pointer;
+  background:linear-gradient(180deg,var(--accent-soft),var(--accent3-soft));display:grid;place-items:center;font-size:20px;cursor:pointer;
   box-shadow:var(--shadow);border:none;transition:.2s;transform:rotate(8deg);
 }
 .fav-pin:hover{transform:rotate(0) scale(1.2)}
-.fav-pin.on{background:var(--accent-soft)}
-.sel-mark{position:absolute;top:-6px;left:14px;width:32px;height:32px;border-radius:10px;background:var(--card);display:none;place-items:center;font-size:17px;box-shadow:var(--shadow);z-index:4}
+.fav-pin.on{background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#fff}
+.sel-mark{position:absolute;top:-6px;left:14px;width:32px;height:32px;border-radius:10px;background:linear-gradient(180deg,var(--accent2-soft),var(--accent3-soft));display:none;place-items:center;font-size:17px;box-shadow:var(--shadow);z-index:4}
 .polaroid.selecting .sel-mark{display:grid}
 .polaroid.checked .sel-mark{background:var(--accent);color:#fff}
 .tag-mini{background:var(--accent2-soft);color:var(--accent2);font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
@@ -348,13 +355,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .star-row button{background:none;border:none;font-size:26px;cursor:pointer;transition:.15s;color:var(--ink-faint)}
 .star-row button.on{color:var(--gold)}
 .star-row button:hover{transform:scale(1.25)}
-.v-close{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:50%;background:var(--card);border:none;font-size:20px;cursor:pointer;box-shadow:var(--shadow);transition:.2s;z-index:5}
+.v-close{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:50%;background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 5px 14px var(--shadow-hover);transition:.2s;z-index:5}
 .v-close:hover{transform:rotate(90deg) scale(1.05)}
-.v-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:var(--card);border:none;font-size:20px;cursor:pointer;box-shadow:var(--shadow);transition:.2s;z-index:5}
+.v-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 5px 14px var(--shadow-hover);transition:.2s;z-index:5}
 .v-nav:hover{transform:translateY(-50%) scale(1.12)}
 .v-nav.prev{left:10px}.v-nav.next{right:10px}
 .zoom-bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(0,0,0,.4);padding:6px;border-radius:999px;z-index:5}
-.zoom-bar button{background:rgba(255,255,255,.9);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;transition:.15s}
+.zoom-bar button{background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#fff;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;transition:.15s}
 .zoom-bar button:hover{transform:scale(1.1)}
 
 /* ============ 幻灯片 ============ */
@@ -380,12 +387,20 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .modal-box.wide{max-width:920px}
 .modal-head{display:flex;align-items:center;gap:10px;padding:15px 20px;border-bottom:1.5px solid var(--line);flex:none}
 .modal-head h2{font-size:18px;flex:1;display:flex;align-items:center;gap:8px}
-.m-close{width:38px;height:38px;border-radius:50%;background:var(--card);border:none;font-size:18px;cursor:pointer;box-shadow:var(--shadow);transition:.2s;flex:none;color:var(--ink)}
+.m-close{width:38px;height:38px;border-radius:50%;background:linear-gradient(180deg,var(--accent),var(--accent-deep));border:none;font-size:18px;cursor:pointer;box-shadow:0 5px 14px var(--shadow-hover);transition:.2s;flex:none;color:#fff}
 .m-close:hover{transform:rotate(90deg) scale(1.05)}
 .modal-body{padding:18px 20px 22px;overflow-y:auto}
 .modal-body h3{font-size:15px;margin:16px 0 8px;color:var(--accent-deep)}
 .hint{font-size:12.5px;color:var(--ink-soft);line-height:1.7}
-.size-tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--ink-soft);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;box-shadow:var(--shadow)}
+/* 卡片大小：5 档（＋ / － / ↺ / 百分比数字），住在「相册」面板右下角的空白角落，四个控件全部透明底 */
+.size-row{display:flex;flex-wrap:nowrap;gap:2px;align-items:center}
+#tab-gallery .sheet{padding-bottom:52px}                 /* 给右下角留出干净的空白角落 */
+#tab-gallery .size-row{position:absolute;right:18px;bottom:12px;margin:0}
+.size-row .sbtn{background:none;border:none;box-shadow:none;color:var(--accent-deep);font-family:inherit;font-size:17px;font-weight:900;line-height:1;cursor:pointer;padding:5px 7px;border-radius:9px;transition:opacity .18s,color .18s}
+.size-row .sbtn:hover{opacity:.55;color:var(--accent)}
+.size-row .sbtn:active{opacity:.4}
+.polaroid:first-child{transform-origin:top left}   /* 第一张卡片的左边框永远钉在原处（缩放/悬停都不跑） */
+.size-tag{display:inline-flex;align-items:center;justify-content:flex-end;gap:6px;font-size:13px;font-weight:900;color:var(--accent-deep);background:none;border:none;border-radius:0;padding:0 2px 0 6px;min-width:46px;box-shadow:none}
 
 /* ============ 拖拽：图片→合集 / 标签→图片 ============ */
 .drag-ghost{position:fixed;z-index:9999;pointer-events:none;transform:translate(-50%,-50%);padding:7px 14px;border-radius:14px;background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#fff;font-size:13px;font-weight:800;box-shadow:var(--shadow-hover);opacity:.96;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -470,6 +485,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
     <button class="nav-item active" onclick="switchTab('gallery',this)"><span class="nb">🎀</span>相册</button>
     <button class="nav-item" onclick="switchTab('sources',this)"><span class="nb">🧭</span>图源导航</button>
     <button class="nav-item" onclick="switchTab('data',this)"><span class="nb">🗃️</span>数据管理</button>
+    <button class="nav-item" onclick="openModal('albumModal')"><span class="nb">📚</span>合集管理</button>
+    <button class="nav-item" onclick="openModal('tagModal')"><span class="nb">🏷️</span>标签管理</button>
   </nav>
 
   <!-- 相册 -->
@@ -477,23 +494,17 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
     <div class="sheet">
       <div class="toolbar">
         <button class="candy" onclick="pickFiles()"><span class="cb">📥</span>上传图片</button>
-        <button class="candy mint" onclick="importByUrl()"><span class="cb">🔗</span>链接导入</button>
-        <button class="candy sky" onclick="randomPick()"><span class="cb">🎲</span>随机宠幸</button>
-        <button class="candy gold" onclick="startSlideshow()"><span class="cb">🎬</span>幻灯片</button>
-        <button class="candy ghost" id="selectBtn" onclick="toggleSelect()"><span class="cb">☑️</span>批量选择</button>
-        <button class="candy ghost" onclick="switchView()" id="viewBtn"><span class="cb">🍱</span>切换视图</button>
-        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files);this.value=''" />
+        <button class="candy" onclick="importByUrl()"><span class="cb">🔗</span>链接导入</button>
+        <button class="candy" onclick="randomPick()"><span class="cb">🎲</span>随机宠幸</button>
+        <button class="candy" onclick="startSlideshow()"><span class="cb">🎬</span>幻灯片</button>
+        <button class="candy" id="selectBtn" onclick="toggleSelect()"><span class="cb">☑️</span>批量选择</button>
+        <button class="candy" onclick="switchView()" id="viewBtn"><span class="cb">🍱</span>切换视图</button>
       </div>
       <div class="toolbar" style="margin-top:9px">
-        <button class="candy ghost sm" onclick="resizeCards(1)"><span class="cb">➕</span>图片变大</button>
-        <button class="candy ghost sm" onclick="resizeCards(-1)"><span class="cb">➖</span>图片变小</button>
-        <button class="candy ghost sm" onclick="resizeCards(0)"><span class="cb">↺</span>默认大小</button>
-        <span class="size-tag" id="sizeLabel">📐 卡片大小 100%</span>
-        <button class="candy mint sm" onclick="openTool('link')"><span class="cb">🔗</span>图片转直链</button>
-        <button class="candy gold sm" onclick="openTool('gif')"><span class="cb">🎞️</span>多图合成 GIF</button>
-        <button class="candy sky sm" onclick="openTool('mp4')"><span class="cb">🎬</span>GIF 转 MP4</button>
-        <button class="candy ghost sm" onclick="openModal('albumModal')"><span class="cb">📚</span>合集管理</button>
-        <button class="candy ghost sm" onclick="openModal('tagModal')"><span class="cb">🏷️</span>标签管理</button>
+        <button class="candy sky" onclick="openTool('link')"><span class="cb">🔗</span>图片转直链</button>
+        <button class="candy sky" onclick="openTool('gif')"><span class="cb">🎞️</span>多图合成 GIF</button>
+        <button class="candy sky" onclick="openTool('mp4')"><span class="cb">🎬</span>GIF 转 MP4</button>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files);this.value=''" />
       </div>
       <div class="dropzone" id="dropzone" onclick="pickFiles()">
         <div class="dz-emoji">🐻‍❄️</div>
@@ -514,6 +525,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
           <option value="name">🔤 名称</option>
         </select>
         <button class="pill" id="compressToggle" onclick="toggleCompress()" title="入库时自动压缩超大图（长边超过2048px），节省存储空间">🗜️ 大图压缩</button>
+      </div>
+      <div class="size-row">
+        <button class="sbtn" onclick="resizeCards(1)" title="放大一档">＋</button>
+        <button class="sbtn" onclick="resizeCards(-1)" title="缩小一档">－</button>
+        <button class="sbtn" onclick="resizeCards(0)" title="回到 100%">↺</button>
+        <span class="size-tag" id="sizeLabel" title="当前卡片大小（50% / 75% / 100% / 125% / 150%）">100%</span>
       </div>
       <div class="album-bar" id="albumBar"></div>
       <div class="filters" id="tagFilter" style="margin-top:8px"></div>
@@ -569,7 +586,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <button class="candy mint" onclick="reGrantFolder()"><span class="cb">🔓</span>重新授权</button>
         <button class="candy sky" onclick="pushAllToFolder()"><span class="cb">⬆️</span>迁入文件夹并释放C盘</button>
         <button class="candy gold" onclick="scanFolderRestore()"><span class="cb">🔄</span>扫描文件夹恢复</button>
-        <button class="candy ghost" onclick="reloadThumbs()"><span class="cb">🖼️</span>重新读取原图</button>
+        <button class="candy plum" onclick="reloadThumbs()"><span class="cb">🖼️</span>重新读取原图</button>
         <button class="candy danger" onclick="forgetFolder()"><span class="cb">🔌</span>断开文件夹</button>
       </div>
       <p class="desc" style="margin-top:14px">文件夹里会有 <b>images</b>（原图）和 <b>_meta.json</b>（名字 / 标签 / 评分 / 合集）。删除不会硬删，而是移进 <b>_trash</b>，手滑也还有救。⚠️ 浏览器重启后授权会过期（安全设计，原图主库唯一的代价）：点一次「🔓 重新授权」，就能继续看图与写入。</p>
@@ -577,7 +594,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 
     <div class="sheet">
       <h2>🗃️ 数据管理</h2>
-      <p class="desc">原图在文件夹里，浏览器只存索引。随时备份、迁移、还原。（📚 合集管理 / 🏷️ 标签管理 已经搬到首页工具栏，点一下就能打开～）</p>
+      <p class="desc">原图在文件夹里，浏览器只存索引。随时备份、迁移、还原。（📚 合集管理 / 🏷️ 标签管理 就在上方导航栏里，点一下就能打开～）</p>
       <div class="data-grid" id="dataGrid"></div>
       <div class="toolbar" style="margin-top:20px">
         <button class="candy" onclick="exportAll()"><span class="cb">📤</span>导出全部(含图)</button>
@@ -647,10 +664,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       </div>
       <div class="toolbar" style="margin-top:14px">
         <button class="candy" onclick="document.getElementById('linkFiles').click()"><span class="cb">📥</span>选择图片上传</button>
-        <button class="candy ghost" onclick="linkUseSelected()"><span class="cb">☑️</span>用相册里选中的</button>
-        <button class="candy ghost" onclick="linkUseAlbum()"><span class="cb">📚</span>用当前筛选结果</button>
+        <button class="candy berry" onclick="linkUseSelected()"><span class="cb">☑️</span>用相册里选中的</button>
+        <button class="candy leaf" onclick="linkUseAlbum()"><span class="cb">📚</span>用当前筛选结果</button>
         <button class="candy mint" onclick="linkCopyAll()"><span class="cb">📋</span>复制全部直链</button>
-        <button class="candy ghost" onclick="linkClear()"><span class="cb">♻️</span>清空列表</button>
+        <button class="candy danger" onclick="linkClear()"><span class="cb">♻️</span>清空列表</button>
         <input type="file" id="linkFiles" accept="image/*" multiple style="display:none" onchange="linkFilesPicked(this.files);this.value=''" />
       </div>
       <div class="progress-bar" id="linkBar"><i></i></div>
@@ -664,20 +681,20 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
   <div class="modal-box wide">
     <div class="modal-head"><h2>🎞️ 多图合成 GIF</h2><button class="m-close" onclick="closeToolModal()">✕</button></div>
     <div class="modal-body">
-      <p class="hint">把好几张图变成一张会动的 GIF：图片之间会加上<b>过渡动画</b>（白闪 / 叠化 / 擦除…），不会"啪"地一下跳过去。顺序就是下面缩略图的顺序。</p>
+      <p class="hint">把好几张图变成一张会动的 GIF：图片之间会加上<b>连续插值的平滑过渡</b>（叠化 / 白闪 / 擦除 / 滑动 / 缩放），不会"啪"地一下跳过去。顺序就是下面缩略图的顺序。</p>
       <div class="toolbar">
         <button class="candy" onclick="document.getElementById('gifFiles').click()"><span class="cb">📥</span>添加图片</button>
-        <button class="candy ghost" onclick="gifUseSelected()"><span class="cb">☑️</span>用相册里选中的</button>
-        <button class="candy ghost" onclick="gifUseAlbum()"><span class="cb">📚</span>用当前筛选结果</button>
-        <button class="candy ghost" onclick="gifClearFrames()"><span class="cb">♻️</span>清空</button>
+        <button class="candy berry" onclick="gifUseSelected()"><span class="cb">☑️</span>用相册里选中的</button>
+        <button class="candy leaf" onclick="gifUseAlbum()"><span class="cb">📚</span>用当前筛选结果</button>
+        <button class="candy danger" onclick="gifClearFrames()"><span class="cb">♻️</span>清空</button>
         <input type="file" id="gifFiles" accept="image/*" multiple style="display:none" onchange="gifFilesPicked(this.files);this.value=''" />
       </div>
       <div class="frame-strip" id="gifStrip"></div>
       <div class="tool-grid">
         <div class="field"><label>每张停留</label><select id="gifDelay"><option value="600">0.6 秒</option><option value="900" selected>0.9 秒</option><option value="1200">1.2 秒</option><option value="1800">1.8 秒</option><option value="2400">2.4 秒</option></select></div>
         <div class="field"><label>画面宽度</label><select id="gifSize"><option value="320">320px（最小）</option><option value="420" selected>420px</option><option value="540">540px</option><option value="640">640px（最清晰）</option></select></div>
-        <div class="field"><label>过渡效果</label><select id="gifFx"><option value="white" selected>白闪淡入淡出</option><option value="dissolve">颗粒叠化</option><option value="wipe">横向擦除</option><option value="slide">横向滑动</option><option value="black">黑场闪黑</option><option value="none">不加过渡</option></select></div>
-        <div class="field"><label>过渡帧数</label><select id="gifFxN"><option value="2">2 帧（最快）</option><option value="4" selected>4 帧</option><option value="6">6 帧（最顺）</option></select></div>
+        <div class="field"><label>过渡效果</label><select id="gifFx"><option value="crossfade" selected>平滑叠化（最顺）</option><option value="white">白闪淡入淡出</option><option value="black">黑场闪黑</option><option value="wipe">横向擦除</option><option value="slide">横向滑动</option><option value="zoom">缩放淡入</option><option value="none">不加过渡</option></select></div>
+        <div class="field"><label>过渡时长</label><select id="gifFxMs"><option value="300">0.3 秒（轻快）</option><option value="450">0.45 秒</option><option value="600" selected>0.6 秒（推荐）</option><option value="900">0.9 秒（悠长）</option></select></div>
         <div class="field"><label>画面比例</label><select id="gifFit"><option value="contain" selected>完整显示（留边）</option><option value="cover">铺满裁切</option></select></div>
         <div class="field"><label>背景色</label><select id="gifBg"><option value="#fffdf9" selected>奶油白</option><option value="#000000">黑色</option><option value="transparent">透明</option></select></div>
       </div>
@@ -1317,8 +1334,11 @@ let images = [];
 let currentFilter = 'all';
 let currentView = 'grid';   // 'grid' = 横向网格（默认） / 'waterfall' = 竖向瀑布流；下面会读取上次的选择
 try{ const v = localStorage.getItem('view_mode'); if(v==='grid' || v==='waterfall') currentView = v; }catch(e){}
-let cardScale = 1;          // 卡片大小倍率 0.55 ~ 1.8（首页 ➕/➖/↺ 三个按钮调的就是它）
-try{ const s = parseFloat(localStorage.getItem('card_scale')); if(s>=0.55 && s<=1.8) cardScale = s; }catch(e){}
+/* 卡片大小只有 5 档：50% / 75% / 100% / 125% / 150%（＋ / － / ↺ 三个按钮调的就是它） */
+const SCALE_LEVELS = [0.5, 0.75, 1, 1.25, 1.5];
+let cardScale = 1;
+function nearestScale(v){ let best = 1, bd = Infinity; SCALE_LEVELS.forEach(s=>{ const d = Math.abs(s - v); if(d < bd){ bd = d; best = s; } }); return best; }
+try{ const s = parseFloat(localStorage.getItem('card_scale')); if(s>=0.5 && s<=1.5) cardScale = nearestScale(s); }catch(e){}
 let tagShowAll = false;     // 标签条是否展开全部
 let currentAlbum = null;   // null = 全部
 let selecting = false;
@@ -1429,7 +1449,7 @@ function renderGallery(){
   let list = filtered(); // 标签/合集/收藏/搜索筛选统一在这里，翻页与幻灯片永远同步
   document.getElementById('emptyState').style.display = list.length ? 'none' : 'block';
   if(!list.length){ wrap.innerHTML=''; return; }
-  const tilts = [-1.6,-0.8,0,0.8,1.6,1.2,-1.2,0.4];
+  const tilts = [0,-0.8,0,0.8,1.6,1.2,-1.2,0.4];   // 第一张不歪：它的左边框要死死贴住上方面板的左边线
   wrap.innerHTML = list.map((im,idx)=>{
     const rt = Math.min(5, Math.max(0, Math.round(+im.rating)||0)); // 恶意 rating 防崩
     const stars = '★'.repeat(rt) + '☆'.repeat(5-rt);
@@ -1559,25 +1579,38 @@ function switchView(){
   toast(currentView==='grid' ? '换成「横向网格」视图 🔲' : '换成「竖向瀑布流」视图 🧱');
 }
 
-/* ==================== 卡片大小（➕ / ➖ / ↺） ==================== */
+/* ==================== 卡片大小（＋ / － / ↺） ==================== */
+/* 旧写法用 minmax()+auto-fill：列数是阶跃的，缩放过了某个点就再也不变（主人说的 115% 之后没反应就是这个原因）。
+   现在卡片宽度 = 基准 × 倍率，列数只负责把一行排满，所以 11 档每一档都真的变大变小。 */
 function applyCardSize(wrap){
   wrap = wrap || document.getElementById('galleryWrap');
   if(!wrap) return;
   const w = window.innerWidth;
   const base = w<=620 ? 128 : (w<=900 ? 164 : 190);   // 小屏自动用更小的基准，手机上不至于挤成一团
-  wrap.style.setProperty('--card-min', Math.round(base*cardScale)+'px');
-  const baseCols = w<=620 ? 2 : (w<=900 ? 3 : 4);
-  wrap.style.setProperty('--wf-cols', Math.max(1, Math.round(baseCols/cardScale)));
+  const gap = w<=620 ? 12 : 18;
+  const inner = wrap.clientWidth > 40 ? wrap.clientWidth : (Math.min(w, 1200) - 40);
+  const avail = Math.max(80, inner - 2);
+  let cw = Math.max(56, Math.round(base*cardScale));    // 卡片实际宽度：每一档都真的变化
+  const cols = Math.max(1, Math.floor((avail + gap) / (cw + gap)));
+  if(cols === 1) cw = Math.min(cw, Math.round(avail));  // 单列时不要溢出容器
+  wrap.style.setProperty('--card-w', cw + 'px');
+  wrap.style.setProperty('--card-min', cw + 'px');
+  wrap.style.setProperty('--grid-cols', cols);
+  wrap.style.setProperty('--wf-cols', cols);
   const lb = document.getElementById('sizeLabel');
-  if(lb) lb.textContent = '📐 卡片大小 ' + Math.round(cardScale*100) + '%';
+  if(lb) lb.textContent = Math.round(cardScale*100) + '%';
 }
 function resizeCards(dir){
-  if(dir===0) cardScale = 1;
-  else cardScale = Math.min(1.8, Math.max(0.55, Math.round((cardScale + dir*0.15)*100)/100));
+  if(dir===0){ cardScale = 1; }                       // ↺ 直接回到 100%
+  else{
+    let i = SCALE_LEVELS.indexOf(cardScale);
+    if(i < 0) i = SCALE_LEVELS.indexOf(nearestScale(cardScale));
+    cardScale = SCALE_LEVELS[Math.min(SCALE_LEVELS.length-1, Math.max(0, i + dir))]; // 只在 50 / 75 / 100 / 125 / 150 这五档里走
+  }
   try{ localStorage.setItem('card_scale', String(cardScale)); }catch(e){}
   applyCardSize();
   sparkleAt(innerWidth/2, 120);
-  toast('图片大小：' + Math.round(cardScale*100) + '% ' + (dir>0?'🔍':(dir<0?'🔎':'↺ 恢复默认')));
+  toast('卡片大小：' + Math.round(cardScale*100) + '% ' + (dir>0?'🔍':(dir<0?'🔎':'↺ 恢复默认')));
 }
 addEventListener('resize', ()=>applyCardSize());
 
@@ -1662,7 +1695,7 @@ async function openViewer(id){
     <div class="field"><label>备注</label><textarea id="vNote" rows="3">${escapeHtml(im.note||'')}</textarea></div>
     <div class="viewer-actions">
       <button class="candy" data-act="vsave"><span class="cb">💾</span>保存</button>
-      <button class="candy ${im.fav?'mint':'ghost'}" data-act="vfav" data-id="${escapeHtml(im.id)}">${im.fav?'💗 已收藏':'🤍 收藏'}</button>
+      <button class="candy ${im.fav?'mint':'sky'}" data-act="vfav" data-id="${escapeHtml(im.id)}">${im.fav?'💗 已收藏':'🤍 收藏'}</button>
       <button class="candy sky" data-act="vdownload" data-id="${escapeHtml(im.id)}"><span class="cb">⬇️</span>下载</button>
       <button class="candy gold" data-act="vcopy" data-id="${escapeHtml(im.id)}"><span class="cb">📋</span>复制图片</button>
       <button class="candy danger" data-act="vdelete" data-id="${escapeHtml(im.id)}"><span class="cb">🗑️</span>删除</button>
@@ -2111,7 +2144,7 @@ function renderSources(){
         <div class="s-actions">
           <button class="candy sm" data-act="open" data-url="${encodeURIComponent(s.home)}" data-name="${escapeHtml(s.name)}">🏠 直达</button>
           ${s.search ? `<button class="candy mint sm" data-act="search" data-url="${encodeURIComponent(s.search)}" data-name="${escapeHtml(s.name)}">🔍 搜索</button>` : ''}
-          <button class="candy ghost sm" data-act="copy" data-url="${encodeURIComponent(s.home)}">📋 复制</button>
+          <button class="candy sky sm" data-act="copy" data-url="${encodeURIComponent(s.home)}">📋 复制</button>
         </div>
       </div>`;
     });
@@ -2226,7 +2259,7 @@ function renderAlbumList(){
     html += `<div class="mgmt-item">
       <span class="mi-name">📚 ${escapeHtml(a)}</span>
       <span class="mi-count">${counts[a]||0} 张</span>
-      <button class="candy ghost sm" onclick="renameAlbum(${i})">✏️</button>
+      <button class="candy sky sm" onclick="renameAlbum(${i})">✏️</button>
       <button class="candy danger sm" onclick="delAlbum(${i})">🗑️</button>
     </div>`;
   });
@@ -2269,7 +2302,7 @@ function renderTagList(){
   box.innerHTML = tags.map(t=>`<div class="mgmt-item">
     <span class="mi-name">🏷️ ${escapeHtml(t)}</span>
     <span class="mi-count">${tagCount[t]} 张</span>
-    <button class="candy ghost sm" data-act="renametag" data-tag="${escapeHtml(t)}">✏️</button>
+    <button class="candy sky sm" data-act="renametag" data-tag="${escapeHtml(t)}">✏️</button>
     <button class="candy danger sm" data-act="deltag" data-tag="${escapeHtml(t)}">🗑️</button>
   </div>`).join('');
 }
@@ -2893,57 +2926,40 @@ function drawGifFrame(img, cw, ch, fit, bg){
   ctx.drawImage(img, Math.round((cw-dw)/2), Math.round((ch-dh)/2), dw, dh);
   return c;
 }
+/* 平滑过渡的核心：所有效果都改成「逐帧连续插值」——
+   进度 t 走 smoothstep 缓动曲线，配合高密度过渡帧（见 buildGifClick 里的 40ms 一帧），
+   相邻两帧只差一点点，所以是连续渐变，不会再几帧一卡地硬切。 */
+const FX_EASE = t => t*t*(3-2*t);   // smoothstep：两端慢、中间快，起止都不会“啪”地一下
 function makeTransitionFrames(a, b, cw, ch, fx, n, bg){
   const list = [];
   const mk = ()=>{ const c = document.createElement('canvas'); c.width = cw; c.height = ch; return c; };
   const base = (ctx)=>{ if(bg !== 'transparent'){ ctx.fillStyle = bg; ctx.fillRect(0,0,cw,ch); } };
-  if(fx === 'white' || fx === 'black'){
-    const col = fx === 'white' ? '255,255,255' : '0,0,0';
-    for(let j=1;j<=n;j++){ const t=j/(n+1), c=mk(), ctx=c.getContext('2d'); base(ctx); ctx.drawImage(a,0,0); ctx.fillStyle='rgba('+col+','+t.toFixed(3)+')'; ctx.fillRect(0,0,cw,ch); list.push(c); }
-    for(let j=n;j>=1;j--){ const t=j/(n+1), c=mk(), ctx=c.getContext('2d'); base(ctx); ctx.drawImage(b,0,0); ctx.fillStyle='rgba('+col+','+t.toFixed(3)+')'; ctx.fillRect(0,0,cw,ch); list.push(c); }
-    return list;
-  }
-  if(fx === 'wipe'){
-    for(let j=1;j<=n;j++){
-      const t=j/(n+1), c=mk(), ctx=c.getContext('2d');
-      base(ctx); ctx.drawImage(a,0,0);
-      ctx.save(); ctx.beginPath(); ctx.rect(0,0,cw*t,ch); ctx.clip(); ctx.drawImage(b,0,0); ctx.restore();
-      list.push(c);
-    }
-    return list;
-  }
-  if(fx === 'slide'){
-    for(let j=1;j<=n;j++){
-      const t=j/(n+1), c=mk(), ctx=c.getContext('2d');
-      base(ctx);
+  for(let j=1;j<=n;j++){
+    const raw = j/(n+1), t = FX_EASE(raw);
+    const c = mk(), ctx = c.getContext('2d');
+    base(ctx);
+    if(fx === 'crossfade'){
+      ctx.drawImage(a, 0, 0);                                   // 真正的逐像素叠化：A 打底，B 的透明度从 0 连续爬到 1
+      ctx.globalAlpha = t; ctx.drawImage(b, 0, 0); ctx.globalAlpha = 1;
+    }else if(fx === 'slide'){
       ctx.drawImage(a, Math.round(-cw*t), 0);
       ctx.drawImage(b, Math.round(cw*(1-t)), 0);
-      list.push(c);
+    }else if(fx === 'wipe'){
+      ctx.drawImage(a, 0, 0);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, cw*t, ch); ctx.clip(); ctx.drawImage(b, 0, 0); ctx.restore();
+    }else if(fx === 'zoom'){
+      ctx.drawImage(a, 0, 0);
+      const sc = 0.6 + 0.4*t, dw = Math.max(1, Math.round(cw*sc)), dh = Math.max(1, Math.round(ch*sc));
+      ctx.globalAlpha = Math.min(1, raw*1.4);
+      ctx.drawImage(b, Math.round((cw-dw)/2), Math.round((ch-dh)/2), dw, dh);
+      ctx.globalAlpha = 1;
+    }else{                                                      // white / black：亮度按正弦包络连续升起再落下，换图那一刻正好被亮光完全盖住
+      ctx.drawImage(raw < 0.5 ? a : b, 0, 0);
+      const al = Math.sin(Math.PI*raw).toFixed(3);
+      ctx.fillStyle = 'rgba(' + (fx === 'black' ? '0,0,0' : '255,255,255') + ',' + al + ')';
+      ctx.fillRect(0, 0, cw, ch);
     }
-    return list;
-  }
-  if(fx === 'dissolve'){
-    const A = a.getContext('2d').getImageData(0,0,cw,ch).data;
-    const B = b.getContext('2d').getImageData(0,0,cw,ch).data;
-    for(let j=1;j<=n;j++){
-      const t = j/(n+1);
-      const c = mk(), ctx = c.getContext('2d');
-      const out = ctx.createImageData(cw, ch), o = out.data;
-      for(let y=0;y<ch;y++){
-        const row = y*cw*4;
-        for(let x=0;x<cw;x++){
-          const p = row + x*4;
-          const useB = (BAYER8[y&7][x&7] / 64) < t;
-          o[p]   = useB ? B[p]   : A[p];
-          o[p+1] = useB ? B[p+1] : A[p+1];
-          o[p+2] = useB ? B[p+2] : A[p+2];
-          o[p+3] = useB ? B[p+3] : A[p+3];
-        }
-      }
-      ctx.putImageData(out, 0, 0);
-      list.push(c);
-    }
-    return list;
+    list.push(c);
   }
   return list;
 }
@@ -2952,7 +2968,7 @@ async function buildGifClick(){
   const W = parseInt(document.getElementById('gifSize').value) || 420;
   const delayCs = Math.max(2, Math.round((parseInt(document.getElementById('gifDelay').value) || 900) / 10));
   const fx = document.getElementById('gifFx').value;
-  const fxN = parseInt(document.getElementById('gifFxN').value) || 4;
+  const fxMs = parseInt(document.getElementById('gifFxMs').value) || 600;
   const fit = document.getElementById('gifFit').value;
   const bg = document.getElementById('gifBg').value;
   const transparent = (bg === 'transparent');
@@ -2965,12 +2981,19 @@ async function buildGifClick(){
   box.textContent = '正在把 ' + gifFrames.length + ' 张图拼成动图…（图片多的时候要等几秒）';
   try{
     const drawn = gifFrames.map(f=>drawGifFrame(f.img, cw, ch, fit, bg));
+    // 过渡帧按 40ms 一帧（≈25fps）铺满设定时长：帧够密，肉眼看到的才是连续渐变；总帧数封顶，避免文件爆掉
+    const FX_STEP_MS = 40, fxDelayCs = Math.max(2, Math.round(FX_STEP_MS/10));
+    let fxN = Math.max(6, Math.round(fxMs / FX_STEP_MS));
+    if(drawn.length > 1){
+      const budget = Math.max(1, Math.floor((280 - drawn.length) / drawn.length));
+      fxN = Math.max(1, Math.min(fxN, budget));
+    }
     const seq = [];
     for(let i=0;i<drawn.length;i++){
       seq.push({ canvas: drawn[i], delayCs });
       if(fx !== 'none' && drawn.length > 1){
         const trans = makeTransitionFrames(drawn[i], drawn[(i+1)%drawn.length], cw, ch, fx, fxN, bg);
-        trans.forEach(c=>seq.push({ canvas:c, delayCs: Math.max(4, Math.round(delayCs/4)) }));
+        trans.forEach(c=>seq.push({ canvas:c, delayCs: fxDelayCs }));
       }
       fill.style.width = (5 + 30*(i+1)/drawn.length) + '%';
       if(i % 2 === 0) await new Promise(r=>setTimeout(r, 0));
