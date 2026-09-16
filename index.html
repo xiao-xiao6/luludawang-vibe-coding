@@ -248,10 +248,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .album-chip:hover{transform:translateY(-2px)}
 
 /* 拍立得卡片 */
-.waterfall{column-count:4;column-gap:18px;margin-top:18px}
-.gridview{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;margin-top:18px}
-@media(max-width:900px){.waterfall{column-count:3}}
-@media(max-width:620px){.waterfall{column-count:2}}
+.waterfall{column-count:var(--wf-cols,4);column-gap:18px;margin-top:18px}
+.gridview{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-min,190px),1fr));gap:18px;margin-top:18px}
+@media(max-width:620px){.gridview{gap:12px}.waterfall{column-gap:12px}}
+/* 卡片大小与列数由 applyCardSize() 按窗口宽度 + 用户缩放实时计算 */
 .polaroid{
   position:relative;break-inside:avoid;margin-bottom:20px;background:var(--card);
   padding:10px 10px 12px;border-radius:6px;box-shadow:var(--shadow);
@@ -367,6 +367,56 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .slideshow .ss-ctrl{margin-top:22px;display:flex;gap:10px}
 .slideshow .ss-hint{position:absolute;bottom:18px;color:#8a8396;font-size:12px}
 
+/* ============ 标题旁的小头像 ============ */
+.brand h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.2}
+.brand-logo{height:48px;width:auto;border-radius:14px;display:block;
+  filter:drop-shadow(0 6px 14px rgba(180,140,100,.32));animation:logoWiggle 6s ease-in-out infinite}
+@media(max-width:620px){.brand-logo{height:36px}}
+
+/* ============ 弹窗（合集 / 标签 / 小工具） ============ */
+.modal{position:fixed;inset:0;z-index:9200;background:rgba(30,20,15,.62);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal.open{display:flex;animation:fadeIn .22s}
+.modal-box{background:var(--paper);border-radius:22px;max-width:760px;width:100%;box-shadow:0 26px 70px rgba(0,0,0,.45);animation:viewerPop .32s cubic-bezier(.34,1.56,.64,1);margin:auto;overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
+.modal-box.wide{max-width:920px}
+.modal-head{display:flex;align-items:center;gap:10px;padding:15px 20px;border-bottom:1.5px solid var(--line);flex:none}
+.modal-head h2{font-size:18px;flex:1;display:flex;align-items:center;gap:8px}
+.m-close{width:38px;height:38px;border-radius:50%;background:var(--card);border:none;font-size:18px;cursor:pointer;box-shadow:var(--shadow);transition:.2s;flex:none;color:var(--ink)}
+.m-close:hover{transform:rotate(90deg) scale(1.05)}
+.modal-body{padding:18px 20px 22px;overflow-y:auto}
+.modal-body h3{font-size:15px;margin:16px 0 8px;color:var(--accent-deep)}
+.hint{font-size:12.5px;color:var(--ink-soft);line-height:1.7}
+.size-tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--ink-soft);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;box-shadow:var(--shadow)}
+
+/* ============ 拖拽：图片→合集 / 标签→图片 ============ */
+.drag-ghost{position:fixed;z-index:9999;pointer-events:none;transform:translate(-50%,-50%);padding:7px 14px;border-radius:14px;background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#fff;font-size:13px;font-weight:800;box-shadow:var(--shadow-hover);opacity:.96;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drag-ghost.tag{background:linear-gradient(180deg,var(--accent2),#5fa382)}
+.album-chip.hot{background:var(--accent);color:#fff;border-color:transparent;transform:scale(1.1) translateY(-2px)}
+.polaroid.hot{outline:3px dashed var(--accent);outline-offset:3px;transform:translateY(-6px) scale(1.03)}
+.pill.draggable{cursor:grab;user-select:none}
+.pill.draggable:active{cursor:grabbing}
+.polaroid[draggable="true"]{cursor:grab}
+
+/* ============ 小工具面板（直链 / GIF / MP4） ============ */
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
+.tool-grid .field{margin-bottom:0}
+.res-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;max-height:300px;overflow-y:auto}
+.res-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px}
+.res-item img{width:46px;height:46px;object-fit:cover;border-radius:8px;background:var(--bg-deep);flex:none}
+.res-item .r-main{flex:1;min-width:0}
+.res-item .r-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-item .r-url{font-size:11.5px;color:var(--ink-soft);word-break:break-all;line-height:1.5}
+.res-item .r-state{font-size:12px;font-weight:800;color:var(--accent2);white-space:nowrap}
+.progress-bar{height:9px;border-radius:999px;background:var(--accent-soft);overflow:hidden;margin-top:10px;display:none}
+.progress-bar.show{display:block}
+.progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s}
+.preview-box{display:grid;place-items:center;background:var(--bg-deep);border-radius:14px;padding:12px;margin-top:14px;min-height:110px;color:var(--ink-soft);font-size:13px}
+.preview-box img{max-width:100%;max-height:340px;border-radius:10px;box-shadow:var(--shadow)}
+.frame-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.frame-strip .fr{position:relative;width:64px;height:64px;border-radius:10px;overflow:hidden;background:var(--bg-deep);border:1.5px solid var(--line)}
+.frame-strip .fr img{width:100%;height:100%;object-fit:cover}
+.frame-strip .fr .fx{position:absolute;top:0;right:0;background:rgba(0,0,0,.55);color:#fff;border:none;font-size:11px;width:18px;height:18px;cursor:pointer;border-radius:0 0 0 6px;line-height:1}
+.frame-strip .fr .no{position:absolute;left:2px;bottom:2px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;border-radius:5px;padding:0 4px}
+
 /* ============ 气泡提示 ============ */
 #bubbles{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
 .bubble{background:var(--ink);color:#fff;font-size:14px;font-weight:700;padding:11px 20px;border-radius:18px;box-shadow:0 10px 26px rgba(0,0,0,.3);animation:bubIn .35s cubic-bezier(.34,1.56,.64,1),bubOut .4s ease forwards;animation-delay:0s,2.3s;position:relative}
@@ -392,7 +442,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
   <div class="topbar">
     <div class="logo">🧁</div>
     <div class="brand">
-      <h1>噜噜大王の好图收纳屋</h1>
+      <h1>噜噜大王の好图收纳屋<img class="brand-logo" src="data:image/png;base64,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" alt="噜噜大王" title="噜噜大王" /></h1>
       <div class="sub"> ✿ 这里是噜噜大王制作的图片收藏小窝，你喜欢的任何图片都可以存在这里哦~✿</div>
     </div>
     <div class="theme-pick" id="themePick">
@@ -434,9 +484,20 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <button class="candy ghost" onclick="switchView()" id="viewBtn"><span class="cb">🍱</span>切换视图</button>
         <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files);this.value=''" />
       </div>
+      <div class="toolbar" style="margin-top:9px">
+        <button class="candy ghost sm" onclick="resizeCards(1)"><span class="cb">➕</span>图片变大</button>
+        <button class="candy ghost sm" onclick="resizeCards(-1)"><span class="cb">➖</span>图片变小</button>
+        <button class="candy ghost sm" onclick="resizeCards(0)"><span class="cb">↺</span>默认大小</button>
+        <span class="size-tag" id="sizeLabel">📐 卡片大小 100%</span>
+        <button class="candy mint sm" onclick="openTool('link')"><span class="cb">🔗</span>图片转直链</button>
+        <button class="candy gold sm" onclick="openTool('gif')"><span class="cb">🎞️</span>多图合成 GIF</button>
+        <button class="candy sky sm" onclick="openTool('mp4')"><span class="cb">🎬</span>GIF 转 MP4</button>
+        <button class="candy ghost sm" onclick="openModal('albumModal')"><span class="cb">📚</span>合集管理</button>
+        <button class="candy ghost sm" onclick="openModal('tagModal')"><span class="cb">🏷️</span>标签管理</button>
+      </div>
       <div class="dropzone" id="dropzone" onclick="pickFiles()">
         <div class="dz-emoji">🐻‍❄️</div>
-        <h3>把TA贴进来吧</h3>
+        <h3>把图片贴进来吧</h3>
         <p>点击选择 · 多张批量 · 直接拖拽 · 甚至 Ctrl+V 粘贴都可以哦</p>
       </div>
       <div class="folder-status warn" id="permHint" style="display:none;cursor:pointer" onclick="folderHintClick()" title="点一下处理图库文件夹">
@@ -456,12 +517,16 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       </div>
       <div class="album-bar" id="albumBar"></div>
       <div class="filters" id="tagFilter" style="margin-top:8px"></div>
+      <div class="filters" style="margin-top:8px">
+        <button class="pill" id="tagMoreBtn" onclick="toggleAllTags()">🏷️ 显示全部标签</button>
+        <span class="hint">💡 把「标签」拖到任意图片上 = 给那张图打标签；把「图片卡片」拖到上方的「合集」上 = 立刻归类，都不用点进去～</span>
+      </div>
     </div>
-    <div id="galleryWrap" class="waterfall"></div>
+    <div id="galleryWrap" class="gridview"></div>
     <div class="empty" id="emptyState" style="display:none">
       <div class="big">🍑</div>
       <h3>小窝还空空的呢～</h3>
-      <p>点上方「上传图片」，或去「图源导航」淘几张TA吧！</p>
+      <p>点上方「上传图片」，或去「图源导航」淘几张喜欢的图吧！</p>
       <button class="candy" onclick="pickFiles()"><span class="cb">🐾</span>收下第一张图片</button>
     </div>
   </section>
@@ -470,7 +535,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
   <section id="tab-sources">
     <div class="sheet">
       <h2>🧭 图源导航</h2>
-      <p class="desc">从这里出发去各大图站淘可爱的胖男孩图片，选中后收进相册。点「直达」进首页，点「搜索」按关键词直达结果。</p>
+      <p class="desc">这里汇集了全球上百个公开图站，按题材分成十多个分类：插画社区、动漫图库、以图搜图、免授权素材、高清壁纸、头像捏人、表情包动图、名画典藏、AI 绘画、图标矢量、摄影、设计配色、材质纹理、影视剧照、游戏素材、社交灵感与中文站点。点「直达」进首页逛，点「搜索」按关键词直达结果页；看到喜欢的图右键保存，或用相册里的「链接导入」收进小窝。</p>
+      <div class="filters" style="margin-top:14px">
+        <input type="search" id="srcSearch" placeholder="🔍 搜图站名字或用途，例如：壁纸 / 表情包 / 配色 / GIF" style="flex:1;min-width:200px" oninput="renderSources()" />
+        <button class="pill on" id="srcCatAll" onclick="setSrcCat('')">🗂️ 全部分类</button>
+        <span class="hint" id="srcCount"></span>
+      </div>
+      <div class="filters" id="srcCatChips" style="margin-top:8px"></div>
       <div class="src-grid" id="srcGrid"></div>
       <div class="src-cat">✨ 最近访问</div>
       <div class="recent-row" id="recentRow"></div>
@@ -506,7 +577,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 
     <div class="sheet">
       <h2>🗃️ 数据管理</h2>
-      <p class="desc">原图在文件夹里，浏览器只存索引。随时备份、迁移、还原。</p>
+      <p class="desc">原图在文件夹里，浏览器只存索引。随时备份、迁移、还原。（📚 合集管理 / 🏷️ 标签管理 已经搬到首页工具栏，点一下就能打开～）</p>
       <div class="data-grid" id="dataGrid"></div>
       <div class="toolbar" style="margin-top:20px">
         <button class="candy" onclick="exportAll()"><span class="cb">📤</span>导出全部(含图)</button>
@@ -519,22 +590,128 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       <p class="desc" style="margin-top:14px">提示：备份是标准 JSON。「含图」备份体积大属正常；「元数据」备份不含图片像素，体积很小。</p>
     </div>
 
-    <div class="sheet">
-      <h2>📚 合集管理</h2>
-      <p class="desc">用不同的「合集」给图片分组，相当于多本相册。</p>
+  </section>
+</div>
+
+<!-- 合集管理 -->
+<div class="modal" id="albumModal" onclick="if(event.target===this)closeModal('albumModal')">
+  <div class="modal-box">
+    <div class="modal-head"><h2>📚 合集管理</h2><button class="m-close" onclick="closeModal('albumModal')">✕</button></div>
+    <div class="modal-body">
+      <p class="hint">用「合集」把图片分成一组组，相当于好几本相册。也可以直接在首页把「图片卡片」<b>拖到</b>某个合集上，一拖就归类～</p>
       <div class="custom-src">
-        <div class="field"><label>新建合集</label><input type="text" id="newAlbumName" placeholder="例如：可爱日常 / 甜甜的午后" /></div>
+        <div class="field"><label>新建合集</label><input type="text" id="newAlbumName" placeholder="例如：游戏 / 角色形象 / 风景 / 表情包 / 设计参考" /></div>
         <button class="candy mint" onclick="addAlbum()"><span class="cb">➕</span>新建</button>
       </div>
       <div class="mgmt-list" id="albumList"></div>
     </div>
+  </div>
+</div>
 
-    <div class="sheet">
-      <h2>🏷️ 标签管理</h2>
-      <p class="desc">重命名或删除标签会同步更新到所有图片。</p>
+<!-- 标签管理 -->
+<div class="modal" id="tagModal" onclick="if(event.target===this)closeModal('tagModal')">
+  <div class="modal-box">
+    <div class="modal-head"><h2>🏷️ 标签管理</h2><button class="m-close" onclick="closeModal('tagModal')">✕</button></div>
+    <div class="modal-body">
+      <p class="hint">重命名或删除标签会同步更新到所有图片上。首页的标签条里，每个标签都能<b>直接拖到某张图片上</b>，松手就打好标签啦。</p>
       <div class="mgmt-list" id="tagList"></div>
     </div>
-  </section>
+  </div>
+</div>
+
+<!-- 图片转直链 -->
+<div class="modal" id="toolLinkModal" onclick="if(event.target===this)closeToolModal()">
+  <div class="modal-box wide">
+    <div class="modal-head"><h2>🔗 图片转直链</h2><button class="m-close" onclick="closeToolModal()">✕</button></div>
+    <div class="modal-body">
+      <p class="hint">选几张图片 → 上传到公开图床 → 拿到 <b>https://</b> 开头的直链，可以直接贴到论坛、文档、聊天窗口里。<br>免注册的图床是<b>临时</b>的（1～72 小时）；想长期保留，填一个自己的 imgbb Key 就好。</p>
+      <div class="tool-grid">
+        <div class="field"><label>上传到哪个图床</label>
+          <select id="linkHost" onchange="onLinkHostChange()">
+            <option value="litterbox">Litterbox（免注册 · 1~72 小时）</option>
+            <option value="kappa">kappa.lol（免注册 · 保存较久）</option>
+            <option value="tmpfiles">tmpfiles.org（免注册 · 约 1 小时）</option>
+            <option value="imgbb">imgbb（自填 API Key · 长期）</option>
+            <option value="custom">自定义接口（进阶）</option>
+          </select>
+        </div>
+        <div class="field" id="linkKeepField"><label>保存时长</label>
+          <select id="linkKeep"><option value="1h">1 小时</option><option value="12h">12 小时</option><option value="24h" selected>24 小时</option><option value="72h">72 小时</option></select>
+        </div>
+      </div>
+      <div class="field" id="linkKeyField" style="display:none"><label>imgbb API Key（api.imgbb.com 免费申请，只存在你这台电脑的浏览器里）</label><input type="text" id="linkKey" placeholder="粘贴 API Key" /></div>
+      <div class="tool-grid" id="linkCustomFields" style="display:none">
+        <div class="field"><label>接口地址（POST）</label><input type="text" id="linkCustomUrl" placeholder="https://example.com/api/upload" /></div>
+        <div class="field"><label>文件字段名</label><input type="text" id="linkCustomField" placeholder="file" /></div>
+        <div class="field"><label>从返回里取 URL 的路径</label><input type="text" id="linkCustomPath" placeholder="如 data.url；留空表示直接返回纯文本 URL" /></div>
+      </div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="candy" onclick="document.getElementById('linkFiles').click()"><span class="cb">📥</span>选择图片上传</button>
+        <button class="candy ghost" onclick="linkUseSelected()"><span class="cb">☑️</span>用相册里选中的</button>
+        <button class="candy ghost" onclick="linkUseAlbum()"><span class="cb">📚</span>用当前筛选结果</button>
+        <button class="candy mint" onclick="linkCopyAll()"><span class="cb">📋</span>复制全部直链</button>
+        <button class="candy ghost" onclick="linkClear()"><span class="cb">♻️</span>清空列表</button>
+        <input type="file" id="linkFiles" accept="image/*" multiple style="display:none" onchange="linkFilesPicked(this.files);this.value=''" />
+      </div>
+      <div class="progress-bar" id="linkBar"><i></i></div>
+      <div class="res-list" id="linkResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 多图合成 GIF -->
+<div class="modal" id="toolGifModal" onclick="if(event.target===this)closeToolModal()">
+  <div class="modal-box wide">
+    <div class="modal-head"><h2>🎞️ 多图合成 GIF</h2><button class="m-close" onclick="closeToolModal()">✕</button></div>
+    <div class="modal-body">
+      <p class="hint">把好几张图变成一张会动的 GIF：图片之间会加上<b>过渡动画</b>（白闪 / 叠化 / 擦除…），不会"啪"地一下跳过去。顺序就是下面缩略图的顺序。</p>
+      <div class="toolbar">
+        <button class="candy" onclick="document.getElementById('gifFiles').click()"><span class="cb">📥</span>添加图片</button>
+        <button class="candy ghost" onclick="gifUseSelected()"><span class="cb">☑️</span>用相册里选中的</button>
+        <button class="candy ghost" onclick="gifUseAlbum()"><span class="cb">📚</span>用当前筛选结果</button>
+        <button class="candy ghost" onclick="gifClearFrames()"><span class="cb">♻️</span>清空</button>
+        <input type="file" id="gifFiles" accept="image/*" multiple style="display:none" onchange="gifFilesPicked(this.files);this.value=''" />
+      </div>
+      <div class="frame-strip" id="gifStrip"></div>
+      <div class="tool-grid">
+        <div class="field"><label>每张停留</label><select id="gifDelay"><option value="600">0.6 秒</option><option value="900" selected>0.9 秒</option><option value="1200">1.2 秒</option><option value="1800">1.8 秒</option><option value="2400">2.4 秒</option></select></div>
+        <div class="field"><label>画面宽度</label><select id="gifSize"><option value="320">320px（最小）</option><option value="420" selected>420px</option><option value="540">540px</option><option value="640">640px（最清晰）</option></select></div>
+        <div class="field"><label>过渡效果</label><select id="gifFx"><option value="white" selected>白闪淡入淡出</option><option value="dissolve">颗粒叠化</option><option value="wipe">横向擦除</option><option value="slide">横向滑动</option><option value="black">黑场闪黑</option><option value="none">不加过渡</option></select></div>
+        <div class="field"><label>过渡帧数</label><select id="gifFxN"><option value="2">2 帧（最快）</option><option value="4" selected>4 帧</option><option value="6">6 帧（最顺）</option></select></div>
+        <div class="field"><label>画面比例</label><select id="gifFit"><option value="contain" selected>完整显示（留边）</option><option value="cover">铺满裁切</option></select></div>
+        <div class="field"><label>背景色</label><select id="gifBg"><option value="#fffdf9" selected>奶油白</option><option value="#000000">黑色</option><option value="transparent">透明</option></select></div>
+      </div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="candy gold" onclick="buildGifClick()"><span class="cb">🎞️</span>开始生成</button>
+        <button class="candy mint" onclick="downloadGif()"><span class="cb">⬇️</span>下载 GIF</button>
+      </div>
+      <div class="progress-bar" id="gifBar"><i></i></div>
+      <div class="preview-box" id="gifPreview">还没生成～ 先添加图片，再点「开始生成」吧</div>
+    </div>
+  </div>
+</div>
+
+<!-- GIF 转 MP4 -->
+<div class="modal" id="toolMp4Modal" onclick="if(event.target===this)closeToolModal()">
+  <div class="modal-box wide">
+    <div class="modal-head"><h2>🎬 GIF 转 MP4</h2><button class="m-close" onclick="closeToolModal()">✕</button></div>
+    <div class="modal-body">
+      <p class="hint">上传一个 GIF，按它原本的帧速重新编码成 <b>MP4（H.264）</b>。体积通常只有 GIF 的几分之一，发到聊天软件 / 视频站也不会再被糊成马赛克。</p>
+      <div class="toolbar">
+        <button class="candy" onclick="document.getElementById('mp4File').click()"><span class="cb">📥</span>选择 GIF</button>
+        <button class="candy gold" onclick="startGif2Mp4()"><span class="cb">🎬</span>开始转换</button>
+        <button class="candy mint" onclick="downloadMp4()"><span class="cb">⬇️</span>下载 MP4</button>
+        <input type="file" id="mp4File" accept="image/gif,.gif" style="display:none" onchange="mp4FilePicked(this.files);this.value=''" />
+      </div>
+      <div class="tool-grid">
+        <div class="field"><label>输出尺寸</label><select id="mp4Scale"><option value="1" selected>和 GIF 一样大</option><option value="1.5">放大 1.5 倍</option><option value="2">放大 2 倍（更清晰）</option></select></div>
+        <div class="field"><label>画质</label><select id="mp4Quality"><option value="1">标准</option><option value="1.8" selected>较好</option><option value="3">很高（文件更大）</option></select></div>
+        <div class="field"><label>播放遍数</label><select id="mp4Loop"><option value="1" selected>播放 1 遍</option><option value="2">播放 2 遍</option><option value="3">播放 3 遍</option></select></div>
+      </div>
+      <div class="progress-bar" id="mp4Bar"><i></i></div>
+      <div class="preview-box" id="mp4Preview">还没有转换～</div>
+    </div>
+  </div>
 </div>
 
 <!-- 查看器 -->
@@ -794,7 +971,7 @@ function fileToDataUrl(file){
   return new Promise((res,rej)=>{ const r = new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
 }
 /* 文件名带 id 前缀，扫描恢复时才能把图和标签信息对上号 */
-function folderFileName(rec, ext){ return rec.id + '__' + safeFileName(rec.name || '可爱男孩') + '.' + (ext || 'png'); }
+function folderFileName(rec, ext){ return rec.id + '__' + safeFileName(rec.name || '未命名图片') + '.' + (ext || 'png'); }
 
 /* 授权检查：needGrant=false 时只问不回弹（用于后台自动写入） */
 async function verifyPermission(handle, needGrant){
@@ -1138,7 +1315,11 @@ async function initFolder(){
 /* ==================== 状态 ==================== */
 let images = [];
 let currentFilter = 'all';
-let currentView = 'waterfall';
+let currentView = 'grid';   // 'grid' = 横向网格（默认） / 'waterfall' = 竖向瀑布流；下面会读取上次的选择
+try{ const v = localStorage.getItem('view_mode'); if(v==='grid' || v==='waterfall') currentView = v; }catch(e){}
+let cardScale = 1;          // 卡片大小倍率 0.55 ~ 1.8（首页 ➕/➖/↺ 三个按钮调的就是它）
+try{ const s = parseFloat(localStorage.getItem('card_scale')); if(s>=0.55 && s<=1.8) cardScale = s; }catch(e){}
+let tagShowAll = false;     // 标签条是否展开全部
 let currentAlbum = null;   // null = 全部
 let selecting = false;
 let selected = new Set();
@@ -1244,6 +1425,7 @@ function ratioPct(im){
 function renderGallery(){
   const wrap = document.getElementById('galleryWrap');
   wrap.className = currentView==='grid' ? 'gridview' : 'waterfall';
+  applyCardSize(wrap);
   let list = filtered(); // 标签/合集/收藏/搜索筛选统一在这里，翻页与幻灯片永远同步
   document.getElementById('emptyState').style.display = list.length ? 'none' : 'block';
   if(!list.length){ wrap.innerHTML=''; return; }
@@ -1255,12 +1437,12 @@ function renderGallery(){
     const checked = selected.has(im.id) ? 'checked' : '';
     const sel = selecting ? 'selecting' : '';
     const tilt = tilts[idx % tilts.length];
-    return `<div class="polaroid ${sel} ${checked}" data-id="${escapeHtml(im.id)}" style="--tilt:${tilt}deg;animation-delay:${Math.min(idx*40,560)}ms">
+    return `<div class="polaroid ${sel} ${checked}" data-id="${escapeHtml(im.id)}" draggable="true" style="--tilt:${tilt}deg;animation-delay:${Math.min(idx*40,560)}ms">
       <span class="tape tl"></span><span class="tape br"></span>
       <span class="pin p1"></span><span class="pin p2"></span>
       <button class="fav-pin ${im.fav?'on':''}" data-fav="${escapeHtml(im.id)}">${im.fav?'💗':'🤍'}</button>
       <div class="sel-mark">✓</div>
-      <div class="ph-frame" data-id="${escapeHtml(im.id)}"${ratioPct(im)}><img alt="${escapeHtml(im.name)}" /></div>
+      <div class="ph-frame" data-id="${escapeHtml(im.id)}"${ratioPct(im)}><img alt="${escapeHtml(im.name)}" draggable="false" /></div>
       <div class="ph-name">${escapeHtml(im.name||'未命名')}</div>
       <div class="ph-meta"><span class="stars">${stars}</span>${tags}</div>
     </div>`;
@@ -1325,10 +1507,19 @@ function renderTagFilter(){
   images.forEach(i=> (i.tags||[]).forEach(t=> tagCount[t]=(tagCount[t]||0)+1));
   const tags = Object.keys(tagCount).sort((a,b)=>tagCount[b]-tagCount[a]);
   const cur = activeTag();
-  let show = tags.slice(0,30);
+  let show = tagShowAll ? tags : tags.slice(0,30);
   if(cur && !show.includes(cur)) show = show.concat([cur]); // 激活中的标签永远保持在列，不会「消失」
-  box.innerHTML = show.map(t=>`<button class="pill ${cur===t?'on':''}" data-tag="${escapeHtml(t)}">${escapeHtml(t)} · ${tagCount[t]}</button>`).join('');
+  box.innerHTML = show.map(t=>`<button class="pill draggable ${cur===t?'on':''}" draggable="true" data-tag="${escapeHtml(t)}" title="点一下筛选 · 拖到图片上就能打标签">${escapeHtml(t)} · ${tagCount[t]}</button>`).join('');
+  box.style.maxHeight = tagShowAll ? '132px' : '';
+  box.style.overflowY = tagShowAll ? 'auto' : '';
+  box.style.overflowX = 'hidden';
+  const btn = document.getElementById('tagMoreBtn');
+  if(btn){
+    btn.style.display = tags.length > 30 ? '' : 'none';
+    btn.textContent = tagShowAll ? '🏷️ 收起标签' : ('🏷️ 显示全部标签（' + tags.length + ' 个）');
+  }
 }
+function toggleAllTags(){ tagShowAll = !tagShowAll; renderTagFilter(); }
 function setTag(t){
   document.querySelectorAll('#tagFilter .pill').forEach(c=> c.classList.toggle('on', t!=null && c.dataset.tag===t));
   renderGallery();
@@ -1363,8 +1554,32 @@ function setFilter(f){
 }
 function switchView(){
   currentView = currentView==='waterfall' ? 'grid' : 'waterfall';
+  try{ localStorage.setItem('view_mode', currentView); }catch(e){}
   renderGallery();
+  toast(currentView==='grid' ? '换成「横向网格」视图 🔲' : '换成「竖向瀑布流」视图 🧱');
 }
+
+/* ==================== 卡片大小（➕ / ➖ / ↺） ==================== */
+function applyCardSize(wrap){
+  wrap = wrap || document.getElementById('galleryWrap');
+  if(!wrap) return;
+  const w = window.innerWidth;
+  const base = w<=620 ? 128 : (w<=900 ? 164 : 190);   // 小屏自动用更小的基准，手机上不至于挤成一团
+  wrap.style.setProperty('--card-min', Math.round(base*cardScale)+'px');
+  const baseCols = w<=620 ? 2 : (w<=900 ? 3 : 4);
+  wrap.style.setProperty('--wf-cols', Math.max(1, Math.round(baseCols/cardScale)));
+  const lb = document.getElementById('sizeLabel');
+  if(lb) lb.textContent = '📐 卡片大小 ' + Math.round(cardScale*100) + '%';
+}
+function resizeCards(dir){
+  if(dir===0) cardScale = 1;
+  else cardScale = Math.min(1.8, Math.max(0.55, Math.round((cardScale + dir*0.15)*100)/100));
+  try{ localStorage.setItem('card_scale', String(cardScale)); }catch(e){}
+  applyCardSize();
+  sparkleAt(innerWidth/2, 120);
+  toast('图片大小：' + Math.round(cardScale*100) + '% ' + (dir>0?'🔍':(dir<0?'🔎':'↺ 恢复默认')));
+}
+addEventListener('resize', ()=>applyCardSize());
 
 /* ==================== 上传 / 导入 ==================== */
 function pickFiles(){ document.getElementById('fileInput').click(); }
@@ -1392,7 +1607,7 @@ async function handleFiles(files){
   }
   await refresh();
   if(ok){ candyRain(70); starBurst(innerWidth/2, innerHeight/2); }
-  let msg = '成功收下 '+ok+' 张TA！🧁';
+  let msg = '成功收下 '+ok+' 张图片！🧁';
   if(dup) msg += ' · 跳过重复 '+dup+' 张';
   if(fail) msg += ' · '+fail+' 张没存进去（存储空间可能不足）🥺';
   toast(msg);
@@ -1523,7 +1738,7 @@ async function toggleFav(id){
   if(b){ b.classList.toggle('on', im.fav); b.textContent = im.fav?'💗':'🤍'; }
   if(im.fav){ const r=b?b.getBoundingClientRect():{x:innerWidth/2,y:innerHeight/2,width:38,height:38}; starBurst(r.x+r.width/2, r.y+r.height/2); }
   await refreshStats();
-  toast(im.fav?'收藏成功，好好珍藏他 💗':'取消收藏啦 🤍');
+  toast(im.fav?'收藏成功，好好珍藏 💗':'取消收藏啦 🤍');
 }
 function extFromDataUrl(d){
   const m = /^data:image\/([\w+.-]+)[;,]/.exec(String(d||''));
@@ -1532,7 +1747,7 @@ function extFromDataUrl(d){
   return t==='jpeg' ? 'jpg' : (t==='svg+xml' ? 'svg' : t);
 }
 function safeFileName(s){
-  return String(s||'可爱男孩').replace(/[\\\/:*?"<>|\s]+/g,'_').slice(0,80) || '可爱男孩';
+  return String(s||'未命名图片').replace(/[\\\/:*?"<>|\s]+/g,'_').slice(0,80) || '未命名图片';
 }
 /* 取原图 Blob：文件夹优先，旧版留在浏览器里的原图兜底 */
 async function blobOf(rec){
@@ -1677,7 +1892,7 @@ async function batchExport(){
   if(!list.length) return;
   toast('正在把选中的原图打包…');
   const packed = await packWithImages(list);
-  downloadText('可爱男孩_选集备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
+  downloadText('好图收纳屋_选集备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
   toast('导出 '+packed.length+' 张备份 📤');
 }
 async function batchDelete(){
@@ -1689,47 +1904,221 @@ async function batchDelete(){
 
 /* ==================== 图源导航 ==================== */
 const BUILTIN_SOURCES = [
-  { cat:'二次元插画', items:[
-    { emoji:'🎨', name:'Pixiv', desc:'全球最大插画社区，搜「ぽっちゃり 男」等标签淘胖男孩', home:'https://www.pixiv.net/', search:'https://www.pixiv.net/tags/{q}/artworks' },
-    { emoji:'🍡', name:'Danbooru', desc:'二次元图库，标签丰富，可用 chubby male 检索', home:'https://danbooru.donmai.us/', search:'https://danbooru.donmai.us/posts?tags={q}' },
-    { emoji:'🌸', name:'Safebooru', desc:'安全向二次元图库，加载快', home:'https://safebooru.org/', search:'https://safebooru.org/index.php?page=post&s=list&tags={q}' },
-    { emoji:'🍥', name:'Gelbooru', desc:'二次元图库，标签体系完善', home:'https://gelbooru.com/', search:'https://gelbooru.com/index.php?page=post&s=list&tags={q}' },
-    { emoji:'✨', name:'Yande.re', desc:'高质量插画图库，画风精致', home:'https://yande.re/post', search:'https://yande.re/post?tags={q}' },
-    { emoji:'🎐', name:'Konachan', desc:'风景与人物插画精选图库', home:'https://konachan.com/post', search:'https://konachan.com/post?tags={q}' },
-    { emoji:'🖌️', name:'DeviantArt', desc:'欧美创作者社区，风格多样', home:'https://www.deviantart.com/', search:'https://www.deviantart.com/search?q={q}' },
-    { emoji:'🎯', name:'ArtStation', desc:'专业艺术家作品集，质感出色', home:'https://www.artstation.com/', search:'https://www.artstation.com/search?query={q}' }
+  { cat:'插画 · 画师社区', items:[
+    { emoji:'🎨', name:'Pixiv', desc:'日本最大的插画投稿社区，画师与作品数量都属世界前列。适合按标签找画风、追喜欢的画师，也是头像和壁纸的宝库。', home:'https://www.pixiv.net/', search:'https://www.pixiv.net/tags/{q}/artworks' },
+    { emoji:'🖌️', name:'ArtStation', desc:'欧美专业美术平台，概念设计、游戏原画、影视美术与 3D 作品云集。想找高质量大图和完整作品集，来这里最合适。', home:'https://www.artstation.com/', search:'https://www.artstation.com/search?query={q}' },
+    { emoji:'🎭', name:'DeviantArt', desc:'老牌创作者社区，插画、同人、摄影、手工什么都收，题材最杂也最活跃，适合淘冷门题材和小众风格。，老牌社区底蕴深厚，冷门题材也能挖到。', home:'https://www.deviantart.com/', search:'https://www.deviantart.com/search?q={q}' },
+    { emoji:'🅱️', name:'Behance', desc:'Adobe 旗下作品集平台，平面、UI、品牌、插画、摄影都齐全。想找成套的设计参考与排版灵感，可以从这里开始。', home:'https://www.behance.net/', search:'https://www.behance.net/search/projects?search={q}' },
+    { emoji:'🏀', name:'Dribbble', desc:'设计师的作品快照社区，界面、图标、插画都是精选小图。风格现代清爽，很适合当作配色与构图的参考。，界面与图标灵感一抓一大把。', home:'https://dribbble.com/', search:'https://dribbble.com/search/{q}' },
+    { emoji:'🖍️', name:'Cara', desc:'新兴插画师社区，主打纯绘画作品、几乎不含 AI 图，界面干净。想找真人画师的原创新作可以来这边逛。，纯人类创作在这里很稀缺，值得支持。', home:'https://cara.app/', search:'https://cara.app/search?q={q}' }
   ]},
-  { cat:'通用图库 · 社交', items:[
-    { emoji:'📌', name:'Pinterest', desc:'灵感图板圣地，搜 chubby boy / ぽっちゃり男子', home:'https://www.pinterest.com/', search:'https://www.pinterest.com/search/pins/?q={q}' },
-    { emoji:'🔍', name:'Google 图片', desc:'万能图搜入口', home:'https://images.google.com/', search:'https://www.google.com/search?tbm=isch&q={q}' },
-    { emoji:'🖼️', name:'Bing 图片', desc:'微软图搜，界面清爽', home:'https://www.bing.com/images', search:'https://www.bing.com/images/search?q={q}' },
-    { emoji:'🐦', name:'X / Twitter', desc:'搜画师分享的可爱胖男孩图', home:'https://x.com/', search:'https://x.com/search?q={q}' },
-    { emoji:'🌀', name:'Tumblr', desc:'复古图博社区，风格独特', home:'https://www.tumblr.com/', search:'https://www.tumblr.com/search/{q}' }
+  { cat:'动漫 · 二次元图库', items:[
+    { emoji:'🍡', name:'Danbooru', desc:'标签体系最完整的动漫图库，每张图都带详细分类标签，适合按角色、作品与画风精确检索，也能查原图出处。，检索语法值得花十分钟学一下。', home:'https://danbooru.donmai.us/', search:'https://danbooru.donmai.us/posts?tags={q}' },
+    { emoji:'🌸', name:'Safebooru', desc:'Danbooru 的全年龄版本，过滤掉不适合工作场合的内容，加载更快。想安安静静按标签搜动漫图就来这里。', home:'https://safebooru.org/', search:'https://safebooru.org/index.php?page=post&s=list&tags={q}' },
+    { emoji:'🍥', name:'Gelbooru', desc:'老牌动漫图库，资源量大、标签齐全，搜索语法与 Danbooru 类似。适合和别的 booru 站交叉检索补全收藏。', home:'https://gelbooru.com/', search:'https://gelbooru.com/index.php?page=post&s=list&tags={q}' },
+    { emoji:'✨', name:'Yande.re', desc:'以高清插画与扫描图著称，画质普遍很高。想收无水印的大图和壁纸，这里的质量相当能打，标签体系也好用。，扫图质量相当稳，收藏党常驻。', home:'https://yande.re/post', search:'https://yande.re/post?tags={q}' },
+    { emoji:'🎐', name:'Konachan', desc:'专注高品质动漫壁纸与插画，横版大图比例很多，适合给电脑、平板与电视找一张不糊的桌面背景图。，横版大图爱好者会很喜欢这里。', home:'https://konachan.com/post', search:'https://konachan.com/post?tags={q}' },
+    { emoji:'🕊️', name:'Zerochan', desc:'按角色与作品整理得很整齐的动漫图库，还能按画师浏览，想给某个角色做专属图集的时候特别好用。，做角色图集时的首选站点。', home:'https://www.zerochan.net/', search:'https://www.zerochan.net/search?q={q}' },
+    { emoji:'🎏', name:'Anime-Pictures', desc:'欧洲团队运营的动漫图站，支持按分辨率、比例与人物数量筛选。找竖版壁纸与手机背景相当好用。，手机壁纸党可以常来翻。', home:'https://anime-pictures.net/', search:'https://anime-pictures.net/posts?search_tag={q}' },
+    { emoji:'🐙', name:'Sankaku Complex', desc:'二次元图库中的大站，标签检索支持繁简中文与罗马音。内容分级混杂，浏览时留意页面上的级别提示。，检索不但支持罗马音也支持中文。', home:'https://chan.sankakucomplex.com/', search:'https://chan.sankakucomplex.com/?tags={q}' },
+    { emoji:'🎬', name:'Sakugabooru', desc:'专门收藏动画作画片段的资料站，一格一格拆解原画与分镜，学动画、找动图参考与临摹时非常宝贵。，动画从业者与作画迷的常备站。', home:'https://www.sakugabooru.com/', search:'https://www.sakugabooru.com/post?tags={q}' },
+    { emoji:'🍭', name:'e-shuushuu', desc:'小众但质量整齐的动漫图库，以可爱向插图为主，页面轻量不打扰，适合随手翻翻找头像和配色灵感。，安安静静翻图的时候很舒服。', home:'https://e-shuushuu.net/' }
   ]},
-  { cat:'头像 · 捏人', items:[
-    { emoji:'🧩', name:'Picrew', desc:'在线捏脸器，可捏出各种可爱男孩子头像', home:'https://picrew.me/', search:'https://picrew.me/search/creator?keyword={q}' },
-    { emoji:'👤', name:'Twoucan', desc:'头像插画聚合站', home:'https://twoucan.com/', search:'https://twoucan.com/search?q={q}' }
+  { cat:'图搜 · 以图搜图', items:[
+    { emoji:'🔍', name:'Google 图片', desc:'覆盖最广的图片搜索，关键词、语言、站点都能限定。想快速找参考图或确认某张图的出处，先来这儿。，最快找到参考图与出处的地方。', home:'https://images.google.com/', search:'https://www.google.com/search?tbm=isch&q={q}' },
+    { emoji:'🖼️', name:'Bing 图片', desc:'界面清爽的图片搜索，支持按尺寸、颜色、版权筛选，也能直接按图搜相似图，国内外网络都比较好访问。，国内访问很稳定，当日常主力也行。', home:'https://www.bing.com/images', search:'https://www.bing.com/images/search?q={q}' },
+    { emoji:'🇷🇺', name:'Yandex 图片', desc:'被很多人称作以图搜图最强的一家，对人脸、服饰、风景的相似匹配很准，常能找出 Google 也搜不到的原图。', home:'https://yandex.com/images/', search:'https://yandex.com/images/search?text={q}' },
+    { emoji:'🐾', name:'百度图片', desc:'中文关键词搜索体验最好，素材、表情包、壁纸一应俱全，还带按图搜图入口，适合找中文语境的图片。，中文搜图的第一选择，用着顺手。', home:'https://image.baidu.com/', search:'https://image.baidu.com/search/index?tn=baiduimage&word={q}' },
+    { emoji:'🐶', name:'搜狗图片', desc:'搜狗旗下的图片搜索，中文长尾关键词命中率高，界面广告较少。找表情包、梗图与时事配图都挺顺手。，中文长尾关键词特别灵。', home:'https://pic.sogou.com/', search:'https://pic.sogou.com/pics?query={q}' },
+    { emoji:'🛡️', name:'360 图片', desc:'360 的图片搜索，中文资源量大，支持按尺寸与版权筛选。和百度图片搭配着用，命中率会更高一些。，当第二选择做交叉检索刚好。', home:'https://image.so.com/', search:'https://image.so.com/i?q={q}' },
+    { emoji:'🎯', name:'TinEye', desc:'老牌以图搜图工具，上传图片或粘贴图片链接就能全网比对，擅长找出图片最早出现的位置与转载路径。，查图片来源与首发位置的利器。', home:'https://tineye.com/' },
+    { emoji:'🍜', name:'SauceNAO', desc:'二次元专用的以图搜图，能反查插画的原作者、Pixiv 链接与作品名。看到喜欢的图却找不到出处时用它。', home:'https://saucenao.com/' },
+    { emoji:'🧭', name:'ascii2d', desc:'日系插画以图搜图工具，支持色合检索与特征检索两种模式，常能补上其它工具找不到的老图与原图出处。，连很老的老图也有机会找回来。', home:'https://ascii2d.net/' },
+    { emoji:'🗃️', name:'IQDB', desc:'同时检索多个 booru 图库的以图搜图工具，速度很快，适合快速判断一张动漫图来自哪个站与哪部作品。', home:'https://iqdb.org/' },
+    { emoji:'🎞️', name:'trace.moe', desc:'动画截图专用搜索引擎，上传截图就能找到出自哪部番、第几集第几分几秒，找动画名场面的利器。，追番考古与找梗出自哪集特别好用。', home:'https://trace.moe/' },
+    { emoji:'📷', name:'Google Lens', desc:'Google 的图像识别搜索，能识别商品、植物、文字与地标并给出相关图片，在手机上使用体验尤其好。，出门在外用手机识图尤其方便。', home:'https://lens.google.com/' }
+  ]},
+  { cat:'免授权 · 免费素材', items:[
+    { emoji:'📷', name:'Unsplash', desc:'全球最有名的免费高清照片库，风格统一、构图讲究，多数图片允许免费商用，做配图与壁纸都很合适。，做配图几乎不用发愁，风格统一。', home:'https://unsplash.com/', search:'https://unsplash.com/s/photos/{q}' },
+    { emoji:'🟢', name:'Pexels', desc:'照片与短视频都齐全的免费素材库，分类清晰、检索方便、授权宽松。写文章、做封面找配图时非常好用。，照片和视频素材能一次拿齐。', home:'https://www.pexels.com/', search:'https://www.pexels.com/search/{q}/' },
+    { emoji:'🌈', name:'Pixabay', desc:'照片、插画、矢量、视频、音效一站齐全，全部免费可商用。数量巨大，适合快速找通用型配图与背景。，一站就能凑齐所有类型的素材。', home:'https://pixabay.com/', search:'https://pixabay.com/images/search/{q}/' },
+    { emoji:'🎧', name:'Openverse', desc:'开放版权内容的聚合搜索，来源包括 Flickr、博物馆与各大开放库，还能直接看到授权类型，用图最安心。', home:'https://openverse.org/', search:'https://openverse.org/search/image?q={q}' },
+    { emoji:'🌍', name:'Wikimedia Commons', desc:'维基媒体共享资源库，历史照片、地图、动植物、建筑与名人肖像都能找到，绝大多数可以自由使用。，引用来源清楚，用起来最省心。', home:'https://commons.wikimedia.org/', search:'https://commons.wikimedia.org/w/index.php?search={q}&ns6=1' },
+    { emoji:'📸', name:'StockSnap', desc:'CC0 授权的免费图库，照片偏生活与商业场景，不用署名即可商用。适合做封面、PPT 与广告版式参考。', home:'https://stocksnap.io/', search:'https://stocksnap.io/search/{q}' },
+    { emoji:'🛍️', name:'Burst', desc:'Shopify 出品的免费图库，电商与商品场景的照片特别多，风格明亮干净，开店做图可以优先来这里找。', home:'https://burst.shopify.com/', search:'https://burst.shopify.com/photos/search?q={q}' },
+    { emoji:'🧡', name:'Kaboompics', desc:'每张照片都附赠配色方案，一边挑图一边顺走色卡。做家居、美食、生活方式类内容与版式尤其合适。，顺手就能凑齐一整套配色方案。', home:'https://kaboompics.com/', search:'https://kaboompics.com/gallery?search={q}' },
+    { emoji:'🌤️', name:'Life of Pix', desc:'免费的高分辨率摄影库，风景与人物照片质感很好，无需署名即可使用。适合做壁纸、海报与网页大图背景。，几乎每张都能直接当桌面。', home:'https://www.lifeofpix.com/' },
+    { emoji:'🎈', name:'Gratisography', desc:'以幽默、搞怪、脑洞照片著称的免费图库，风格跳脱。想让自己的配图不那么无聊，就来这里淘一淘。，风格独特，很少和别人撞图。', home:'https://gratisography.com/' },
+    { emoji:'🖼️', name:'Rawpixel', desc:'复古插画、公共领域艺术品与照片的混合素材库，老海报与手绘素材很多，做复古风格设计很出效果。，复古素材的宝藏库，慢慢翻很有收获。', home:'https://www.rawpixel.com/', search:'https://www.rawpixel.com/search?q={q}' },
+    { emoji:'🍀', name:'Picjumbo', desc:'个人摄影师维护的免费图库，照片自然、生活感强，可免费商用。量不算最大，但质量相当稳定不出错。，日常配图完全够用，也没什么水印。', home:'https://picjumbo.com/' },
+    { emoji:'🧩', name:'Freepik', desc:'矢量插画、图标、PSD 模板与照片的超大素材库，免费区按要求署名即可使用，做海报与演示文稿很省时间。', home:'https://www.freepik.com/', search:'https://www.freepik.com/search?query={q}' }
+  ]},
+  { cat:'壁纸 · 高清大图', items:[
+    { emoji:'🖤', name:'Wallhaven', desc:'公认最好用的壁纸站之一，支持按分辨率、比例、颜色与分级筛选，动漫和风景都有海量高清版本。，壁纸党公认的快乐老家，筛选超细。', home:'https://wallhaven.cc/', search:'https://wallhaven.cc/search?q={q}' },
+    { emoji:'🌌', name:'Wallpaper Abyss', desc:'老牌壁纸站，动漫、游戏、电影、自然题材都齐全，同一张图常有多档分辨率可选，点开就能直接下载。，老牌站资源扎实，题材很全。', home:'https://wall.alphacoders.com/', search:'https://wall.alphacoders.com/search.php?search={q}' },
+    { emoji:'🔥', name:'WallpaperFlare', desc:'壁纸聚合站，量大、更新快，支持按分辨率与分类筛选。想找某个冷门主题的大图可以来这里试一试。，翻页速度很快，找图不费劲。', home:'https://www.wallpaperflare.com/', search:'https://www.wallpaperflare.com/search?q={q}' },
+    { emoji:'🕳️', name:'WallpaperCave', desc:'以合集形式组织壁纸的站点，常能一次找到同一作品或角色的成套壁纸，方便批量收藏、整理与做手机壁纸。，同一套壁纸一次就能收全。', home:'https://wallpapercave.com/', search:'https://wallpapercave.com/search?q={q}' },
+    { emoji:'🖥️', name:'Wallpapers.com', desc:'现代风格的壁纸站，桌面、手机、4K 分区明确，加载快、预览清晰，找横幅大图与手机壁纸很省事。，多屏尺寸适配做得很省心。', home:'https://wallpapers.com/', search:'https://wallpapers.com/search?q={q}' },
+    { emoji:'🗄️', name:'Desktop Nexus', desc:'运营多年的桌面壁纸社区，可按分辨率与主题筛选，还能看用户评分，适合给多屏电脑找同风格壁纸。，老站资源依然扎实，评分也靠谱。', home:'https://www.desktopnexus.com/' },
+    { emoji:'🧭', name:'WallpaperSafari', desc:'老牌壁纸站，冷门题材与老作品壁纸的存量惊人，常能挖到别的站点已经删掉的老图，值得慢慢翻找。，怀旧党和收集党的小天堂。', home:'https://wallpapersafari.com/', search:'https://wallpapersafari.com/search?q={q}' }
+  ]},
+  { cat:'头像 · 捏人 · 生成器', items:[
+    { emoji:'🧩', name:'Picrew', desc:'日本超火的捏人网站，成千上万套画师做的捏脸模板，能拼出各种风格的头像，挑头像最快乐的地方。，一玩就停不下来，头像越捏越多。', home:'https://picrew.me/', search:'https://picrew.me/search/creator?keyword={q}' },
+    { emoji:'👤', name:'Twoucan', desc:'按热度整理社交平台插画的聚合站，头像、半身、原创角色图特别多，更新非常勤快，浏览体验也清爽。，追新图与新画师的好入口。', home:'https://twoucan.com/', search:'https://twoucan.com/search?q={q}' },
+    { emoji:'🐣', name:'捏咔 Neka', desc:'中文圈的捏人平台，模板丰富、操作简单，还能导出高清头像，想做一张独一无二的头像可以玩玩看。，模板更新也很勤快，中文界面顺手。', home:'https://www.neka.cc/' },
+    { emoji:'🐱', name:'Charat', desc:'日系立绘头像生成器，可选发型、服装与表情，风格统一又可爱，几分钟就能捏出一个完整的角色形象。，做头像很省时间，风格还很统一。', home:'https://charat.me/' },
+    { emoji:'🎲', name:'DiceBear', desc:'开源头像生成器，几十种风格可选，还能按名字生成固定形象，适合做测试账号、论坛与项目配图。，接口化调用也很方便，开发者友好。', home:'https://www.dicebear.com/' },
+    { emoji:'🫥', name:'This Person Does Not Exist', desc:'每刷新一次就生成一张不存在的真人脸，由 AI 合成。适合当临时头像，请勿用于任何误导性用途。，当临时头像素材挺方便。', home:'https://thispersondoesnotexist.com/' }
+  ]},
+  { cat:'表情包 · 动图 · Meme', items:[
+    { emoji:'🎬', name:'Giphy', desc:'全球最大的动图平台，影视、动画、反应类动图海量，可以直接复制链接或下载，聊天斗图与做素材必备。，做表情包与动图素材都很省事。', home:'https://giphy.com/', search:'https://giphy.com/search/{q}' },
+    { emoji:'🐤', name:'Tenor', desc:'Google 旗下的动图搜索，关键词覆盖多语言、加载很快，很多表情包在别处发不出来时这里能找到替代。', home:'https://tenor.com/', search:'https://tenor.com/search/{q}' },
+    { emoji:'🖼️', name:'Imgflip', desc:'最常用的 Meme 生成器与图库，自带模板和文字排版工具，想自己做一张梗图几分钟就能搞定。，从做图到分享一气呵成。', home:'https://imgflip.com/', search:'https://imgflip.com/memesearch?q={q}' },
+    { emoji:'📚', name:'Know Your Meme', desc:'网络迷因的百科全书，每个梗的来历、演变与名场面截图都有档案，看不懂朋友的梗时来查一查最靠谱。，考古网络文化必看，说明写得很全。', home:'https://knowyourmeme.com/', search:'https://knowyourmeme.com/search?q={q}' },
+    { emoji:'🥊', name:'斗图啦', desc:'中文表情包大本营，分类细致、更新快，还能打包下载。群里斗图缺弹药的时候来这里补货最方便。，素材量大还免费，下载也方便。', home:'https://www.doutula.com/', search:'https://www.doutula.com/search?keyword={q}' },
+    { emoji:'😂', name:'发表情', desc:'国内老牌表情包网站，按主题与人物分类清楚，可以直接复制图片地址，做聊天表情与自制梗图都方便。，中文表情包的老牌根据地。', home:'https://www.fabiaoqing.com/', search:'https://www.fabiaoqing.com/search/bqb/keyword/{q}' },
+    { emoji:'🤪', name:'Me.me', desc:'Meme 瀑布流社区，按热度刷新，适合休闲翻阅找灵感，看到喜欢的图可以直接分享或另存下来慢慢收藏。，随便刷刷挺解压，适合睡前放松。', home:'https://me.me/' },
+    { emoji:'🟩', name:'Imgur', desc:'欧美互联网的图床兼社区，梗图、截图、搞笑图很密集，很多经典 Meme 的第一手发布地都在这里。，追热点梗图与截图特别方便。', home:'https://imgur.com/', search:'https://imgur.com/search?q={q}' },
+    { emoji:'😆', name:'9GAG', desc:'欧美搞笑图片与动图社区，热点梗更新极快，评论区文化浓厚，适合休闲翻阅或找轻松风格的素材与表情图。，工作累了来轻松一下很不错。', home:'https://9gag.com/' },
+    { emoji:'🎞️', name:'Gifer', desc:'大型 GIF 搜索库，分类齐全、可下载或直接引用链接，找动图素材的时候可以多试一个站，互补性不错。，下载速度也挺快，链接能直接引用。', home:'https://gifer.com/', search:'https://gifer.com/en/search/{q}' }
+  ]},
+  { cat:'名画 · 博物馆典藏', items:[
+    { emoji:'🏛️', name:'Google Arts & Culture', desc:'把全球两千多家博物馆搬上线，支持超高清缩放看笔触，还有线上展览，学艺术史与找参考都很棒。，足不出户就能逛遍全球博物馆。', home:'https://artsandculture.google.com/', search:'https://artsandculture.google.com/search?q={q}' },
+    { emoji:'🖼️', name:'大都会博物馆', desc:'纽约大都会艺术博物馆的在线藏品库，开放版权的图片可免费下载高清版，绘画、器物、服饰都有。，学术引用也很规范，出处清楚。', home:'https://www.metmuseum.org/art/collection', search:'https://www.metmuseum.org/art/collection/search?q={q}' },
+    { emoji:'🎨', name:'芝加哥艺术博物馆', desc:'馆藏检索做得非常友好，名作提供超高分辨率图片免费下载，是找配色、构图与细节参考的富矿。，下载流程非常顺畅，画质惊人。', home:'https://www.artic.edu/collection', search:'https://www.artic.edu/collection?q={q}' },
+    { emoji:'🇳🇱', name:'荷兰国立博物馆', desc:'伦勃朗《夜巡》的家，开放大量高清藏品图，荷兰黄金时代的绘画、版画与工艺品尤其丰富，多数可自由使用。，放大看细节相当震撼。', home:'https://www.rijksmuseum.nl/en/rijksstudio', search:'https://www.rijksmuseum.nl/en/search?q={q}' },
+    { emoji:'🇺🇸', name:'美国国家美术馆', desc:'华盛顿的国家美术馆，开放下载的馆藏图质量极高，从文艺复兴到现代艺术都能找到高清版本与解说。，资源开放度很高，值得慢慢逛。', home:'https://www.nga.gov/' },
+    { emoji:'🏺', name:'史密森尼开放资源', desc:'史密森尼学会的开放获取库，数百万件藏品图（标本、文物、海报）免版权使用，做资料图特别好用。，授权说明写得很清楚，用着放心。', home:'https://www.si.edu/openaccess', search:'https://www.si.edu/search?edan_q={q}' },
+    { emoji:'🇪🇺', name:'Europeana', desc:'欧洲文化遗产的聚合平台，汇集各国图书馆、博物馆与档案馆的老照片、老地图与艺术品，授权状态一目了然。，找老照片与历史地图特别好用。', home:'https://www.europeana.eu/', search:'https://www.europeana.eu/en/search?query={q}' },
+    { emoji:'🖌️', name:'WikiArt', desc:'按艺术家、流派、年代整理的绘画数据库，检索方便，很适合按风格快速翻找参考、临摹素材与艺术史资料。，艺术史的脉络梳理得很清楚。', home:'https://www.wikiart.org/', search:'https://www.wikiart.org/en/search/{q}' },
+    { emoji:'🏺', name:'盖蒂博物馆', desc:'洛杉矶盖蒂中心的藏品库，古代雕塑、手抄本与摄影作品都有高清图，部分可以免费下载用于学习与创作。，摄影与手抄本藏品也很精彩。', home:'https://www.getty.edu/art/collection/' },
+    { emoji:'🖼️', name:'MoMA', desc:'纽约现代艺术博物馆的在线馆藏，现代与当代艺术的重点作品都能查到，还附有创作背景与详细的解说文本。，现代艺术迷一定要来逛一圈。', home:'https://www.moma.org/collection/' }
+  ]},
+  { cat:'AI 绘画 · 生成作品', items:[
+    { emoji:'🤖', name:'Civitai', desc:'最大的 AI 绘画模型与作品社区，能看图、看提示词，还能下载模型自己跑，想研究画风与出图参数就来这里。', home:'https://civitai.com/', search:'https://civitai.com/search/images?query={q}' },
+    { emoji:'🔮', name:'Lexica', desc:'Stable Diffusion 生成图的搜索库，每张图都附带完整提示词，适合找灵感并学习怎么写提示词。', home:'https://lexica.art/', search:'https://lexica.art/?q={q}' },
+    { emoji:'🧠', name:'Krea', desc:'集生成、放大、实时涂抹于一体的 AI 创作工具，界面直观、上手快，免费额度就够试用一阵子再做决定。，实时涂抹与放大玩起来很有趣。', home:'https://www.krea.ai/' },
+    { emoji:'🎨', name:'NightCafe', desc:'上手门槛很低的 AI 绘画社区，多种模型可选，作品公开可浏览，适合刚接触 AI 绘画的人练手与交流。', home:'https://creator.nightcafe.studio/' },
+    { emoji:'🧱', name:'Tensor.Art', desc:'在线跑模型的 AI 绘画平台，模型库丰富、支持图生图，作品区也能当成风格参考库来翻，免费额度友好。，社区模型更新快，风格很全。', home:'https://tensor.art/' },
+    { emoji:'🌊', name:'SeaArt', desc:'中文友好的 AI 绘画平台，模型与画风齐全，还有大量社区作品可以浏览、收藏与二次创作，新手也能用。，中文界面省心，上手几乎没门槛。', home:'https://www.seaart.ai/' },
+    { emoji:'🇨🇳', name:'LiblibAI 哩布哩布', desc:'国内知名的 AI 绘画模型社区，模型、工作流与作品都有，中文界面与配套教程对新手相当友好。，社区教程丰富，入门跟着学就行。', home:'https://www.liblib.art/' },
+    { emoji:'✍️', name:'Ideogram', desc:'以能写对字出名的 AI 绘图工具，海报、标志与带文字的图片表现不错，作品区可以浏览找灵感。，做带中文文字的图也勉强能用。', home:'https://ideogram.ai/' },
+    { emoji:'🖼️', name:'OpenArt', desc:'AI 绘画作品与提示词社区，支持按风格与模型检索，适合对比不同模型的出图效果，也能直接参考别人的提示词。', home:'https://openart.ai/', search:'https://openart.ai/search/{q}' },
+    { emoji:'🦸', name:'PromptHero', desc:'提示词分享站，覆盖 Midjourney、Stable Diffusion 等主流模型，按主题整理得很清楚，抄作业方便。', home:'https://prompthero.com/', search:'https://prompthero.com/search?q={q}' },
+    { emoji:'🗂️', name:'Arthub', desc:'AI 艺术作品的灵感库，风格标签细致，适合按画风找参考，并顺带了解这类画面是用什么方式生成出来的。，标签体系很细，按风格筛很方便。', home:'https://arthub.ai/' }
+  ]},
+  { cat:'图标 · 矢量素材', items:[
+    { emoji:'📐', name:'Flaticon', desc:'全球最大的图标库之一，几百万枚矢量图标，可自定义颜色与格式，免费区下载时按平台要求署名即可。，一口气就能找齐全套风格的图标。', home:'https://www.flaticon.com/', search:'https://www.flaticon.com/search?word={q}' },
+    { emoji:'🔎', name:'Iconfinder', desc:'专业图标搜索平台，支持按风格、线条粗细与授权筛选，商用图标的比价、选型与成套替换都很方便。，成套图标很齐全，替换也方便。', home:'https://www.iconfinder.com/', search:'https://www.iconfinder.com/search?q={q}' },
+    { emoji:'🧿', name:'Iconify', desc:'把上百套开源图标集聚合在一起搜索，直接复制 SVG 或组件代码，前端开发与设计都很省事，样式也统一。', home:'https://icon-sets.iconify.design/', search:'https://icon-sets.iconify.design/?query={q}' },
+    { emoji:'⬛', name:'Iconmonstr', desc:'极简黑白图标库，线条干净统一，免费可商用。做界面与演示文稿时拿来就能用，基本不用再调颜色。，体积小加载快，适合网页直接用。', home:'https://iconmonstr.com/' },
+    { emoji:'💡', name:'Noun Project', desc:'万物皆可图标的项目，概念类图标尤其丰富，适合给文章与演示文稿配上统一风格的小图标，免费即可用。，概念类图标特别好用，表达力强。', home:'https://thenounproject.com/', search:'https://thenounproject.com/search/?q={q}' },
+    { emoji:'🧰', name:'SVGRepo', desc:'开源 SVG 仓库，图标、插画、品牌标志都有，可在线改色后直接下载，量大而且完全免费，用起来省心。，改色下载一步到位，几乎天天用得上。', home:'https://www.svgrepo.com/', search:'https://www.svgrepo.com/vectors/{q}/' },
+    { emoji:'🔷', name:'Material Symbols', desc:'Google 官方图标集，风格统一、多种字重可选，网页与 App 界面开发用得最多的一套，可直接下载。', home:'https://fonts.google.com/icons', search:'https://fonts.google.com/icons?icon.query={q}' },
+    { emoji:'🧱', name:'Tabler Icons', desc:'开源免费的高质量线性图标集，七千多枚，粗细统一、成套成体系，配套代码与设计文件都很齐全好用。，一套下来界面风格立刻统一。', home:'https://tabler.io/icons' },
+    { emoji:'🎨', name:'Vecteezy', desc:'矢量图与插画素材站，图标、背景、图案都有，免费区可按授权使用，做封面、海报与电商图都很方便。，成套素材很多，做系列图很合适。', home:'https://www.vecteezy.com/', search:'https://www.vecteezy.com/search?q={q}' },
+    { emoji:'🌊', name:'Streamline', desc:'知名设计团队的图标与插画库，风格现代、成套成体系，免费包也足够日常界面使用，商用许可写得很清楚。，商业项目也能放心用，授权清晰。', home:'https://www.streamlinehq.com/' }
+  ]},
+  { cat:'摄影 · 自然风光', items:[
+    { emoji:'📸', name:'500px', desc:'知名摄影社区，风光、人像、野生动物的大片密集，能按主题与地点检索，做壁纸与摄影参考都很合适。，学构图与用光的好地方。', home:'https://500px.com/', search:'https://500px.com/search?q={q}' },
+    { emoji:'🟦', name:'Flickr', desc:'老牌照片社区，可根据授权类型筛选（含大量 CC 授权图），历史照片与专业摄影师作品都很多。，按授权类型筛选最省心，用得安心。', home:'https://www.flickr.com/', search:'https://www.flickr.com/search/?text={q}' },
+    { emoji:'🏆', name:'1x', desc:'策展制的摄影网站，只有通过审核的作品才能展出，整体审美水平很高，适合找高级感与情绪感的摄影参考。，审美标准相当高，翻一翻很养眼。', home:'https://1x.com/' },
+    { emoji:'📷', name:'YouPic', desc:'摄影作品社区，分类清晰、支持按器材与风格浏览，能看到不少高质量的日常与旅拍照片，学习构图也好用。，旅拍氛围感很足，看着就想出门。', home:'https://youpic.com/' },
+    { emoji:'🏅', name:'ViewBug', desc:'以比赛与挑战为核心的摄影社区，主题作品集很多，愿意翻的话能挖到不少有故事、有情绪的照片与拍摄思路。，比赛主题常常很有启发。', home:'https://www.viewbug.com/' },
+    { emoji:'🌍', name:'国家地理', desc:'《国家地理》官网，自然、地理、人文纪实照片的标杆，配文也写得好看，适合找叙事型与纪实感的参考。，随手一张都是能当封面的水准。', home:'https://www.nationalgeographic.com/' },
+    { emoji:'🚀', name:'NASA 图像库', desc:'NASA 公开的图像与视频库，星空、火箭、地球与行星照片基本都属于公有领域，科幻感素材的首选。，宇宙与航天素材随便用，还免版权。', home:'https://images.nasa.gov/', search:'https://images.nasa.gov/search?q={q}' },
+    { emoji:'📷', name:'图虫', desc:'国内活跃的摄影社区，人像、风光、城市题材很多，中文标签好搜，还能看到照片的拍摄参数与器材信息。，国内摄影师聚集度很高，评论也专业。', home:'https://tuchong.com/', search:'https://tuchong.com/search/?q={q}' },
+    { emoji:'🖼️', name:'摄图网', desc:'国内素材站，摄影图与设计模板量大，中文检索友好，日常做图找配图很方便，部分素材需授权后商用。，日常做图与做海报基本够用了。', home:'https://699pic.com/' }
+  ]},
+  { cat:'设计 · 配色灵感', items:[
+    { emoji:'🌈', name:'Coolors', desc:'一键生成配色方案的利器，可按色相、明度、色彩心理筛选，还能把喜欢的配色直接存成图片带走使用。，看中的配色可以一键锁定带走。', home:'https://coolors.co/' },
+    { emoji:'🎯', name:'Color Hunt', desc:'人工精选的四色配色库，按主题分类、更新频繁，拿来当界面与海报的配色特别直接，还能看到大家的收藏热度。', home:'https://colorhunt.co/' },
+    { emoji:'🎨', name:'Adobe Color', desc:'Adobe 官方配色工具，支持色轮、渐变与从图片提取主题色，还能浏览社区里分享的配色方案与趋势。，和 Adobe 全家桶衔接得很顺。', home:'https://color.adobe.com/' },
+    { emoji:'✨', name:'Savee', desc:'设计师的灵感收藏夹，图片以极简高质感为主，构图与色调都很干净，适合找版式与氛围参考。，审美在线、更新稳定，越翻越舒服。', home:'https://savee.it/' },
+    { emoji:'🔗', name:'Are.na', desc:'可以建频道收藏图片与链接的灵感工具，社区内容偏概念与艺术，适合长期整理视觉素材与参考资料。，适合长期养一个自己的素材库。', home:'https://www.are.na/' },
+    { emoji:'💡', name:'Designspiration', desc:'设计灵感图库，可按颜色检索，平面、包装、摄影一网打尽，做版式参考很好用，注册后还能自己建收藏板。，按颜色检索这个功能特别好用。', home:'https://www.designspiration.com/' },
+    { emoji:'📰', name:'Muzli', desc:'设计资讯与灵感聚合器，每天推送精选作品，装上浏览器插件还能把新标签页直接变成一面会自己更新的灵感墙。', home:'https://muz.li/' },
+    { emoji:'🧠', name:'Niice', desc:'主打高质量图片的灵感搜索引擎，风格偏商业与创意，适合做提案与情绪板。支持按颜色、关键词与来源筛选，找参考很快。', home:'https://niice.co/' }
+  ]},
+  { cat:'材质 · 纹理 · 3D', items:[
+    { emoji:'🧱', name:'Textures.com', desc:'老牌材质纹理库，砖石、木纹、金属、布料应有尽有，免费额度就够日常做图与 3D 贴图使用。，做设计图与 3D 贴图的首选素材。', home:'https://www.textures.com/', search:'https://www.textures.com/search?q={q}' },
+    { emoji:'🏔️', name:'Poly Haven', desc:'CC0 授权的 HDRI 环境贴图、材质与 3D 模型库，全部免费可商用，做三维场景与渲染的首选素材站。', home:'https://polyhaven.com/' },
+    { emoji:'🧊', name:'ambientCG', desc:'免费的 PBR 材质与 HDRI 库，分辨率从 1K 到 8K 都有，配合 3D 渲染能做出很真实的质感与光照。', home:'https://ambientcg.com/' },
+    { emoji:'🧵', name:'Transparent Textures', desc:'可直接铺在网页上的透明纹理图案，几十种花样、可自定义颜色与透明度，做背景装饰很省事省时间。，代码复制过来就能直接铺。', home:'https://www.transparenttextures.com/' },
+    { emoji:'🪡', name:'Subtle Patterns', desc:'经典的低调背景图案库，纹理细腻不抢眼，网页与演示文稿的背景用它，能让画面立刻多一层质感。，几乎适用于任何风格的项目。', home:'https://www.toptal.com/designers/subtlepatterns/' }
+  ]},
+  { cat:'影视 · 游戏素材', items:[
+    { emoji:'🎞️', name:'FilmGrab', desc:'按电影整理的剧照与画面截图合集，构图与用光都很讲究，是找电影感配色与分镜参考的好地方。，影迷会越翻越上瘾，顺手就存一堆。', home:'https://film-grab.com/' },
+    { emoji:'🎥', name:'Movie-Screencaps', desc:'按影片整理的高清截图库，数量惊人且分辨率很高，做影视类内容、壁纸与调色参考都很够用，更新也稳定。，找某部片的名场面特别快。', home:'https://movie-screencaps.com/' },
+    { emoji:'📽️', name:'Fancaps', desc:'动画、电影与剧集的截图库，按剧集与季整理得很细致，想找某个场景的画面特别快，也能当分镜与配色参考。，截图清晰度不错，按季整理得也整齐。', home:'https://fancaps.net/' },
+    { emoji:'🎬', name:'豆瓣剧照', desc:'豆瓣电影的剧照区，中文片名检索方便，评论与剧照放在一起看，适合找华语影视剧的资料图与名场面截图。，配着影评一起看，找资料图很方便。', home:'https://movie.douban.com/photos/' },
+    { emoji:'🎮', name:'SteamGridDB', desc:'游戏封面、横版图与图标的资源站，可以给自己的游戏库换好看的封面，也能当成游戏美术参考来用。，社区封面更新很快，几乎都能找到。', home:'https://www.steamgriddb.com/' },
+    { emoji:'🕹️', name:'OpenGameArt', desc:'开源游戏素材库，角色、场景、界面、音效都能找到，授权清晰，做小游戏与独立项目很实用。，独立开发者做原型时经常来这儿。', home:'https://opengameart.org/', search:'https://opengameart.org/art-search-advanced?keys={q}' },
+    { emoji:'🎲', name:'Game-icons.net', desc:'四千多枚免费的游戏风格图标，可在线换颜色后直接下载 SVG 或 PNG，做技能图标、界面与设计稿都合适。', home:'https://game-icons.net/' },
+    { emoji:'🧩', name:'The Spriters Resource', desc:'像素游戏的精灵图与场景图鉴，老游戏素材齐全，做像素风、怀旧设计、游戏同人与二创的好去处。，像素与复古游戏爱好者别错过。', home:'https://www.spriters-resource.com/' },
+    { emoji:'🎨', name:'itch.io Assets', desc:'独立游戏素材集市，免费与付费资源混排，从像素到高清都有，授权信息标明得很清楚，挑素材很放心。，小项目做美术资源基本够用。', home:'https://itch.io/game-assets', search:'https://itch.io/search?q={q}' }
+  ]},
+  { cat:'中文站点 · 华语画师', items:[
+    { emoji:'🀄', name:'站酷 ZCOOL', desc:'国内最大的设计师社区，插画、平面、UI、摄影作品都有，中文检索方便，适合找本土风格与商用参考。，某种程度算国内设计的风向标。', home:'https://www.zcool.com.cn/', search:'https://www.zcool.com.cn/search/content?&word={q}' },
+    { emoji:'🖌️', name:'米画师', desc:'国内知名的约稿平台，画师主页与作品集齐全，能按画风与价格筛选，找画师、看商稿水平都很合适。，接稿与约稿基本都在这上面完成。', home:'https://www.mihuashi.com/' },
+    { emoji:'🎨', name:'涂鸦王国', desc:'老牌中文插画社区，原创插画与同人作品为主，圈内画师聚集，能看到不少华语原创作品与完整创作过程。，老站氛围很好，评论区也友善。', home:'https://www.gracg.com/' },
+    { emoji:'📺', name:'哔哩哔哩相册', desc:'B 站的画友板块，国内画师投稿的插画与动态都在这儿，评论区常能看到创作过程与角色设定。，国内画师浓度很高，追新作方便。', home:'https://h.bilibili.com/' },
+    { emoji:'🏠', name:'Lofter', desc:'国内知名的创作社区，同人图、摄影、手作都很多，标签检索方便，追同人作品与找圈子向素材的好地方。，圈子氛围很浓，同好一抓一大把。', home:'https://www.lofter.com/', search:'https://www.lofter.com/tag/{q}' },
+    { emoji:'🌸', name:'花瓣', desc:'国内版的灵感收集器，可以自己建画板采图，设计、家居、穿搭素材都很丰富，做情绪板与素材库很方便。，一边采图一边整理，两件事一起做完。', home:'https://huaban.com/', search:'https://huaban.com/search?q={q}' },
+    { emoji:'🍬', name:'堆糖', desc:'图片收藏社区，头像、壁纸、手账素材很多，中文搜索顺手，找可爱风格的小图和装饰素材特别合适。，做手账与装饰找图特别顺。', home:'https://www.duitang.com/', search:'https://www.duitang.com/search/?kw={q}' },
+    { emoji:'📁', name:'昵图网', desc:'国内老牌素材站，摄影、矢量、模板量大，中文分类细致，日常找图、做海报与设计参考都能用得上。，素材分类清清楚楚，检索不费劲。', home:'https://www.nipic.com/' },
+    { emoji:'🗂️', name:'千图网', desc:'国内常用的设计素材站，海报模板、图标、背景、摄影图都齐全，做电商详情页与活动宣传图很方便。，模板改一改就能直接拿去用。', home:'https://www.58pic.com/' }
+  ]},
+  { cat:'社交 · 灵感收集', items:[
+    { emoji:'📌', name:'Pinterest', desc:'全球最大的灵感图板，算法推荐很懂你，从穿搭到插画到家居都能顺着刷，做情绪板与选图最方便。，一刷就停不下来，灵感源源不断。', home:'https://www.pinterest.com/', search:'https://www.pinterest.com/search/pins/?q={q}' },
+    { emoji:'🌀', name:'Tumblr', desc:'老牌图文社区，同人、摄影、复古审美与迷因混杂，标签文化浓厚，常能挖到风格独特的作品与老图。，审美爱好者聚集地，风格很自由。', home:'https://www.tumblr.com/', search:'https://www.tumblr.com/search/{q}' },
+    { emoji:'🐦', name:'X / Twitter', desc:'画师与创作者最活跃的即时平台，新图更新最快，按标签或画师名搜索就能追到最新作品与创作过程分享。，追画师的更新首选，出图最快。', home:'https://x.com/', search:'https://x.com/search?q={q}' },
+    { emoji:'👽', name:'Reddit', desc:'分门别类的兴趣社区，摄影、插画、地图、老照片等版块质量很高，还能看到大量讨论与图片来源的线索。，冷知识与一手资料特别多。', home:'https://www.reddit.com/', search:'https://www.reddit.com/search/?q={q}' },
+    { emoji:'📸', name:'Instagram', desc:'视觉内容为主的社交平台，摄影与生活方式图片密集，按标签浏览能看到全球创作者的日常与作品。，风格细腻的图片很多，看着很治愈。', home:'https://www.instagram.com/', search:'https://www.instagram.com/explore/tags/{q}/' },
+    { emoji:'🦋', name:'Bluesky', desc:'新兴社交平台，插画师与艺术家迁移过来不少，时间线干净、广告少，能看到很多创作者的原创新作与日常练习。', home:'https://bsky.app/', search:'https://bsky.app/search?q={q}' },
+    { emoji:'🐳', name:'微博', desc:'国内最大的公开社交平台，画师、摄影博主与官方账号都在，按话题与关键词搜图很快，热点图片更新也最早。，国内热点的图片往往最早出现在这里。', home:'https://weibo.com/', search:'https://s.weibo.com/weibo?q={q}' },
+    { emoji:'📕', name:'小红书', desc:'生活方式分享社区，摄影、穿搭、家居、手作的图片特别多，中文长尾关键词命中率很高，找参考很好用。，搜中文题材的参考图特别灵。', home:'https://www.xiaohongshu.com/', search:'https://www.xiaohongshu.com/search_result?keyword={q}' }
   ]}
 ];
+let srcCat = '';
+function setSrcCat(c){ srcCat = c || ''; renderSources(); }
+function srcTotal(){ let n = 0; BUILTIN_SOURCES.forEach(g=>n += g.items.length); return n; }
 function renderSources(){
   const grid = document.getElementById('srcGrid');
-  let html = '';
+  if(!grid) return;
+  const kwEl = document.getElementById('srcSearch');
+  const kw = (kwEl && kwEl.value ? kwEl.value : '').trim().toLowerCase();
+  const chipBox = document.getElementById('srcCatChips');
+  if(chipBox){
+    chipBox.innerHTML = BUILTIN_SOURCES.map(g=>
+      `<button class="pill ${srcCat===g.cat?'on':''}" onclick="setSrcCat('${g.cat}')">${g.cat} · ${g.items.length}</button>`
+    ).join('');
+  }
+  const allBtn = document.getElementById('srcCatAll');
+  if(allBtn) allBtn.classList.toggle('on', !srcCat);
+  let html = '', shown = 0;
   BUILTIN_SOURCES.forEach(group=>{
-    html += `<div class="src-cat" style="grid-column:1/-1">${group.cat}</div>`;
-    group.items.forEach((s,i)=>{
-      html += `<div class="src-card" style="animation-delay:${i*50}ms">
+    if(srcCat && group.cat !== srcCat) return;
+    const items = group.items.filter(s=> !kw || (s.name + ' ' + s.desc + ' ' + group.cat).toLowerCase().includes(kw));
+    if(!items.length) return;
+    shown += items.length;
+    html += `<div class="src-cat" style="grid-column:1/-1">${group.cat}<span style="font-size:12px;color:var(--ink-soft);font-weight:700">（${items.length} 个）</span></div>`;
+    items.forEach((s,i)=>{
+      html += `<div class="src-card" style="animation-delay:${Math.min(i*40,400)}ms">
         <div class="s-emoji">${s.emoji}</div>
-        <div class="s-name">${s.name}</div>
-        <div class="s-desc">${s.desc}</div>
+        <div class="s-name">${escapeHtml(s.name)}</div>
+        <div class="s-desc">${escapeHtml(s.desc)}</div>
         <div class="s-actions">
           <button class="candy sm" data-act="open" data-url="${encodeURIComponent(s.home)}" data-name="${escapeHtml(s.name)}">🏠 直达</button>
-          <button class="candy mint sm" data-act="search" data-url="${encodeURIComponent(s.search)}" data-name="${escapeHtml(s.name)}">🔍 搜索</button>
+          ${s.search ? `<button class="candy mint sm" data-act="search" data-url="${encodeURIComponent(s.search)}" data-name="${escapeHtml(s.name)}">🔍 搜索</button>` : ''}
           <button class="candy ghost sm" data-act="copy" data-url="${encodeURIComponent(s.home)}">📋 复制</button>
         </div>
       </div>`;
     });
   });
-  grid.innerHTML = html;
+  const cnt = document.getElementById('srcCount');
+  if(cnt) cnt.textContent = kw ? ('命中 ' + shown + ' 个图站') : ('共 ' + srcTotal() + ' 个图站 · ' + BUILTIN_SOURCES.length + ' 个分类');
+  grid.innerHTML = html || '<p class="desc" style="grid-column:1/-1;text-align:center;padding:18px">没有找到匹配的图站，换个关键词试试～</p>';
   renderRecent(); renderCustomSources();
 }
 function recordRecent(name, url){
@@ -1749,7 +2138,7 @@ function openUrl(u, name){
   window.open(u, '_blank', 'noopener,noreferrer'); // 防 tabnabbing
 }
 function searchSrc(tpl, name){
-  const kw = prompt('想搜什么关键词？（例如：ぽっちゃり 男 / chubby boy / 胖男孩）');
+  const kw = prompt('想搜什么关键词？（例如：cat / forest / anime girl / 风景 / 插画）');
   if(!kw) return;
   const url = decodeURIComponent(tpl).replace('{q}', encodeURIComponent(kw.trim()));
   recordRecent(name+'·搜索', url);
@@ -1909,13 +2298,13 @@ async function exportAll(){
   if(est > 150*1024*1024 && !confirm('图库约 '+bytesToSize(est)+'，导出文件会很大，生成时页面可能卡顿几秒～ 继续吗？')) return;
   toast('正在把文件夹里的原图打包…');
   const packed = await packWithImages(images);
-  downloadText('胖男孩图片_完整备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
+  downloadText('好图收纳屋_完整备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
   candyRain(55); toast('全部 '+packed.length+' 张已导出 📤');
 }
 function exportMeta(){
   if(!images.length){ toast('还没有图片可以导出～'); return; }
   const meta = images.map(i=>({id:i.id,name:i.name,tags:i.tags,note:i.note,rating:i.rating,fav:i.fav,source:i.source,album:i.album,w:i.w,h:i.h,size:i.size,addedAt:i.addedAt}));
-  downloadText('胖男孩图片_元数据.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), meta}));
+  downloadText('好图收纳屋_元数据.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), meta}));
   toast('导出元数据 '+meta.length+' 条 🗜️');
 }
 async function exportFav(){
@@ -1923,7 +2312,7 @@ async function exportFav(){
   if(!list.length){ toast('还没有收藏任何图片哦～'); return; }
   toast('正在把收藏的原图打包…');
   const packed = await packWithImages(list);
-  downloadText('胖男孩图片_收藏备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
+  downloadText('好图收纳屋_收藏备份.json', JSON.stringify({version:1, exportedAt:new Date().toISOString(), images:packed}));
   toast('导出收藏 '+packed.length+' 张 🎁');
 }
 async function handleImport(files){
@@ -1981,6 +2370,904 @@ async function clearAll(){
   await refresh();
   try{ await writeMetaFile(true); }catch(e){}   // 显式清空磁盘元数据（原图已进 _trash）
   toast('已全部清空 🗑️');
+}
+
+/* ==================== 弹窗（合集 / 标签 / 小工具） ==================== */
+function openModal(id){
+  if(id==='albumModal') renderAlbumList();
+  if(id==='tagModal') renderTagList();
+  const el = document.getElementById(id);
+  if(el) el.classList.add('open');
+}
+function closeModal(id){ const el = document.getElementById(id); if(el) el.classList.remove('open'); }
+function openTool(kind){
+  const map = { link:'toolLinkModal', gif:'toolGifModal', mp4:'toolMp4Modal' };
+  openModal(map[kind] || kind);
+}
+function closeToolModal(){ ['toolLinkModal','toolGifModal','toolMp4Modal'].forEach(closeModal); }
+addEventListener('keydown', e=>{
+  if(e.key !== 'Escape') return;
+  const opened = document.querySelector('.modal.open');
+  if(opened) closeModal(opened.id);
+});
+
+/* ==================== 拖拽：图片→合集 / 标签→图片 ==================== */
+let dragCardId = null, dragTag = null, dragGhostEl = null;
+function makeGhost(text, isTag){
+  removeGhost();
+  const g = document.createElement('div');
+  g.className = 'drag-ghost' + (isTag ? ' tag' : '');
+  g.textContent = text;
+  document.body.appendChild(g);
+  dragGhostEl = g;
+}
+function moveGhost(e){
+  if(!dragGhostEl || !e) return;
+  dragGhostEl.style.left = e.clientX + 'px';
+  dragGhostEl.style.top = e.clientY + 'px';
+}
+function removeGhost(){ if(dragGhostEl){ try{ dragGhostEl.remove(); }catch(e){} dragGhostEl = null; } }
+function clearHot(){ document.querySelectorAll('.hot').forEach(el=>el.classList.remove('hot')); }
+document.addEventListener('dragover', e=>{ if(dragGhostEl) moveGhost(e); });
+
+const galleryWrapEl = document.getElementById('galleryWrap');
+const albumBarEl = document.getElementById('albumBar');
+const tagFilterEl = document.getElementById('tagFilter');
+
+/* —— 拖起一张图片卡片 —— */
+galleryWrapEl.addEventListener('dragstart', e=>{
+  const card = e.target.closest('.polaroid'); if(!card || !card.dataset.id) return;
+  dragCardId = card.dataset.id;
+  const im = images.find(x=>x.id===dragCardId);
+  try{ e.dataTransfer.setData('text/plain', (im && im.name) || 'image'); e.dataTransfer.effectAllowed = 'move'; }catch(err){}
+  makeGhost('🖼️ ' + ((im && im.name) || '这张图') + '　→ 拖到合集上', false);
+  moveGhost(e);
+});
+galleryWrapEl.addEventListener('dragend', ()=>{ dragCardId = null; removeGhost(); clearHot(); });
+
+/* —— 合集接住图片 —— */
+albumBarEl.addEventListener('dragover', e=>{
+  if(!dragCardId) return;
+  const chip = e.target.closest('.album-chip'); if(!chip) return;
+  e.preventDefault();
+  try{ e.dataTransfer.dropEffect = 'move'; }catch(err){}
+  clearHot(); chip.classList.add('hot');
+});
+albumBarEl.addEventListener('dragleave', e=>{ if(!albumBarEl.contains(e.relatedTarget)) clearHot(); });
+albumBarEl.addEventListener('drop', async e=>{
+  if(!dragCardId) return;
+  const chip = e.target.closest('.album-chip'); if(!chip) return;
+  e.preventDefault();
+  const album = chip.dataset.album || '未分类';
+  const id = dragCardId;
+  const ids = (selecting && selected.has(id) && selected.size>1) ? Array.from(selected) : [id];
+  dragCardId = null; removeGhost(); clearHot();
+  await setImagesAlbum(ids, album);
+});
+async function setImagesAlbum(ids, album){
+  if(!ids || !ids.length) return;
+  for(const id of ids){
+    const im = images.find(x=>x.id===id);
+    if(im && (im.album||'未分类') !== album){ im.album = album; await dbPut(im); }
+  }
+  const albums = getAlbums();
+  if(album !== '未分类' && !albums.includes(album)){ albums.push(album); saveAlbums(albums); }
+  await refresh();
+  toast('已归入「' + album + '」📚 ' + ids.length + ' 张');
+  sparkleAt(innerWidth/2, innerHeight*0.25);
+}
+
+/* —— 拖起一个标签 —— */
+tagFilterEl.addEventListener('dragstart', e=>{
+  const p = e.target.closest('.pill'); if(!p || !p.dataset.tag) return;
+  dragTag = p.dataset.tag;
+  try{ e.dataTransfer.setData('text/plain', dragTag); e.dataTransfer.effectAllowed = 'copy'; }catch(err){}
+  makeGhost('🏷️ ' + dragTag + '　→ 拖到图片上', true);
+  moveGhost(e);
+});
+tagFilterEl.addEventListener('dragend', ()=>{ dragTag = null; removeGhost(); clearHot(); });
+
+/* —— 图片接住标签 —— */
+galleryWrapEl.addEventListener('dragover', e=>{
+  if(!dragTag) return;
+  const card = e.target.closest('.polaroid'); if(!card) return;
+  e.preventDefault();
+  try{ e.dataTransfer.dropEffect = 'copy'; }catch(err){}
+  clearHot(); card.classList.add('hot');
+});
+galleryWrapEl.addEventListener('dragleave', e=>{ if(!galleryWrapEl.contains(e.relatedTarget)) clearHot(); });
+galleryWrapEl.addEventListener('drop', async e=>{
+  if(!dragTag) return;
+  const card = e.target.closest('.polaroid'); if(!card) return;
+  e.preventDefault();
+  const tag = dragTag, id = card.dataset.id;
+  dragTag = null; removeGhost(); clearHot();
+  await applyTagToImage(id, tag);
+});
+async function applyTagToImage(id, tag){
+  const im = images.find(x=>x.id===id); if(!im || !tag) return;
+  if((im.tags||[]).includes(tag)){ toast('这张图上已经有「' + tag + '」啦～'); return; }
+  im.tags = Array.from(new Set([...(im.tags||[]), tag]));
+  await dbPut(im);
+  await refresh();
+  starBurst(innerWidth/2, innerHeight*0.34);
+  toast('已给「' + (im.name||'这张图') + '」打上标签：' + tag + ' 🏷️');
+}
+
+/* ==================== 图片转直链（上传到公开图床） ==================== */
+let linkItems = [];   // { name, size, url, state, err, thumb }
+function linkOpts(){
+  return {
+    keep: (document.getElementById('linkKeep')||{}).value || '24h',
+    key: ((document.getElementById('linkKey')||{}).value || '').trim(),
+    url: ((document.getElementById('linkCustomUrl')||{}).value || '').trim(),
+    field: ((document.getElementById('linkCustomField')||{}).value || '').trim() || 'file',
+    path: ((document.getElementById('linkCustomPath')||{}).value || '').trim()
+  };
+}
+function onLinkHostChange(){
+  const h = document.getElementById('linkHost').value;
+  document.getElementById('linkKeepField').style.display = (h==='litterbox') ? '' : 'none';
+  document.getElementById('linkKeyField').style.display = (h==='imgbb') ? '' : 'none';
+  document.getElementById('linkCustomFields').style.display = (h==='custom') ? '' : 'none';
+  if(h==='imgbb'){
+    let k = '';
+    try{ k = localStorage.getItem('imgbb_key') || ''; }catch(e){}
+    document.getElementById('linkKey').value = k;
+  }
+  if(h==='custom'){
+    try{
+      document.getElementById('linkCustomUrl').value = localStorage.getItem('custom_up_url') || '';
+      document.getElementById('linkCustomField').value = localStorage.getItem('custom_up_field') || 'file';
+      document.getElementById('linkCustomPath').value = localStorage.getItem('custom_up_path') || '';
+    }catch(e){}
+  }
+}
+function saveLinkOpts(){
+  try{
+    localStorage.setItem('imgbb_key', (document.getElementById('linkKey')||{}).value || '');
+    localStorage.setItem('custom_up_url', (document.getElementById('linkCustomUrl')||{}).value || '');
+    localStorage.setItem('custom_up_field', (document.getElementById('linkCustomField')||{}).value || 'file');
+    localStorage.setItem('custom_up_path', (document.getElementById('linkCustomPath')||{}).value || '');
+  }catch(e){}
+}
+/* 一个文件 → 一条直链（不同图床各写一个分支，互不影响） */
+async function uploadToHost(host, file, opt){
+  if(host === 'litterbox'){
+    const fd = new FormData();
+    fd.append('reqtype','fileupload');
+    fd.append('time', opt.keep || '24h');
+    fd.append('fileToUpload', file, file.name || 'image.png');
+    const r = await fetch('https://litterbox.catbox.moe/resources/internals/api.php', { method:'POST', body:fd });
+    const t = (await r.text()).trim();
+    if(!/^https?:\/\//.test(t)) throw new Error(t || ('HTTP ' + r.status));
+    return t;
+  }
+  if(host === 'tmpfiles'){
+    const fd = new FormData(); fd.append('file', file, file.name || 'image.png');
+    const r = await fetch('https://tmpfiles.org/api/v1/upload', { method:'POST', body:fd });
+    const j = await r.json().catch(()=>({}));
+    const u = j && j.data && j.data.url;
+    if(!u) throw new Error('图床没返回链接（可能被限流了）');
+    return u.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+  }
+  if(host === 'kappa'){
+    const fd = new FormData(); fd.append('file', file, file.name || 'image.png');
+    const r = await fetch('https://kappa.lol/api/upload', { method:'POST', body:fd });
+    const j = await r.json().catch(()=>({}));
+    if(!j || !j.link) throw new Error('图床没返回链接（可能被限流了）');
+    return j.link;
+  }
+  if(host === 'imgbb'){
+    const fd = new FormData();
+    fd.append('key', opt.key);
+    fd.append('image', file, file.name || 'image.png');
+    const r = await fetch('https://api.imgbb.com/1/upload', { method:'POST', body:fd });
+    const j = await r.json().catch(()=>({}));
+    if(!j || !j.success) throw new Error((j && j.error && j.error.message) || ('HTTP ' + r.status));
+    return j.data.url || j.data.display_url;
+  }
+  if(host === 'custom'){
+    if(!opt.url) throw new Error('还没填自定义接口地址');
+    const fd = new FormData();
+    fd.append(opt.field || 'file', file, file.name || 'image.png');
+    const r = await fetch(opt.url, { method:'POST', body:fd });
+    const t = await r.text();
+    if(opt.path){
+      let o = null;
+      try{ o = JSON.parse(t); }catch(e){}
+      if(o){ opt.path.split('.').forEach(k=>{ if(o != null) o = o[k.trim()]; }); }
+      const got = String(o == null ? '' : o);
+      if(!/^https?:\/\//.test(got)) throw new Error('按路径没取到链接：' + t.slice(0,120));
+      return got;
+    }
+    const plain = t.trim();
+    if(!/^https?:\/\//.test(plain)) throw new Error('返回里没有直链：' + t.slice(0,120));
+    return plain;
+  }
+  throw new Error('未知的图床');
+}
+function renderLinkResults(){
+  const box = document.getElementById('linkResults');
+  if(!box) return;
+  if(!linkItems.length){ box.innerHTML = '<p class="hint">还没有上传记录～</p>'; return; }
+  box.innerHTML = linkItems.map((it,i)=>`<div class="res-item">
+      ${it.thumb ? `<img src="${it.thumb}" alt="" />` : '<div class="res-item-thumb"></div>'}
+      <div class="r-main">
+        <div class="r-name">${escapeHtml(it.name)}　<span class="hint">${bytesToSize(it.size||0)}</span></div>
+        <div class="r-url">${it.url ? escapeHtml(it.url) : escapeHtml(it.err || it.state)}</div>
+      </div>
+      <span class="r-state">${escapeHtml(it.state)}</span>
+      ${it.url ? `<button class="candy sm" onclick="linkCopy(${i})">📋</button><button class="candy sky sm" onclick="linkOpen(${i})">↗</button>` : ''}
+    </div>`).join('');
+}
+function linkCopy(i){
+  const it = linkItems[i]; if(!it || !it.url) return;
+  navigator.clipboard.writeText(it.url).then(()=>toast('直链已复制 📋')).catch(()=>toast('复制失败，手动选一下文字吧～'));
+}
+function linkOpen(i){ const it = linkItems[i]; if(it && it.url) window.open(it.url, '_blank', 'noopener,noreferrer'); }
+function linkCopyAll(){
+  const list = linkItems.filter(x=>x.url).map(x=>x.url);
+  if(!list.length){ toast('还没有成功的直链哦～'); return; }
+  navigator.clipboard.writeText(list.join('\n')).then(()=>toast('已复制 ' + list.length + ' 条直链 📋')).catch(()=>toast('复制失败 🥺'));
+}
+function linkClear(){
+  linkItems.forEach(x=>{ if(x.thumb) try{ URL.revokeObjectURL(x.thumb); }catch(e){} });
+  linkItems = []; renderLinkResults(); toast('列表清空啦 ♻️');
+}
+function linkFilesPicked(files){
+  const arr = Array.from(files||[]).filter(f=>f.type.startsWith('image/'));
+  if(!arr.length){ toast('没有识别到图片哦～'); return; }
+  linkUploadFiles(arr);
+}
+async function linkUploadFiles(files){
+  const host = document.getElementById('linkHost').value;
+  const opt = linkOpts(); saveLinkOpts();
+  if(host==='imgbb' && !opt.key){ toast('imgbb 要先填 API Key 哦～'); return; }
+  if(host==='custom' && !opt.url){ toast('自定义接口要先填地址～'); return; }
+  const bar = document.getElementById('linkBar');
+  bar.classList.add('show');
+  let done = 0;
+  for(const f of files){
+    const item = { name:f.name || ('图片_' + done), size:f.size, url:'', state:'上传中…', err:'', thumb:'' };
+    try{ item.thumb = URL.createObjectURL(f); }catch(e){}
+    linkItems.push(item); renderLinkResults();
+    try{
+      item.url = await uploadToHost(host, f, opt);
+      item.state = '✅ 完成';
+    }catch(err){
+      console.warn(err);
+      item.state = '❌ 失败';
+      item.err = '失败原因：' + ((err && err.message) || err);
+    }
+    done++;
+    bar.querySelector('i').style.width = Math.round(done / files.length * 100) + '%';
+    renderLinkResults();
+    await new Promise(r=>setTimeout(r, 30));
+  }
+  setTimeout(()=>{ bar.classList.remove('show'); bar.querySelector('i').style.width = '0'; }, 700);
+  const ok = files.length - linkItems.slice(-files.length).filter(x=>!x.url).length;
+  toast('上传结束：成功 ' + ok + ' / ' + files.length + ' 张 🔗');
+  if(ok) candyRain(30);
+}
+function linkUseSelected(){
+  if(!selected.size){ toast('先在首页点「批量选择」勾几张图吧～'); return; }
+  linkUploadRecords(images.filter(i=>selected.has(i.id)));
+}
+function linkUseAlbum(){
+  const list = filtered();
+  if(!list.length){ toast('当前筛选里没有图片哦～'); return; }
+  if(list.length > 10 && !confirm('当前筛选共 ' + list.length + ' 张，免注册图床传起来会有点慢（部分图床每批约 10 张），继续吗？')) return;
+  linkUploadRecords(list.slice(0, 30));
+}
+async function linkUploadRecords(list){
+  toast('正在从图库读原图…');
+  const files = [];
+  for(const im of list){
+    const b = await blobOf(im);
+    if(b) files.push(new File([b], safeFileName(im.name || 'image') + '.' + extOf(b, im), { type: b.type || 'image/png' }));
+  }
+  if(!files.length){ toast('读不到原图，先给图库文件夹「重新授权」吧 🥺'); return; }
+  linkUploadFiles(files);
+}
+
+
+/* ==================== GIF89a 编码器（纯前端，不依赖任何库） ==================== */
+function bayerMatrix(n){
+  let m = [[0]];
+  while(m.length < n){
+    const s = m.length, out = [];
+    for(let y=0;y<s*2;y++) out.push(new Array(s*2).fill(0));
+    for(let y=0;y<s;y++) for(let x=0;x<s;x++){
+      const v = m[y][x]*4;
+      out[y][x] = v; out[y][x+s] = v+2; out[y+s][x] = v+3; out[y+s][x+s] = v+1;
+    }
+    m = out;
+  }
+  return m;
+}
+const BAYER8 = bayerMatrix(8);
+
+/* 中位切分：从一张图的像素里挑出最合适的 N 种颜色（GIF 最多 256 色） */
+function medianCutPalette(px, maxColors){
+  const total = px.length / 4;
+  const step = Math.max(1, Math.floor(total / 24000));
+  const pts = [];
+  for(let i=0;i<total;i+=step) pts.push([px[i*4], px[i*4+1], px[i*4+2]]);
+  if(!pts.length) return [[0,0,0]];
+  let boxes = [pts];
+  while(boxes.length < maxColors){
+    let bi = -1, bestScore = -1;
+    for(let i=0;i<boxes.length;i++){
+      const b = boxes[i];
+      if(b.length < 2) continue;
+      let mn0=255,mn1=255,mn2=255,mx0=0,mx1=0,mx2=0;
+      for(const p of b){
+        if(p[0]<mn0)mn0=p[0]; if(p[0]>mx0)mx0=p[0];
+        if(p[1]<mn1)mn1=p[1]; if(p[1]>mx1)mx1=p[1];
+        if(p[2]<mn2)mn2=p[2]; if(p[2]>mx2)mx2=p[2];
+      }
+      const rng = Math.max(mx0-mn0, mx1-mn1, mx2-mn2);
+      const score = rng * Math.log(b.length + 1);
+      if(score > bestScore){ bestScore = score; bi = i; }
+    }
+    if(bi < 0) break;
+    const b = boxes[bi];
+    const mn=[255,255,255], mx=[0,0,0];
+    for(const p of b) for(let c=0;c<3;c++){ if(p[c]<mn[c])mn[c]=p[c]; if(p[c]>mx[c])mx[c]=p[c]; }
+    let ch = 0, w = -1;
+    for(let c=0;c<3;c++){ const d = mx[c]-mn[c]; if(d>w){ w=d; ch=c; } }
+    b.sort((p,q)=>p[ch]-q[ch]);
+    const mid = b.length >> 1;
+    boxes.splice(bi, 1, b.slice(0, mid), b.slice(mid));
+  }
+  return boxes.filter(b=>b.length).map(b=>{
+    let r=0,g=0,bl=0;
+    for(const p of b){ r+=p[0]; g+=p[1]; bl+=p[2]; }
+    return [Math.round(r/b.length), Math.round(g/b.length), Math.round(bl/b.length)];
+  });
+}
+/* 每个像素 → 调色板索引（15 位颜色缓存，几十万像素也能很快） */
+function quantizeFrame(px, palette, transparent){
+  const offset = transparent ? 1 : 0;
+  const cache = new Int16Array(32768).fill(-1);
+  const n = palette.length;
+  const out = new Uint8Array(px.length / 4);
+  for(let i=0, j=0; i<px.length; i+=4, j++){
+    if(transparent && px[i+3] < 128){ out[j] = 0; continue; }
+    const r = px[i], g = px[i+1], b = px[i+2];
+    const key = ((r>>3)<<10) | ((g>>3)<<5) | (b>>3);
+    let idx = cache[key];
+    if(idx < 0){
+      let bd = Infinity, bi = 0;
+      for(let k=0;k<n;k++){
+        const p = palette[k];
+        const dr = r-p[0], dg = g-p[1], db = b-p[2];
+        const d = dr*dr + dg*dg + db*db;
+        if(d < bd){ bd = d; bi = k; }
+      }
+      idx = bi; cache[key] = bi;
+    }
+    out[j] = idx + offset;
+  }
+  return out;
+}
+/* GIF 的 LZW 压缩（就是规范里那套变长编码） */
+function lzwEncode(indices, minCodeSize){
+  const out = [];
+  let bitBuf = 0, bitCnt = 0;
+  const clearCode = 1 << minCodeSize, eoiCode = clearCode + 1;
+  let codeSize = minCodeSize + 1, nextCode = eoiCode + 1, table = new Map();
+  const emit = code => {
+    bitBuf |= code << bitCnt; bitCnt += codeSize;
+    while(bitCnt >= 8){ out.push(bitBuf & 255); bitBuf >>>= 8; bitCnt -= 8; }
+  };
+  emit(clearCode);
+  if(indices.length){
+    let cur = indices[0];
+    for(let i=1;i<indices.length;i++){
+      const k = indices[i];
+      const key = (cur << 8) | k;
+      const found = table.get(key);
+      if(found !== undefined){ cur = found; continue; }
+      emit(cur);
+      if(nextCode === 4096){
+        emit(clearCode);
+        table = new Map(); codeSize = minCodeSize + 1; nextCode = eoiCode + 1;
+      } else {
+        if(nextCode >= (1 << codeSize) && codeSize < 12) codeSize++;   // 与标准实现一致：加宽要在写入新码「之前」判断
+        table.set(key, nextCode++);
+      }
+      cur = k;
+    }
+    emit(cur);
+  }
+  emit(eoiCode);
+  if(bitCnt > 0) out.push(bitBuf & 255);
+  return out;
+}
+/* 把若干帧拼成完整的 GIF89a 字节流 */
+function buildGif(frames, opt){
+  const bytes = [];
+  const byte = b => bytes.push(b & 255);
+  const short = v => { byte(v); byte(v >> 8); };
+  const str = s => { for(let i=0;i<s.length;i++) byte(s.charCodeAt(i)); };
+  const W = opt.width, H = opt.height;
+  str('GIF89a');
+  short(W); short(H);
+  byte(0x70); byte(0); byte(0);                       // 没有全局调色板，每帧自带
+  byte(0x21); byte(0xFF); byte(11); str('NETSCAPE2.0');// 循环播放
+  byte(3); byte(1); short(opt.loop || 0); byte(0);
+  for(const f of frames){
+    const pal = f.palette && f.palette.length ? f.palette : [[0,0,0]];
+    let k = Math.ceil(Math.log2(Math.max(2, pal.length))) - 1;
+    if(k < 0) k = 0; if(k > 7) k = 7;
+    const tableSize = 1 << (k + 1);
+    const trans = !!f.transparent;
+    byte(0x21); byte(0xF9); byte(4);                  // 图形控制扩展
+    byte((2 << 2) | (trans ? 1 : 0));                 // 处置方式=2（每帧清回背景）+ 透明标记
+    short(Math.max(2, Math.round(f.delayCs || 10)));  // 延时，单位 1/100 秒
+    byte(trans ? (f.transparentIndex || 0) : 0);
+    byte(0);
+    byte(0x2C);                                       // 图像描述符
+    short(0); short(0); short(W); short(H);
+    byte(0x80 | k);                                   // 有本地调色板
+    for(let i=0;i<tableSize;i++){
+      const c = pal[i] || [0,0,0];
+      byte(c[0]); byte(c[1]); byte(c[2]);
+    }
+    const minCodeSize = Math.max(2, k + 1);
+    byte(minCodeSize);
+    const data = lzwEncode(f.indices, minCodeSize);
+    for(let i=0;i<data.length;i+=255){
+      const chunk = data.slice(i, i + 255);
+      byte(chunk.length);
+      for(const v of chunk) byte(v);
+    }
+    byte(0);
+  }
+  byte(0x3B);
+  return new Uint8Array(bytes);
+}
+
+/* ==================== 多图合成 GIF ==================== */
+let gifFrames = [];     // { name, url, img, w, h }
+let gifBlob = null;
+function renderGifStrip(){
+  const strip = document.getElementById('gifStrip');
+  if(!strip) return;
+  strip.innerHTML = gifFrames.length ? gifFrames.map((f,i)=>`<div class="fr" data-i="${i}">
+      <img src="${f.url}" alt="" />
+      <button class="fx" onclick="gifRemoveFrame(${i})" title="移除这一张">✕</button>
+      <span class="no">${i+1}</span>
+    </div>`).join('') : '<span class="hint">还没有图片～ 点上面「添加图片」，或用相册里选中的图</span>';
+}
+function gifAddImg(img, name, url){
+  gifFrames.push({ name, url, img, w:img.naturalWidth || img.width, h:img.naturalHeight || img.height });
+  renderGifStrip();
+}
+function gifFilesPicked(files){
+  const arr = Array.from(files||[]).filter(f=>f.type.startsWith('image/'));
+  if(!arr.length){ toast('没有识别到图片哦～'); return; }
+  arr.slice(0, 40 - gifFrames.length).forEach(f=>{
+    const url = URL.createObjectURL(f);
+    const img = new Image();
+    img.onload = ()=>renderGifStrip();
+    img.src = url;
+    gifAddImg(img, f.name, url);
+  });
+  toast('已加入图片，共 ' + gifFrames.length + ' 帧 🎞️');
+}
+function gifRemoveFrame(i){ const f = gifFrames.splice(i,1)[0]; if(f) try{ URL.revokeObjectURL(f.url); }catch(e){} renderGifStrip(); }
+function gifClearFrames(){ gifFrames.forEach(f=>{ try{ URL.revokeObjectURL(f.url); }catch(e){} }); gifFrames = []; gifBlob = null; renderGifStrip(); }
+async function gifAddFromRecords(list){
+  toast('正在从图库读原图…');
+  let n = 0;
+  for(const im of list){
+    if(gifFrames.length >= 40) break;
+    const b = await blobOf(im);
+    if(!b) continue;
+    const url = URL.createObjectURL(b);
+    const img = new Image();
+    try{ await new Promise((res, rej)=>{ img.onload = res; img.onerror = rej; img.src = url; }); }catch(e){ continue; }
+    gifAddImg(img, im.name || '图片', url);
+    n++;
+  }
+  toast(n ? ('已加入 ' + n + ' 张，共 ' + gifFrames.length + ' 帧 🎞️') : '读不到原图，先给图库文件夹「重新授权」吧 🥺');
+}
+function gifUseSelected(){
+  if(!selected.size){ toast('先在首页点「批量选择」勾几张图吧～'); return; }
+  gifAddFromRecords(images.filter(i=>selected.has(i.id)));
+}
+function gifUseAlbum(){ gifAddFromRecords(filtered().slice(0, 40)); }
+
+function drawGifFrame(img, cw, ch, fit, bg){
+  const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+  if(bg !== 'transparent'){ ctx.fillStyle = bg; ctx.fillRect(0, 0, cw, ch); }
+  const iw = img.naturalWidth || img.width || 0, ih = img.naturalHeight || img.height || 0;
+  if(!iw || !ih) return c;
+  const sc = (fit === 'cover') ? Math.max(cw/iw, ch/ih) : Math.min(cw/iw, ch/ih);
+  const dw = Math.max(1, Math.round(iw*sc)), dh = Math.max(1, Math.round(ih*sc));
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, Math.round((cw-dw)/2), Math.round((ch-dh)/2), dw, dh);
+  return c;
+}
+function makeTransitionFrames(a, b, cw, ch, fx, n, bg){
+  const list = [];
+  const mk = ()=>{ const c = document.createElement('canvas'); c.width = cw; c.height = ch; return c; };
+  const base = (ctx)=>{ if(bg !== 'transparent'){ ctx.fillStyle = bg; ctx.fillRect(0,0,cw,ch); } };
+  if(fx === 'white' || fx === 'black'){
+    const col = fx === 'white' ? '255,255,255' : '0,0,0';
+    for(let j=1;j<=n;j++){ const t=j/(n+1), c=mk(), ctx=c.getContext('2d'); base(ctx); ctx.drawImage(a,0,0); ctx.fillStyle='rgba('+col+','+t.toFixed(3)+')'; ctx.fillRect(0,0,cw,ch); list.push(c); }
+    for(let j=n;j>=1;j--){ const t=j/(n+1), c=mk(), ctx=c.getContext('2d'); base(ctx); ctx.drawImage(b,0,0); ctx.fillStyle='rgba('+col+','+t.toFixed(3)+')'; ctx.fillRect(0,0,cw,ch); list.push(c); }
+    return list;
+  }
+  if(fx === 'wipe'){
+    for(let j=1;j<=n;j++){
+      const t=j/(n+1), c=mk(), ctx=c.getContext('2d');
+      base(ctx); ctx.drawImage(a,0,0);
+      ctx.save(); ctx.beginPath(); ctx.rect(0,0,cw*t,ch); ctx.clip(); ctx.drawImage(b,0,0); ctx.restore();
+      list.push(c);
+    }
+    return list;
+  }
+  if(fx === 'slide'){
+    for(let j=1;j<=n;j++){
+      const t=j/(n+1), c=mk(), ctx=c.getContext('2d');
+      base(ctx);
+      ctx.drawImage(a, Math.round(-cw*t), 0);
+      ctx.drawImage(b, Math.round(cw*(1-t)), 0);
+      list.push(c);
+    }
+    return list;
+  }
+  if(fx === 'dissolve'){
+    const A = a.getContext('2d').getImageData(0,0,cw,ch).data;
+    const B = b.getContext('2d').getImageData(0,0,cw,ch).data;
+    for(let j=1;j<=n;j++){
+      const t = j/(n+1);
+      const c = mk(), ctx = c.getContext('2d');
+      const out = ctx.createImageData(cw, ch), o = out.data;
+      for(let y=0;y<ch;y++){
+        const row = y*cw*4;
+        for(let x=0;x<cw;x++){
+          const p = row + x*4;
+          const useB = (BAYER8[y&7][x&7] / 64) < t;
+          o[p]   = useB ? B[p]   : A[p];
+          o[p+1] = useB ? B[p+1] : A[p+1];
+          o[p+2] = useB ? B[p+2] : A[p+2];
+          o[p+3] = useB ? B[p+3] : A[p+3];
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+      list.push(c);
+    }
+    return list;
+  }
+  return list;
+}
+async function buildGifClick(){
+  if(gifFrames.length < 2){ toast('至少要有 2 张图片才能合成动图哦～'); return; }
+  const W = parseInt(document.getElementById('gifSize').value) || 420;
+  const delayCs = Math.max(2, Math.round((parseInt(document.getElementById('gifDelay').value) || 900) / 10));
+  const fx = document.getElementById('gifFx').value;
+  const fxN = parseInt(document.getElementById('gifFxN').value) || 4;
+  const fit = document.getElementById('gifFit').value;
+  const bg = document.getElementById('gifBg').value;
+  const transparent = (bg === 'transparent');
+  const first = gifFrames[0];
+  const ratio = (first.w && first.h) ? (first.h / first.w) : 1;
+  const cw = W, ch = Math.max(2, Math.round(W * Math.min(2.2, Math.max(0.45, ratio))));
+  const bar = document.getElementById('gifBar'), fill = bar.querySelector('i');
+  const box = document.getElementById('gifPreview');
+  bar.classList.add('show'); fill.style.width = '5%';
+  box.textContent = '正在把 ' + gifFrames.length + ' 张图拼成动图…（图片多的时候要等几秒）';
+  try{
+    const drawn = gifFrames.map(f=>drawGifFrame(f.img, cw, ch, fit, bg));
+    const seq = [];
+    for(let i=0;i<drawn.length;i++){
+      seq.push({ canvas: drawn[i], delayCs });
+      if(fx !== 'none' && drawn.length > 1){
+        const trans = makeTransitionFrames(drawn[i], drawn[(i+1)%drawn.length], cw, ch, fx, fxN, bg);
+        trans.forEach(c=>seq.push({ canvas:c, delayCs: Math.max(4, Math.round(delayCs/4)) }));
+      }
+      fill.style.width = (5 + 30*(i+1)/drawn.length) + '%';
+      if(i % 2 === 0) await new Promise(r=>setTimeout(r, 0));
+    }
+    const encFrames = [];
+    for(let i=0;i<seq.length;i++){
+      const cv = seq[i].canvas, ctx = cv.getContext('2d');
+      const data = ctx.getImageData(0, 0, cw, ch);
+      const pal = medianCutPalette(data.data, transparent ? 254 : 255);
+      const full = transparent ? [[0,0,0]].concat(pal.slice(0,254)) : pal.slice(0,256);
+      encFrames.push({
+        indices: quantizeFrame(data.data, pal.slice(0, transparent ? 254 : 256), transparent),
+        palette: full, delayCs: seq[i].delayCs, transparent, transparentIndex: 0
+      });
+      fill.style.width = (35 + 60*(i+1)/seq.length) + '%';
+      if(i % 3 === 0) await new Promise(r=>setTimeout(r, 0));
+    }
+    const bytes = buildGif(encFrames, { width: cw, height: ch, loop: 0 });
+    gifBlob = new Blob([bytes], { type:'image/gif' });
+    box.innerHTML = '';
+    const img = document.createElement('img');
+    const u = URL.createObjectURL(gifBlob);
+    img.src = u;
+    box.appendChild(img);
+    const info = document.createElement('div');
+    info.className = 'hint'; info.style.marginTop = '10px';
+    info.textContent = '✅ 生成成功：' + cw + '×' + ch + ' · ' + encFrames.length + ' 帧 · ' + bytesToSize(gifBlob.size) + '（点「下载 GIF」保存）';
+    box.appendChild(info);
+    toast('GIF 生成好啦 🎞️');
+    candyRain(30);
+  }catch(err){
+    console.warn(err);
+    box.textContent = '生成失败：' + ((err && err.message) || err);
+    toast('生成失败，换小一点的尺寸再试试 🥺');
+  }finally{
+    setTimeout(()=>{ bar.classList.remove('show'); fill.style.width = '0'; }, 600);
+  }
+}
+function downloadGif(){
+  if(!gifBlob){ toast('先点「开始生成」做一张 GIF 吧～'); return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(gifBlob);
+  a.download = '好图收纳屋_' + String(Date.now()).slice(-6) + '.gif';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>{ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 5000);
+  toast('GIF 开始下载 ⬇️');
+}
+
+
+/* ==================== GIF 转 MP4（WebCodecs 编码 + 自己拼 MP4 容器） ==================== */
+let mp4SrcFile = null, mp4OutBlob = null;
+function mp4FilePicked(files){
+  const f = files && files[0]; if(!f) return;
+  mp4SrcFile = f; mp4OutBlob = null;
+  document.getElementById('mp4Preview').textContent = '已选择：' + f.name + '（' + bytesToSize(f.size) + '）→ 点「开始转换」';
+}
+function mp4cat(parts){
+  let len = 0;
+  for(const p of parts){ if(p) len += p.length; }
+  const out = new Uint8Array(len); let o = 0;
+  for(const p of parts){ if(!p) continue; out.set(p, o); o += p.length; }
+  return out;
+}
+function mp4str(s){ const a = new Uint8Array(s.length); for(let i=0;i<s.length;i++) a[i] = s.charCodeAt(i) & 255; return a; }
+function mp4u32(v){ v = v >>> 0; return new Uint8Array([(v>>>24)&255,(v>>>16)&255,(v>>>8)&255,v&255]); }
+function mp4u16(v){ return new Uint8Array([(v>>8)&255, v&255]); }
+function mp4box(type, ...parts){ const body = mp4cat(parts); return mp4cat([mp4u32(body.length+8), mp4str(type), body]); }
+const MP4_MATRIX = mp4cat([
+  mp4u32(0x00010000), mp4u32(0), mp4u32(0),
+  mp4u32(0), mp4u32(0x00010000), mp4u32(0),
+  mp4u32(0), mp4u32(0), mp4u32(0x40000000)
+]);
+function mp4Mvhd(ts, dur){
+  return mp4box('mvhd', mp4u32(0), mp4u32(0), mp4u32(0), mp4u32(ts), mp4u32(dur),
+    mp4u32(0x00010000), mp4u16(0x0100), mp4u16(0), mp4u32(0), mp4u32(0),
+    MP4_MATRIX, mp4u32(0), mp4u32(0), mp4u32(0), mp4u32(0), mp4u32(0), mp4u32(0), mp4u32(2));
+}
+function mp4Tkhd(dur, w, h){
+  return mp4box('tkhd', mp4u32(7), mp4u32(0), mp4u32(0), mp4u32(1), mp4u32(0), mp4u32(dur),
+    mp4u32(0), mp4u32(0), mp4u16(0), mp4u16(0), mp4u16(0), mp4u16(0),
+    MP4_MATRIX, mp4u32(Math.round(w*65536)), mp4u32(Math.round(h*65536)));
+}
+function mp4Mdhd(ts, dur){
+  return mp4box('mdhd', mp4u32(0), mp4u32(0), mp4u32(0), mp4u32(ts), mp4u32(dur), mp4u16(0x55C4), mp4u16(0));
+}
+function mp4Hdlr(){
+  return mp4box('hdlr', mp4u32(0), mp4u32(0), mp4str('vide'), mp4u32(0), mp4u32(0), mp4u32(0), mp4str('VideoHandler'), new Uint8Array([0]));
+}
+const MP4_VMHD = mp4box('vmhd', mp4u32(1), mp4u16(0), mp4u16(0), mp4u16(0), mp4u16(0));
+const MP4_DINF = mp4box('dinf', mp4box('dref', mp4u32(0), mp4u32(1), mp4box('url ', mp4u32(1))));
+function mp4Avc1(desc, w, h){
+  return mp4box('avc1',
+    mp4u32(0), mp4u16(0), mp4u16(1),
+    mp4u16(0), mp4u16(0), mp4u32(0), mp4u32(0), mp4u32(0),
+    mp4u16(w), mp4u16(h),
+    mp4u32(0x00480000), mp4u32(0x00480000),
+    mp4u32(0), mp4u16(1),
+    new Uint8Array(32),
+    mp4u16(0x0018), mp4u16(0xFFFF),
+    mp4box('avcC', new Uint8Array(desc)));
+}
+/* 把所有编码帧拼成一个最小可用的 MP4（ftyp + mdat + moov） */
+function buildMp4Bytes(chunks, desc, width, height){
+  const ts = 1000, n = chunks.length;
+  const datas = [], sizes = [], deltas = [];
+  let total = 0;
+  for(let i=0;i<n;i++){
+    const u = new Uint8Array(chunks[i].byteLength);
+    chunks[i].copyTo(u);
+    datas.push(u); sizes.push(u.length);
+    const cur = chunks[i].timestamp;
+    const nxt = (i+1 < n) ? chunks[i+1].timestamp : (cur + (chunks[i].duration || 40000));
+    const d = Math.max(1, Math.round((nxt - cur)/1000));
+    deltas.push(d); total += d;
+  }
+  const ftyp = mp4box('ftyp', mp4str('isom'), mp4u32(512), mp4str('isom'), mp4str('iso2'), mp4str('avc1'), mp4str('mp41'));
+  const mdat = mp4box('mdat', mp4cat(datas));
+  const chunkOffset = ftyp.length + 8;
+  const runs = [];
+  for(const d of deltas){
+    const last = runs[runs.length-1];
+    if(last && last[1] === d) last[0]++;
+    else runs.push([1, d]);
+  }
+  const stts = mp4box('stts', mp4u32(0), mp4u32(runs.length), mp4cat(runs.map(r=>mp4cat([mp4u32(r[0]), mp4u32(r[1])]))));
+  const keys = [];
+  for(let i=0;i<n;i++) if(chunks[i].type === 'key') keys.push(i+1);
+  const stss = (keys.length === n) ? null : mp4box('stss', mp4u32(0), mp4u32(keys.length), mp4cat(keys.map(k=>mp4u32(k))));
+  const stsc = mp4box('stsc', mp4u32(0), mp4u32(1), mp4u32(1), mp4u32(n), mp4u32(1));
+  const stsz = mp4box('stsz', mp4u32(0), mp4u32(0), mp4u32(n), mp4cat(sizes.map(s=>mp4u32(s))));
+  const stco = mp4box('stco', mp4u32(0), mp4u32(1), mp4u32(chunkOffset));
+  const stbl = mp4box('stbl', mp4box('stsd', mp4u32(0), mp4u32(1), mp4Avc1(desc, width, height)), stts, stss, stsc, stsz, stco);
+  const minf = mp4box('minf', MP4_VMHD, MP4_DINF, stbl);
+  const mdia = mp4box('mdia', mp4Mdhd(ts, total), mp4Hdlr(), minf);
+  const trak = mp4box('trak', mp4Tkhd(total, width, height), mdia);
+  const moov = mp4box('moov', mp4Mvhd(ts, total), trak);
+  return mp4cat([ftyp, mdat, moov]);
+}
+/* 用浏览器的 ImageDecoder 把 GIF 拆成「每帧位图 + 每帧时长」 */
+async function decodeGifFrames(file){
+  if(typeof ImageDecoder !== 'function') throw new Error('这个浏览器不支持 ImageDecoder（用 Chrome / Edge 打开就好）');
+  const data = new Uint8Array(await file.arrayBuffer());
+  const dec = new ImageDecoder({ data, type:'image/gif' });
+  await dec.completed;
+  // 轨道列表是异步就绪的，不等它就只能拿到 1 帧（踩过的坑）
+  try{ if(dec.tracks && dec.tracks.ready) await dec.tracks.ready; }catch(e){}
+  let count = 0;
+  try{
+    const t = (dec.tracks && dec.tracks.selectedTrack) || (dec.tracks && dec.tracks.length ? dec.tracks[0] : null);
+    if(t && t.frameCount) count = t.frameCount;
+  }catch(e){}
+  const out = [];
+  const limit = count || 2000;   // 拿不到帧数就一帧帧硬解，解不动为止
+  for(let i=0;i<limit;i++){
+    let res = null;
+    try{ res = await dec.decode({ frameIndex:i }); }catch(e){ break; }
+    const vf = res && res.image;
+    if(!vf) break;
+    const ms = Math.max(20, Math.round((vf.duration || 100000)/1000));
+    const bmp = await createImageBitmap(vf);
+    try{ vf.close(); }catch(e){}
+    out.push({ bitmap:bmp, ms });
+  }
+  if(!out.length) throw new Error('这个 GIF 里没读到任何帧');
+  return out;
+}
+async function pickAvcConfig(W, H, fps, bitrate){
+  if(typeof VideoEncoder !== 'function') return null;
+  const cands = ['avc1.42001f', 'avc1.42002a', 'avc1.4D0028', 'avc1.640028'];
+  for(const codec of cands){
+    const cfg = { codec, width:W, height:H, bitrate, framerate:fps, avc:{ format:'avc' } };
+    try{
+      const sup = await VideoEncoder.isConfigSupported(cfg);
+      if(sup && sup.supported) return cfg;
+    }catch(e){}
+  }
+  return null;
+}
+async function encodeMp4WithWebCodecs(seq, W, H, cfg, bar){
+  const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const chunks = [];
+  let desc = null, encErr = null;
+  const enc = new VideoEncoder({
+    output: (chunk, meta)=>{
+      if(!desc && meta && meta.decoderConfig && meta.decoderConfig.description){
+        desc = new Uint8Array(meta.decoderConfig.description);
+      }
+      chunks.push(chunk);
+    },
+    error: e=>{ encErr = e; }
+  });
+  enc.configure(cfg);
+  let t = 0;
+  for(let i=0;i<seq.length;i++){
+    if(encErr) throw encErr;
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(seq[i].bitmap, 0, 0, W, H);
+    const vf = new VideoFrame(canvas, { timestamp: Math.round(t*1000), duration: Math.round(seq[i].ms*1000) });
+    enc.encode(vf, { keyFrame: i === 0 });
+    try{ vf.close(); }catch(e){}
+    t += seq[i].ms;
+    if(bar) bar.style.width = (30 + 55*(i+1)/seq.length) + '%';
+    if(i % 3 === 0) await new Promise(r=>setTimeout(r, 0));
+  }
+  await enc.flush();
+  try{ enc.close(); }catch(e){}
+  if(encErr) throw encErr;
+  if(!chunks.length) throw new Error('浏览器没输出任何编码帧（可能不支持 H.264 编码）');
+  if(!desc) throw new Error('没拿到 avcC 配置，没法封装 MP4');
+  return buildMp4Bytes(chunks, desc, W, H);
+}
+/* 兜底：老浏览器没有 WebCodecs 时，用 MediaRecorder 实时录一遍（可能给到 WebM） */
+async function encodeFallback(seq, W, H, fps, prefer){
+  if(typeof MediaRecorder !== 'function') return null;
+  const types = [prefer + ';codecs=avc1.42001f', prefer, 'video/webm;codecs=vp9', 'video/webm'];
+  let mime = '';
+  for(const t of types){ try{ if(MediaRecorder.isTypeSupported(t)){ mime = t; break; } }catch(e){} }
+  if(!mime) return null;
+  const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const stream = canvas.captureStream(0);
+  const track = stream.getVideoTracks()[0];
+  const rec = new MediaRecorder(stream, { mimeType:mime, videoBitsPerSecond: Math.max(400000, Math.round(W*H*fps*0.3)) });
+  const blobs = [];
+  rec.ondataavailable = e=>{ if(e.data && e.data.size) blobs.push(e.data); };
+  const stopped = new Promise(r=>{ rec.onstop = r; });
+  rec.start();
+  for(const fr of seq){
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(fr.bitmap, 0, 0, W, H);
+    try{ if(track && track.requestFrame) track.requestFrame(); }catch(e){}
+    await new Promise(r=>setTimeout(r, fr.ms));
+  }
+  rec.stop();
+  await stopped;
+  return new Blob(blobs, { type: mime.split(';')[0] });
+}
+async function startGif2Mp4(){
+  if(!mp4SrcFile){ toast('先选一个 GIF 文件吧～'); return; }
+  const bar = document.getElementById('mp4Bar'), fill = bar.querySelector('i');
+  const box = document.getElementById('mp4Preview');
+  bar.classList.add('show'); fill.style.width = '6%';
+  box.textContent = '正在读取 GIF 帧…';
+  try{
+    const frames = await decodeGifFrames(mp4SrcFile);
+    fill.style.width = '25%';
+    const scale = parseFloat(document.getElementById('mp4Scale').value) || 1;
+    const q = parseFloat(document.getElementById('mp4Quality').value) || 1.8;
+    const loops = parseInt(document.getElementById('mp4Loop').value) || 1;
+    const W = Math.max(2, Math.round(frames[0].bitmap.width * scale / 2) * 2);
+    const H = Math.max(2, Math.round(frames[0].bitmap.height * scale / 2) * 2);
+    const seq = [];
+    for(let l=0;l<loops;l++) for(const fr of frames) seq.push(fr);
+    const totalMs = seq.reduce((s,x)=>s+x.ms, 0);
+    const fps = Math.max(2, Math.min(60, Math.round(1000 / (totalMs/seq.length))));
+    const bitrate = Math.max(260000, Math.round(W*H*fps*0.16*q));
+    box.textContent = 'GIF 共 ' + frames.length + ' 帧 · 输出 ' + W + '×' + H + ' · 约 ' + (totalMs/1000).toFixed(1) + ' 秒，正在编码…';
+    const cfg = await pickAvcConfig(W, H, fps, bitrate);
+    if(cfg){
+      mp4OutBlob = new Blob([await encodeMp4WithWebCodecs(seq, W, H, cfg, fill)], { type:'video/mp4' });
+    } else {
+      box.textContent = '这台浏览器不支持 H.264 编码，改用备用方式录制…';
+      mp4OutBlob = await encodeFallback(seq, W, H, fps, 'video/mp4');
+    }
+    if(!mp4OutBlob) throw new Error('这个浏览器没法生成 MP4，换 Chrome / Edge 试试～');
+    fill.style.width = '100%';
+    const isMp4 = /mp4/i.test(mp4OutBlob.type);
+    box.innerHTML = '';
+    const v = document.createElement('video');
+    v.controls = true; v.loop = true; v.playsInline = true; v.muted = true;
+    v.src = URL.createObjectURL(mp4OutBlob);
+    v.style.maxWidth = '100%'; v.style.maxHeight = '320px'; v.style.borderRadius = '12px';
+    box.appendChild(v);
+    const info = document.createElement('div');
+    info.className = 'hint'; info.style.marginTop = '10px';
+    info.textContent = (isMp4 ? '✅ MP4 转换成功：' : '⚠️ 这台浏览器只给到 WebM：') + W + '×' + H + ' · ' + frames.length + ' 帧 → ' + bytesToSize(mp4OutBlob.size) + '（点「下载 MP4」保存）';
+    box.appendChild(info);
+    toast('转换完成 🎬');
+    candyRain(30);
+  }catch(err){
+    console.warn(err);
+    box.textContent = '转换失败：' + ((err && err.message) || err);
+    toast('转换失败 🥺');
+  }finally{
+    setTimeout(()=>{ bar.classList.remove('show'); fill.style.width = '0'; }, 600);
+  }
+}
+function downloadMp4(){
+  if(!mp4OutBlob){ toast('先点「开始转换」吧～'); return; }
+  const ext = /mp4/i.test(mp4OutBlob.type) ? 'mp4' : 'webm';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(mp4OutBlob);
+  a.download = (mp4SrcFile ? safeFileName(String(mp4SrcFile.name).replace(/\.[^.]+$/, '')) : '动图') + '_' + String(Date.now()).slice(-6) + '.' + ext;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>{ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 5000);
+  toast('开始下载 ' + ext.toUpperCase() + ' ⬇️');
 }
 
 /* ==================== 拖拽上传 ==================== */
@@ -2041,6 +3328,8 @@ function refreshStats(){
   try{ savedTheme = localStorage.getItem('album_theme') || ''; }catch(e){}
   applyTheme(savedTheme);
   renderCompressToggle();
+  onLinkHostChange();
+  applyCardSize();
   try{ await openDB(); }
   catch(e){
     console.warn(e);
