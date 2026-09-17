@@ -4,25 +4,28 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>噜噜大王の好图收纳屋 🧁</title>
+<link rel="apple-touch-icon" href="brand_160.png" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧁%3C/text%3E%3C/svg%3E" />
 <style>
 /* ============ 主题皮肤 ============ */
 :root{
   --bg:#fdf3e7; --bg-deep:#f9e8d3;
   --paper:#fffdf9; --card:#ffffff;
-  --ink:#5b4636; --ink-soft:#a0846f; --ink-faint:#c9b6a4;
+  --ink:#5b4636; --ink-soft:#8a6b56; --ink-faint:#c9b6a4;
   --accent:#e8825a; --accent-deep:#cf6a3f; --accent-soft:#fbe3d5;
   --accent2:#7fb89a; --accent2-soft:#e2f2ea;
   --accent3:#7fa8d9; --accent3-soft:#e2edf9;
   --gold:#e8b25a; --gold-soft:#fdf0d5;
   --line:#f0e2d2; --shadow:0 8px 24px rgba(180,140,100,.16);
   --shadow-hover:0 16px 40px rgba(180,140,100,.26);
+  /* 提示气泡 / 批量操作条：固定深色底，绝不跟随主题反色（星空皮肤下曾变成白底白字、完全隐形） */
+  --toast-bg:#3a3226; --toast-fg:#fffdf9;
   --radius:20px;
 }
 [data-theme="strawberry"]{
   --bg:#fdf0f2; --bg-deep:#fbe0e6;
   --paper:#fffafb; --card:#ffffff;
-  --ink:#6b3a48; --ink-soft:#b5808e; --ink-faint:#d9b3bd;
+  --ink:#6b3a48; --ink-soft:#9c6472; --ink-faint:#d9b3bd;
   --accent:#e56b8d; --accent-deep:#cf4e74; --accent-soft:#fbe1e8;
   --accent2:#c98fb8; --accent2-soft:#f4e4f0;
   --accent3:#e7a1b0; --accent3-soft:#fbe7ec;
@@ -33,7 +36,7 @@
 [data-theme="matcha"]{
   --bg:#f3f7ec; --bg-deep:#e6efd9;
   --paper:#fbfdf6; --card:#ffffff;
-  --ink:#46503a; --ink-soft:#87927b; --ink-faint:#c2c9b7;
+  --ink:#46503a; --ink-soft:#6b7760; --ink-faint:#c2c9b7;
   --accent:#6fae6f; --accent-deep:#4f944f; --accent-soft:#e0f0dc;
   --accent2:#d9a05b; --accent2-soft:#f6ecda;
   --accent3:#7fa8d9; --accent3-soft:#e2edf9;
@@ -44,18 +47,19 @@
 [data-theme="starry"]{
   --bg:#2a2440; --bg-deep:#1f1b31;
   --paper:#34304e; --card:#3a3557;
-  --ink:#ece7f7; --ink-soft:#a89fc9; --ink-faint:#6b6390;
+  --ink:#ece7f7; --ink-soft:#a89fc9; --ink-faint:#6b6390;   /* 深色主题本来就有 4.5:1+，不动 */
   --accent:#b89ae8; --accent-deep:#a07fd6; --accent-soft:#3d3660;
   --accent2:#9ad0e8; --accent2-soft:#2e3d55;
   --accent3:#e8b25a; --accent3-soft:#4a3d2a;
   --gold:#e8b25a; --gold-soft:#4a3d2a;
   --line:#4a4470; --shadow:0 8px 24px rgba(10,8,20,.5);
   --shadow-hover:0 16px 40px rgba(10,8,20,.6);
+  --toast-bg:#15122a; --toast-fg:#f4f1fc;
 }
 [data-theme="blueberry"]{
   --bg:#eef2fb; --bg-deep:#e0e7f7;
   --paper:#fbfcff; --card:#ffffff;
-  --ink:#3d4368; --ink-soft:#7c84a8; --ink-faint:#b6bcd6;
+  --ink:#3d4368; --ink-soft:#666e93; --ink-faint:#b6bcd6;
   --accent:#6c7fd6; --accent-deep:#5264c4; --accent-soft:#e4e9fb;
   --accent2:#9a8fd6; --accent2-soft:#efeafb;
   --accent3:#7fb8d9; --accent3-soft:#e2f1f9;
@@ -66,7 +70,7 @@
 [data-theme="lemon"]{
   --bg:#fdf8e3; --bg-deep:#f9f0c8;
   --paper:#fffef6; --card:#ffffff;
-  --ink:#6a5c2e; --ink-soft:#a39658; --ink-faint:#d2c796;
+  --ink:#6a5c2e; --ink-soft:#7f7440; --ink-faint:#d2c796;
   --accent:#e8c14f; --accent-deep:#cfa52e; --accent-soft:#fbf0cc;
   --accent2:#d9a05b; --accent2-soft:#f6ecda;
   --accent3:#8fbf6f; --accent3-soft:#e6f2dc;
@@ -77,7 +81,7 @@
 [data-theme="peach"]{
   --bg:#fdf1e4; --bg-deep:#fbe4cf;
   --paper:#fffaf4; --card:#ffffff;
-  --ink:#7a5235; --ink-soft:#b08768; --ink-faint:#d8b9a0;
+  --ink:#7a5235; --ink-soft:#8f6a4c; --ink-faint:#d8b9a0;
   --accent:#f09a6a; --accent-deep:#d67f4a; --accent-soft:#fbe7d8;
   --accent2:#e8a06f; --accent2-soft:#f7e9dc;
   --accent3:#7fb89a; --accent3-soft:#e2f2ea;
@@ -88,7 +92,7 @@
 [data-theme="mint"]{
   --bg:#e9f6f0; --bg-deep:#d8eee3;
   --paper:#f6fdf9; --card:#ffffff;
-  --ink:#335a4c; --ink-soft:#6f9486; --ink-faint:#b2cfc3;
+  --ink:#335a4c; --ink-soft:#527567; --ink-faint:#b2cfc3;
   --accent:#4cb897; --accent-deep:#349b7c; --accent-soft:#dcf3ea;
   --accent2:#7fb8d9; --accent2-soft:#e2f1f9;
   --accent3:#d9b86f; --accent3-soft:#f7efd6;
@@ -99,7 +103,7 @@
 [data-theme="chocolate"]{
   --bg:#f5ead9; --bg-deep:#eadbc4;
   --paper:#fdf8ef; --card:#fffdf8;
-  --ink:#5a4128; --ink-soft:#9a7f5f; --ink-faint:#cbb592;
+  --ink:#5a4128; --ink-soft:#7d6448; --ink-faint:#cbb592;
   --accent:#a9744a; --accent-deep:#8b5a33; --accent-soft:#f0e2d0;
   --accent2:#c98f6b; --accent2-soft:#f4e7dc;
   --accent3:#8fa86a; --accent3-soft:#e9f0dd;
@@ -150,10 +154,11 @@ body{
 @keyframes logoWiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-3px)}}
 .brand h1{font-size:24px;font-weight:900;letter-spacing:1px;color:var(--accent-deep)}
 .brand .sub{font-size:13px;color:var(--ink-soft);margin-top:2px}
-.theme-pick{display:grid;grid-template-columns:repeat(3,30px);gap:7px;margin-left:auto;align-content:start}
-.theme-dot{width:30px;height:30px;border-radius:50%;border:3px solid #fff;cursor:pointer;box-shadow:var(--shadow);transition:.2s;position:relative}
-.theme-dot:hover{transform:scale(1.2)}
-.theme-dot.on{outline:3px solid var(--accent);outline-offset:2px}
+/* 换肤栏：单行窄条小圆点（既定约定：一套排版 × 九色皮肤，切换栏只负责换色，不许变高变重） */
+.theme-pick{display:grid;grid-template-columns:repeat(9,18px);gap:7px;margin-left:auto;justify-content:flex-end;align-content:center}
+.theme-dot{width:18px;height:18px;border-radius:50%;border:2px solid #fff;cursor:pointer;box-shadow:var(--shadow);transition:.2s;position:relative;padding:0}
+.theme-dot:hover{transform:scale(1.25)}
+.theme-dot.on{outline:2px solid var(--accent);outline-offset:2px}
 
 /* 统计便签 */
 .sticky-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
@@ -166,7 +171,8 @@ body{
 .sticky b{color:var(--accent-deep);font-size:15px}
 
 /* ============ 导航 ============ */
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+/* 长图库刚需：翻到下面也能切标签，所以导航要能粘住 */
+.nav{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:8px;z-index:60;background:var(--bg);padding:8px;margin:-8px -8px 10px;border-radius:18px}
 .nav-item{
   position:relative;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:15px;
   padding:12px 22px;border-radius:16px;background:var(--card);color:var(--ink-soft);
@@ -192,22 +198,27 @@ section.active{display:block}
   position:relative;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:14px;
   padding:11px 18px;border-radius:999px;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
   overflow:hidden;display:inline-flex;align-items:center;gap:7px;color:#fff;
-  background:linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 5px 14px var(--shadow-hover),inset 0 2px 0 rgba(255,255,255,.35);
+  background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 5px 14px var(--shadow-hover),inset 0 2px 0 rgba(255,255,255,.35);
+  text-shadow:0 1px 2px rgba(0,0,0,.22);   /* 白字压在糖果色上时更清楚 */
 }
 .candy::after{content:"";position:absolute;left:18%;right:18%;top:4px;height:38%;border-radius:999px;background:rgba(255,255,255,.35);filter:blur(1px)}
 .candy:hover{transform:translateY(-3px) scale(1.03)}
 .candy:active{transform:scale(.94)}
-.candy.mint{background:linear-gradient(180deg,var(--accent2),#5fa382)}
-.candy.sky{background:linear-gradient(180deg,var(--accent3),#5f88c0)}
-.candy.gold{background:linear-gradient(180deg,var(--gold),#d09a3f)}
+.candy.mint{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,var(--accent2),#5fa382)}
+.candy.sky{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,var(--accent3),#5f88c0)}
+.candy.gold{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,var(--gold),#d09a3f)}
 .candy.ghost{background:var(--card);color:var(--accent-deep);border:1.5px solid var(--accent-soft);box-shadow:0 3px 10px var(--shadow);background-image:none}
 .candy.ghost::after{background:rgba(255,255,255,.5)}
 .candy.ghost:hover{background:var(--accent-soft)}
-.candy.danger{background:linear-gradient(180deg,#e58a8a,#c95f5f)}
-.candy.plum{background:linear-gradient(180deg,#b98fdd,#8f63b8)}
-.candy.berry{background:linear-gradient(180deg,#ef97b6,#cf6f92)}
-.candy.leaf{background:linear-gradient(180deg,#a7c97f,#7ea457)}
-.candy.coral{background:linear-gradient(180deg,#f4a684,#dd7c57)}
+.candy.danger{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,#e58a8a,#c95f5f)}
+/* 危险操作降一档：描边红色比实心红弱，不会跟旁边的实心主按钮抢视线（防误点） */
+.candy.danger-ghost{background:var(--card);color:#c95f5f;border:1.5px solid #e5b0b0;background-image:none;box-shadow:0 3px 10px var(--shadow)}
+.candy.danger-ghost:hover{background:#fbeaea;transform:translateY(-2px)}
+.candy.danger-ghost::after{background:rgba(255,255,255,.5)}
+.candy.plum{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,#b98fdd,#8f63b8)}
+.candy.berry{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,#ef97b6,#cf6f92)}
+.candy.leaf{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,#a7c97f,#7ea457)}
+.candy.coral{background:linear-gradient(0deg,rgba(0,0,0,.16),rgba(0,0,0,.16)),linear-gradient(180deg,#f4a684,#dd7c57)}
 .candy.sm{padding:8px 14px;font-size:13px;border-radius:999px}
 .candy.sq{padding:8px 15px;font-size:15px;border-radius:999px;min-width:46px;justify-content:center}
 .candy .cb{font-size:16px}
@@ -224,6 +235,8 @@ input[type=text],input[type=search],textarea,select{
   border:1.5px solid var(--line);border-radius:13px;padding:10px 14px;outline:none;transition:.2s;width:100%;
 }
 input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+/* 键盘用户必须看得见焦点在哪（鼠标点击不触发 :focus-visible，不影响原有观感） */
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:13px;font-weight:800;color:var(--ink-soft)}
 
@@ -257,7 +270,17 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 /* 拍立得卡片 */
 .waterfall{column-count:var(--wf-cols,4);column-gap:18px;margin-top:18px}
 .gridview{display:grid;grid-template-columns:repeat(var(--grid-cols,4),var(--card-w,190px));gap:18px;margin-top:18px;justify-content:start}  /* start：网格永远从容器左边线开始，不会因为卡片变小而被居中推开 */
-@media(max-width:620px){.gridview{gap:12px}.waterfall{column-gap:12px}}
+@media(max-width:620px){
+  .gridview{gap:12px}.waterfall{column-gap:12px}
+  .toolbar{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}   /* 手机上整齐两列，不再 2-2-1 锯齿孤行 */
+  .toolbar .candy{justify-content:center;padding:11px 10px}
+  .theme-pick{grid-template-columns:repeat(9,16px);gap:5px}
+  .theme-dot{width:16px;height:16px}
+  .brand h1{font-size:19px}
+  .brand .sub{font-size:11.5px}
+  .topbar{gap:10px;margin-bottom:10px}          /* 手机上顶栏再瘦一点，首屏多留给图片 */
+  .logo{width:46px;height:46px;border-radius:14px;font-size:24px}
+}
 /* 卡片大小与列数由 applyCardSize() 按窗口宽度 + 用户缩放实时计算 */
 .polaroid{
   position:relative;break-inside:avoid;margin-bottom:20px;background:var(--card);
@@ -301,7 +324,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .empty p{color:var(--ink-soft);font-size:14px;margin-bottom:16px}
 
 /* 批量栏 */
-.batchbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:600;background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;display:none;gap:10px;align-items:center;box-shadow:0 12px 34px rgba(0,0,0,.3);animation:secPop .3s}
+.batchbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:600;background:var(--toast-bg);color:var(--toast-fg);border-radius:999px;padding:10px 18px;display:none;gap:10px;align-items:center;box-shadow:0 12px 34px rgba(0,0,0,.3);animation:secPop .3s}
 .batchbar.show{display:flex}
 .batchbar .bb{background:rgba(255,255,255,.16);border:none;color:#fff;font-family:inherit;font-weight:700;font-size:13px;padding:8px 13px;border-radius:999px;cursor:pointer;transition:.2s}
 .batchbar .bb:hover{background:rgba(255,255,255,.3)}
@@ -392,6 +415,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .modal-body{padding:18px 20px 22px;overflow-y:auto}
 .modal-body h3{font-size:15px;margin:16px 0 8px;color:var(--accent-deep)}
 .hint{font-size:12.5px;color:var(--ink-soft);line-height:1.7}
+/* 页脚：把页面重心压下来，顺便放「便签装不下」的信息（数据量 / 上次备份） */
+.foot{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;align-items:center;font-size:12px;color:var(--ink-soft);padding:24px 12px 6px;line-height:1.7;text-align:center}
+.foot span{background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:5px 13px;box-shadow:var(--shadow)}
+/* 回顶按钮：长图库翻到底部时的救命绳 */
+.to-top{position:fixed;right:22px;bottom:24px;z-index:700;width:46px;height:46px;border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:20px;font-weight:900;font-family:inherit;line-height:1;background:linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 8px 22px var(--shadow-hover);opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .25s,transform .25s}
+.to-top.show{opacity:1;pointer-events:auto;transform:none}
+.to-top:hover{transform:translateY(-3px) scale(1.06)}
+@media(max-width:620px){.to-top{right:14px;bottom:16px;width:42px;height:42px}}
 /* 卡片大小：5 档（＋ / － / ↺ / 百分比数字），住在「相册」面板右下角的空白角落，四个控件全部透明底 */
 .size-row{display:flex;flex-wrap:nowrap;gap:2px;align-items:center}
 #tab-gallery .sheet{padding-bottom:52px}                 /* 给右下角留出干净的空白角落 */
@@ -434,8 +465,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 
 /* ============ 气泡提示 ============ */
 #bubbles{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
-.bubble{background:var(--ink);color:#fff;font-size:14px;font-weight:700;padding:11px 20px;border-radius:18px;box-shadow:0 10px 26px rgba(0,0,0,.3);animation:bubIn .35s cubic-bezier(.34,1.56,.64,1),bubOut .4s ease forwards;animation-delay:0s,2.3s;position:relative}
-.bubble::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:var(--ink);border-radius:0 0 4px 0;transform:translateX(-50%) rotate(45deg)}
+.bubble{background:var(--toast-bg);color:var(--toast-fg);font-size:14px;font-weight:700;padding:11px 20px;border-radius:18px;box-shadow:0 10px 26px rgba(0,0,0,.3);animation:bubIn .35s cubic-bezier(.34,1.56,.64,1),bubOut .4s ease forwards;animation-delay:0s,2.3s;position:relative}
+.bubble::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:var(--toast-bg);border-radius:0 0 4px 0;transform:translateX(-50%) rotate(45deg)}
 @keyframes bubIn{from{opacity:0;transform:translateY(-20px) scale(.85)}to{opacity:1;transform:none}}
 @keyframes bubOut{to{opacity:0;transform:translateY(-18px) scale(.85)}}
 
@@ -451,25 +482,25 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 <canvas id="sky"></canvas>
 <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
 <div id="sparkleLayer"></div>
-<div id="bubbles"></div>
+<div id="bubbles" role="status" aria-live="polite" aria-atomic="true"></div>
 
-<div class="wrap">
+<main class="wrap">
   <div class="topbar">
     <div class="logo">🧁</div>
     <div class="brand">
       <h1>噜噜大王の好图收纳屋<img class="brand-logo" src="data:image/png;base64,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" alt="噜噜大王" title="噜噜大王" /></h1>
       <div class="sub"> ✿ 这里是噜噜大王制作的图片收藏小窝，你喜欢的任何图片都可以存在这里哦~✿</div>
     </div>
-    <div class="theme-pick" id="themePick">
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf3e7,#e8825a)" data-theme="" title="奶油"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf0f2,#e56b8d)" data-theme="strawberry" title="草莓"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#f3f7ec,#6fae6f)" data-theme="matcha" title="抹茶"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#2a2440,#b89ae8)" data-theme="starry" title="星空"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#eef2fb,#6c7fd6)" data-theme="blueberry" title="蓝莓"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf8e3,#e8c14f)" data-theme="lemon" title="柠檬"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#fdf1e4,#f09a6a)" data-theme="peach" title="蜜桃"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#e9f6f0,#4cb897)" data-theme="mint" title="薄荷"></button>
-      <button class="theme-dot" style="background:linear-gradient(135deg,#f5ead9,#a9744a)" data-theme="chocolate" title="巧克力"></button>
+    <div class="theme-pick" id="themePick" role="group" aria-label="皮肤切换（一套排版 · 九种配色）">
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#fdf3e7,#e8825a)" data-theme="" title="奶油" aria-label="奶油"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#fdf0f2,#e56b8d)" data-theme="strawberry" title="草莓" aria-label="草莓"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#f3f7ec,#6fae6f)" data-theme="matcha" title="抹茶" aria-label="抹茶"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#2a2440,#b89ae8)" data-theme="starry" title="星空" aria-label="星空"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#eef2fb,#6c7fd6)" data-theme="blueberry" title="蓝莓" aria-label="蓝莓"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#fdf8e3,#e8c14f)" data-theme="lemon" title="柠檬" aria-label="柠檬"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#fdf1e4,#f09a6a)" data-theme="peach" title="蜜桃" aria-label="蜜桃"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#e9f6f0,#4cb897)" data-theme="mint" title="薄荷" aria-label="薄荷"></button>
+      <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#f5ead9,#a9744a)" data-theme="chocolate" title="巧克力" aria-label="巧克力"></button>
     </div>
   </div>
 
@@ -515,10 +546,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <span class="fs-dot"></span><span class="fs-text">正在检查图库文件夹…</span>
       </div>
       <div class="filters">
-        <input type="search" id="searchBox" placeholder="🔍 搜名字 / 标签 / 备注…" style="flex:1;min-width:180px" oninput="searchDebounce()" />
+        <input type="search" id="searchBox" aria-label="搜索图片（名字 / 标签 / 备注）" placeholder="🔍 搜名字 / 标签 / 备注…" style="flex:1;min-width:180px" oninput="searchDebounce()" />
         <button class="pill on" id="chipAll" onclick="setFilter('all')">全部</button>
         <button class="pill" id="chipFav" onclick="setFilter('fav')">💗 收藏</button>
-        <select id="sortSel" onchange="renderGallery()" style="width:auto">
+        <select id="sortSel" aria-label="排序方式" onchange="renderGallery()" style="width:auto">
           <option value="new">🕐 最新</option>
           <option value="old">🕰️ 最早</option>
           <option value="rate">⭐ 评分</option>
@@ -554,7 +585,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       <h2>🧭 图源导航</h2>
       <p class="desc">这里汇集了全球上百个公开图站，按题材分成十多个分类：插画社区、动漫图库、以图搜图、免授权素材、高清壁纸、头像捏人、表情包动图、名画典藏、AI 绘画、图标矢量、摄影、设计配色、材质纹理、影视剧照、游戏素材、社交灵感与中文站点。点「直达」进首页逛，点「搜索」按关键词直达结果页；看到喜欢的图右键保存，或用相册里的「链接导入」收进小窝。</p>
       <div class="filters" style="margin-top:14px">
-        <input type="search" id="srcSearch" placeholder="🔍 搜图站名字或用途，例如：壁纸 / 表情包 / 配色 / GIF" style="flex:1;min-width:200px" oninput="renderSources()" />
+        <input type="search" id="srcSearch" aria-label="搜索图源" placeholder="🔍 搜图站名字或用途，例如：壁纸 / 表情包 / 配色 / GIF" style="flex:1;min-width:200px" oninput="renderSources()" />
         <button class="pill on" id="srcCatAll" onclick="setSrcCat('')">🗂️ 全部分类</button>
         <span class="hint" id="srcCount"></span>
       </div>
@@ -566,8 +597,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <div class="src-cat">➕ 自定义图源</div>
         <p class="desc" style="margin-top:6px">把常用网站加进来吧，搜索链接里用 <b>{q}</b> 作为关键词占位符。</p>
         <div class="custom-src">
-          <div class="field"><label>图源名称</label><input type="text" id="newSrcName" placeholder="例如：我的宝藏图站" /></div>
-          <div class="field"><label>首页 / 搜索链接</label><input type="text" id="newSrcUrl" placeholder="https://example.com/search?q={q}" /></div>
+          <div class="field"><label>图源名称</label><input type="text" id="newSrcName" aria-label="新图源名称" placeholder="例如：我的宝藏图站" /></div>
+          <div class="field"><label>首页 / 搜索链接</label><input type="text" id="newSrcUrl" aria-label="新图源首页或搜索链接" placeholder="https://example.com/search?q={q}" /></div>
           <button class="candy" onclick="addCustomSrc()"><span class="cb">➕</span>添加</button>
         </div>
         <div class="src-grid" id="customSrcGrid"></div>
@@ -584,12 +615,22 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       <div class="toolbar" style="margin-top:16px">
         <button class="candy" onclick="pickFolder()"><span class="cb">📁</span>选择图库文件夹</button>
         <button class="candy mint" onclick="reGrantFolder()"><span class="cb">🔓</span>重新授权</button>
-        <button class="candy sky" onclick="pushAllToFolder()"><span class="cb">⬆️</span>迁入文件夹并释放C盘</button>
-        <button class="candy gold" onclick="scanFolderRestore()"><span class="cb">🔄</span>扫描文件夹恢复</button>
-        <button class="candy plum" onclick="reloadThumbs()"><span class="cb">🖼️</span>重新读取原图</button>
-        <button class="candy danger" onclick="forgetFolder()"><span class="cb">🔌</span>断开文件夹</button>
+        <button class="candy ghost" onclick="pushAllToFolder()"><span class="cb">⬆️</span>迁入文件夹并释放C盘</button>
+        <button class="candy ghost" onclick="scanFolderRestore()"><span class="cb">🔄</span>扫描文件夹恢复</button>
+        <button class="candy ghost" onclick="reloadThumbs()"><span class="cb">🖼️</span>重新读取原图</button>
+        <button class="candy danger-ghost" onclick="forgetFolder()"><span class="cb">🔌</span>断开文件夹</button>
       </div>
-      <p class="desc" style="margin-top:14px">文件夹里会有 <b>images</b>（原图）和 <b>_meta.json</b>（名字 / 标签 / 评分 / 合集）。删除不会硬删，而是移进 <b>_trash</b>，手滑也还有救。⚠️ 浏览器重启后授权会过期（安全设计，原图主库唯一的代价）：点一次「🔓 重新授权」，就能继续看图与写入。</p>
+      <p class="desc" style="margin-top:14px">文件夹里会有 <b>images</b>（原图）和 <b>_meta.json</b>（名字 / 标签 / 评分 / 合集）。删除不会硬删：原图会先进 <b>_trash</b>，在下面的「🗑️ 回收站」里可以一键恢复或彻底清空。⚠️ 浏览器重启后授权会过期（安全设计，原图主库唯一的代价）：点一次「🔓 重新授权」，就能继续看图与写入。</p>
+    </div>
+
+    <div class="sheet">
+      <h2>🗑️ 回收站（_trash）</h2>
+      <p class="desc">删除图片时原图不会硬删，而是搬进图库文件夹里的 <b>_trash</b>。这里可以把它们<b>整批挪回 images</b>，也可以彻底清空释放磁盘 —— 「手滑也还有救」不再是空话。</p>
+      <div class="folder-status" id="trashStatus"><span class="fs-dot"></span><span class="fs-text">正在检查回收站…</span></div>
+      <div class="toolbar" style="margin-top:16px">
+        <button type="button" class="candy mint" onclick="restoreTrash()"><span class="cb">↩️</span>恢复回收站里的图</button>
+        <button type="button" class="candy danger-ghost" onclick="emptyTrash()"><span class="cb">🧹</span>彻底清空回收站</button>
+      </div>
     </div>
 
     <div class="sheet">
@@ -598,26 +639,33 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       <div class="data-grid" id="dataGrid"></div>
       <div class="toolbar" style="margin-top:20px">
         <button class="candy" onclick="exportAll()"><span class="cb">📤</span>导出全部(含图)</button>
-        <button class="candy mint" onclick="exportMeta()"><span class="cb">🗜️</span>导出元数据</button>
-        <button class="candy gold" onclick="exportFav()"><span class="cb">🎁</span>导出收藏</button>
-        <button class="candy sky" onclick="document.getElementById('importInput').click()"><span class="cb">📥</span>导入备份</button>
-        <button class="candy danger" onclick="clearAll()"><span class="cb">🗑️</span>清空全部</button>
+        <button class="candy ghost" onclick="exportMeta()"><span class="cb">🗜️</span>导出元数据</button>
+        <button class="candy ghost" onclick="exportFav()"><span class="cb">🎁</span>导出收藏</button>
+        <button class="candy ghost" onclick="document.getElementById('importInput').click()"><span class="cb">📥</span>导入备份</button>
+        <button class="candy danger-ghost" onclick="clearAll()"><span class="cb">🗑️</span>清空全部</button>
         <input type="file" id="importInput" accept="application/json,.json" style="display:none" onchange="handleImport(this.files);this.value=''" />
       </div>
       <p class="desc" style="margin-top:14px">提示：备份是标准 JSON。「含图」备份体积大属正常；「元数据」备份不含图片像素，体积很小。</p>
     </div>
-
   </section>
-</div>
+
+  <footer class="foot">
+    <span>🧁 噜噜大王の好图收纳屋 · 九色皮肤</span>
+    <span id="footStats">收录 0 张</span>
+    <span id="footBackup">还没导出过备份</span>
+  </footer>
+</main>
+
+<button class="to-top" id="toTop" type="button" aria-label="回到顶部" title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <!-- 合集管理 -->
-<div class="modal" id="albumModal" onclick="if(event.target===this)closeModal('albumModal')">
+<div class="modal" id="albumModal" role="dialog" aria-modal="true" aria-label="合集管理" onclick="if(event.target===this)closeModal('albumModal')">
   <div class="modal-box">
     <div class="modal-head"><h2>📚 合集管理</h2><button class="m-close" onclick="closeModal('albumModal')">✕</button></div>
     <div class="modal-body">
       <p class="hint">用「合集」把图片分成一组组，相当于好几本相册。也可以直接在首页把「图片卡片」<b>拖到</b>某个合集上，一拖就归类～</p>
       <div class="custom-src">
-        <div class="field"><label>新建合集</label><input type="text" id="newAlbumName" placeholder="例如：游戏 / 角色形象 / 风景 / 表情包 / 设计参考" /></div>
+        <div class="field"><label>新建合集</label><input type="text" id="newAlbumName" aria-label="新合集名称" placeholder="例如：游戏 / 角色形象 / 风景 / 表情包 / 设计参考" /></div>
         <button class="candy mint" onclick="addAlbum()"><span class="cb">➕</span>新建</button>
       </div>
       <div class="mgmt-list" id="albumList"></div>
@@ -626,7 +674,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 </div>
 
 <!-- 标签管理 -->
-<div class="modal" id="tagModal" onclick="if(event.target===this)closeModal('tagModal')">
+<div class="modal" id="tagModal" role="dialog" aria-modal="true" aria-label="标签管理" onclick="if(event.target===this)closeModal('tagModal')">
   <div class="modal-box">
     <div class="modal-head"><h2>🏷️ 标签管理</h2><button class="m-close" onclick="closeModal('tagModal')">✕</button></div>
     <div class="modal-body">
@@ -636,15 +684,34 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
   </div>
 </div>
 
+<!-- 批量操作选择器（加标签 / 归合集）：跟全站弹窗一套语言，不再用原生 prompt -->
+<div class="modal" id="pickModal" role="dialog" aria-modal="true" aria-label="批量操作" onclick="if(event.target===this)closeModal('pickModal')">
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="pickTitle">批量操作</h2><button type="button" class="m-close" onclick="closeModal('pickModal')">✕</button></div>
+    <div class="modal-body">
+      <p class="hint" id="pickHint"></p>
+      <div class="filters" id="pickChips" style="margin-top:12px"></div>
+      <div class="custom-src" style="margin-top:14px">
+        <div class="field"><label id="pickInputLabel">新建</label><input type="text" id="pickInput" aria-label="新建名称" placeholder="输入后按回车，或点右边的「添加」" /></div>
+        <button type="button" class="candy mint" onclick="pickAddNew()"><span class="cb">➕</span>添加</button>
+      </div>
+      <div class="toolbar" style="margin-top:16px">
+        <button type="button" class="candy" onclick="pickConfirm()"><span class="cb">✅</span>确定</button>
+        <button type="button" class="candy ghost" onclick="closeModal('pickModal')">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- 图片转直链 -->
-<div class="modal" id="toolLinkModal" onclick="if(event.target===this)closeToolModal()">
+<div class="modal" id="toolLinkModal" role="dialog" aria-modal="true" aria-label="图片转直链" onclick="if(event.target===this)closeToolModal()">
   <div class="modal-box wide">
     <div class="modal-head"><h2>🔗 图片转直链</h2><button class="m-close" onclick="closeToolModal()">✕</button></div>
     <div class="modal-body">
       <p class="hint">选几张图片 → 上传到公开图床 → 拿到 <b>https://</b> 开头的直链，可以直接贴到论坛、文档、聊天窗口里。<br>免注册的图床是<b>临时</b>的（1～72 小时）；想长期保留，填一个自己的 imgbb Key 就好。</p>
       <div class="tool-grid">
         <div class="field"><label>上传到哪个图床</label>
-          <select id="linkHost" onchange="onLinkHostChange()">
+          <select id="linkHost" aria-label="上传到哪个图床" onchange="onLinkHostChange()">
             <option value="litterbox">Litterbox（免注册 · 1~72 小时）</option>
             <option value="kappa">kappa.lol（免注册 · 保存较久）</option>
             <option value="tmpfiles">tmpfiles.org（免注册 · 约 1 小时）</option>
@@ -653,14 +720,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
           </select>
         </div>
         <div class="field" id="linkKeepField"><label>保存时长</label>
-          <select id="linkKeep"><option value="1h">1 小时</option><option value="12h">12 小时</option><option value="24h" selected>24 小时</option><option value="72h">72 小时</option></select>
+          <select id="linkKeep" aria-label="直链保存时长"><option value="1h">1 小时</option><option value="12h">12 小时</option><option value="24h" selected>24 小时</option><option value="72h">72 小时</option></select>
         </div>
       </div>
-      <div class="field" id="linkKeyField" style="display:none"><label>imgbb API Key（api.imgbb.com 免费申请，只存在你这台电脑的浏览器里）</label><input type="text" id="linkKey" placeholder="粘贴 API Key" /></div>
+      <div class="field" id="linkKeyField" style="display:none"><label>imgbb API Key（api.imgbb.com 免费申请，只存在你这台电脑的浏览器里）</label><input type="text" id="linkKey" aria-label="imgbb API Key" placeholder="粘贴 API Key" /></div>
       <div class="tool-grid" id="linkCustomFields" style="display:none">
-        <div class="field"><label>接口地址（POST）</label><input type="text" id="linkCustomUrl" placeholder="https://example.com/api/upload" /></div>
-        <div class="field"><label>文件字段名</label><input type="text" id="linkCustomField" placeholder="file" /></div>
-        <div class="field"><label>从返回里取 URL 的路径</label><input type="text" id="linkCustomPath" placeholder="如 data.url；留空表示直接返回纯文本 URL" /></div>
+        <div class="field"><label>接口地址（POST）</label><input type="text" id="linkCustomUrl" aria-label="自定义接口地址" placeholder="https://example.com/api/upload" /></div>
+        <div class="field"><label>文件字段名</label><input type="text" id="linkCustomField" aria-label="上传的文件字段名" placeholder="file" /></div>
+        <div class="field"><label>从返回里取 URL 的路径</label><input type="text" id="linkCustomPath" aria-label="从返回里取 URL 的路径" placeholder="如 data.url；留空表示直接返回纯文本 URL" /></div>
       </div>
       <div class="toolbar" style="margin-top:14px">
         <button class="candy" onclick="document.getElementById('linkFiles').click()"><span class="cb">📥</span>选择图片上传</button>
@@ -677,7 +744,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 </div>
 
 <!-- 多图合成 GIF -->
-<div class="modal" id="toolGifModal" onclick="if(event.target===this)closeToolModal()">
+<div class="modal" id="toolGifModal" role="dialog" aria-modal="true" aria-label="多图合成 GIF" onclick="if(event.target===this)closeToolModal()">
   <div class="modal-box wide">
     <div class="modal-head"><h2>🎞️ 多图合成 GIF</h2><button class="m-close" onclick="closeToolModal()">✕</button></div>
     <div class="modal-body">
@@ -691,12 +758,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       </div>
       <div class="frame-strip" id="gifStrip"></div>
       <div class="tool-grid">
-        <div class="field"><label>每张停留</label><select id="gifDelay"><option value="600">0.6 秒</option><option value="900" selected>0.9 秒</option><option value="1200">1.2 秒</option><option value="1800">1.8 秒</option><option value="2400">2.4 秒</option></select></div>
-        <div class="field"><label>画面宽度</label><select id="gifSize"><option value="320">320px（最小）</option><option value="420" selected>420px</option><option value="540">540px</option><option value="640">640px（最清晰）</option></select></div>
-        <div class="field"><label>过渡效果</label><select id="gifFx"><option value="crossfade" selected>平滑叠化（最顺）</option><option value="white">白闪淡入淡出</option><option value="black">黑场闪黑</option><option value="wipe">横向擦除</option><option value="slide">横向滑动</option><option value="zoom">缩放淡入</option><option value="none">不加过渡</option></select></div>
-        <div class="field"><label>过渡时长</label><select id="gifFxMs"><option value="300">0.3 秒（轻快）</option><option value="450">0.45 秒</option><option value="600" selected>0.6 秒（推荐）</option><option value="900">0.9 秒（悠长）</option></select></div>
-        <div class="field"><label>画面比例</label><select id="gifFit"><option value="contain" selected>完整显示（留边）</option><option value="cover">铺满裁切</option></select></div>
-        <div class="field"><label>背景色</label><select id="gifBg"><option value="#fffdf9" selected>奶油白</option><option value="#000000">黑色</option><option value="transparent">透明</option></select></div>
+        <div class="field"><label>每张停留</label><select id="gifDelay" aria-label="GIF 每张停留时长"><option value="600">0.6 秒</option><option value="900" selected>0.9 秒</option><option value="1200">1.2 秒</option><option value="1800">1.8 秒</option><option value="2400">2.4 秒</option></select></div>
+        <div class="field"><label>画面宽度</label><select id="gifSize" aria-label="GIF 画面宽度"><option value="320">320px（最小）</option><option value="420" selected>420px</option><option value="540">540px</option><option value="640">640px（最清晰）</option></select></div>
+        <div class="field"><label>过渡效果</label><select id="gifFx" aria-label="GIF 过渡效果"><option value="crossfade" selected>平滑叠化（最顺）</option><option value="white">白闪淡入淡出</option><option value="black">黑场闪黑</option><option value="wipe">横向擦除</option><option value="slide">横向滑动</option><option value="zoom">缩放淡入</option><option value="none">不加过渡</option></select></div>
+        <div class="field"><label>过渡时长</label><select id="gifFxMs" aria-label="GIF 过渡时长"><option value="300">0.3 秒（轻快）</option><option value="450">0.45 秒</option><option value="600" selected>0.6 秒（推荐）</option><option value="900">0.9 秒（悠长）</option></select></div>
+        <div class="field"><label>画面比例</label><select id="gifFit" aria-label="GIF 画面比例"><option value="contain" selected>完整显示（留边）</option><option value="cover">铺满裁切</option></select></div>
+        <div class="field"><label>背景色</label><select id="gifBg" aria-label="GIF 背景色"><option value="#fffdf9" selected>奶油白</option><option value="#000000">黑色</option><option value="transparent">透明</option></select></div>
       </div>
       <div class="toolbar" style="margin-top:14px">
         <button class="candy gold" onclick="buildGifClick()"><span class="cb">🎞️</span>开始生成</button>
@@ -709,7 +776,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 </div>
 
 <!-- GIF 转 MP4 -->
-<div class="modal" id="toolMp4Modal" onclick="if(event.target===this)closeToolModal()">
+<div class="modal" id="toolMp4Modal" role="dialog" aria-modal="true" aria-label="GIF 转 MP4" onclick="if(event.target===this)closeToolModal()">
   <div class="modal-box wide">
     <div class="modal-head"><h2>🎬 GIF 转 MP4</h2><button class="m-close" onclick="closeToolModal()">✕</button></div>
     <div class="modal-body">
@@ -721,9 +788,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
         <input type="file" id="mp4File" accept="image/gif,.gif" style="display:none" onchange="mp4FilePicked(this.files);this.value=''" />
       </div>
       <div class="tool-grid">
-        <div class="field"><label>输出尺寸</label><select id="mp4Scale"><option value="1" selected>和 GIF 一样大</option><option value="1.5">放大 1.5 倍</option><option value="2">放大 2 倍（更清晰）</option></select></div>
-        <div class="field"><label>画质</label><select id="mp4Quality"><option value="1">标准</option><option value="1.8" selected>较好</option><option value="3">很高（文件更大）</option></select></div>
-        <div class="field"><label>播放遍数</label><select id="mp4Loop"><option value="1" selected>播放 1 遍</option><option value="2">播放 2 遍</option><option value="3">播放 3 遍</option></select></div>
+        <div class="field"><label>输出尺寸</label><select id="mp4Scale" aria-label="MP4 输出尺寸"><option value="1" selected>和 GIF 一样大</option><option value="1.5">放大 1.5 倍</option><option value="2">放大 2 倍（更清晰）</option></select></div>
+        <div class="field"><label>画质</label><select id="mp4Quality" aria-label="MP4 画质"><option value="1">标准</option><option value="1.8" selected>较好</option><option value="3">很高（文件更大）</option></select></div>
+        <div class="field"><label>播放遍数</label><select id="mp4Loop" aria-label="MP4 播放遍数"><option value="1" selected>播放 1 遍</option><option value="2">播放 2 遍</option><option value="3">播放 3 遍</option></select></div>
       </div>
       <div class="progress-bar" id="mp4Bar"><i></i></div>
       <div class="preview-box" id="mp4Preview">还没有转换～</div>
@@ -732,7 +799,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 </div>
 
 <!-- 查看器 -->
-<div class="viewer" id="viewer" onclick="if(event.target===this)closeViewer()">
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="图片查看器" onclick="if(event.target===this)closeViewer()">
   <div class="viewer-box">
     <div class="viewer-imgwrap" id="vImgwrap">
       <img id="vImg" src="" alt="" />
@@ -799,7 +866,7 @@ function skySpawn(init){
     col: SKY_COLORS[Math.floor(Math.random()*SKY_COLORS.length)]
   }, init||{}));
 }
-for(let i=0;i<38;i++) skySpawn({init:true});
+if(!(REDUCE_MOTION && REDUCE_MOTION.matches)) for(let i=0;i<38;i++) skySpawn({init:true});
 (function skyLoop(){
   if(REDUCE_MOTION && REDUCE_MOTION.matches){ requestAnimationFrame(skyLoop); return; }
   sctx.clearRect(0,0,innerWidth,innerHeight);
@@ -883,6 +950,7 @@ candyKeyframes.textContent = '@keyframes candyFall{to{transform:translateY(110vh
 document.head.appendChild(candyKeyframes);
 
 function starBurst(x,y){
+  if(REDUCE_MOTION && REDUCE_MOTION.matches) return;   // CSS 已经停了动画，JS 也不该再往页面里塞粒子
   const emojis = ['⭐','✨','💖','🌟','💛'];
   for(let i=0;i<7;i++){
     const s = document.createElement('span'); s.className='star-burst';
@@ -895,6 +963,7 @@ function starBurst(x,y){
   }
 }
 function sparkleAt(x,y){
+  if(REDUCE_MOTION && REDUCE_MOTION.matches) return;   // 同上：减少动效时不再创建 DOM 粒子
   for(let i=0;i<5;i++){
     const s=document.createElement('span'); s.className='sparkle';
     s.style.left=(x+(Math.random()-.5)*40)+'px'; s.style.top=(y+(Math.random()-.5)*40)+'px';
@@ -908,17 +977,32 @@ function toast(msg){
   const t=document.createElement('div'); t.className='bubble'; t.textContent=msg;
   document.getElementById('bubbles').appendChild(t); setTimeout(()=>t.remove(),2800);
 }
-
 /* ==================== 主题 ==================== */
+/* 皮肤白名单：旧版皮肤名（jelly / paw / pixel / candy …）自动映射回现在的九色，非法值一律回退奶油色。
+   不然 data-theme 匹配不到任何 CSS，会变成「九个圆点全不亮」，看起来像皮肤系统坏了。 */
+const THEMES = ['', 'strawberry', 'matcha', 'starry', 'blueberry', 'lemon', 'peach', 'mint', 'chocolate'];
+const THEME_ALIAS = { cream:'', candy:'', jelly:'strawberry', paw:'peach', pixel:'matcha', hud:'starry', cafe:'chocolate', win:'blueberry', mag:'lemon' };
+function normalizeTheme(t){
+  const v = String(t == null ? '' : t).trim().toLowerCase();
+  if(THEMES.indexOf(v) >= 0) return v;
+  if(Object.prototype.hasOwnProperty.call(THEME_ALIAS, v)) return THEME_ALIAS[v];
+  return '';
+}
 function applyTheme(t){
-  document.body.setAttribute('data-theme', t);
-  try{ localStorage.setItem('album_theme', t); }catch(e){}
-  document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('on', d.dataset.theme===t));
+  const theme = normalizeTheme(t);
+  document.body.setAttribute('data-theme', theme);
+  try{ localStorage.setItem('album_theme', theme); }catch(e){}
+  document.querySelectorAll('.theme-dot').forEach(d=>{
+    const on = normalizeTheme(d.dataset.theme) === theme;
+    d.classList.toggle('on', on);
+    d.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
 }
 document.getElementById('themePick').addEventListener('click', e => {
   const d = e.target.closest('.theme-dot'); if(!d) return;
   applyTheme(d.dataset.theme);
-  toast('换上新皮肤啦～ 🎨');
+  // 触屏没有 hover：点一下就把皮肤名念出来，不然永远不知道哪个是「薄荷」
+  toast('换上「' + (d.getAttribute('aria-label') || d.title || '新') + '」皮肤啦～ 🎨');
 });
 
 /* ==================== IndexedDB ==================== */
@@ -1087,7 +1171,7 @@ async function persistRec(rec){
   if(archived){
     try{ IMG_CACHE.set(rec.id, URL.createObjectURL(dataUrlToBlob(rec.dataUrl))); trimCache(); }catch(e){}
     rec.dataUrl = '';               // 像素已经落盘，索引里不再留第二份
-    return await safePut(rec);
+    return await safePut(rec);       // 写失败会返回 false，由上层如实报错（绝不假成功）
   }
   if(galleryDir && folderSupported()) notifyNeedGrant();
   return await safePutRaw(rec);     // 兜底：浏览器不支持 / 未选文件夹 / 授权过期
@@ -1136,12 +1220,89 @@ async function trashFromFolder(rec){
   }catch(e){ console.warn('移入 _trash 失败：', e); return false; }
 }
 
+/* ==================== 回收站（_trash）：恢复 / 彻底清空 ==================== */
+/* 删除时原图先搬进 _trash，这里再给主人一个「捞回来」和「真删掉」的入口 —— 文案里的承诺必须能兑现 */
+let trashInfo = { count:0, bytes:0, known:false };
+async function listTrashFiles(){
+  if(!galleryDir || !folderSupported()) return null;
+  if(!await verifyPermission(galleryDir, false)) return null;
+  let dir = null;
+  try{ dir = await galleryDir.getDirectoryHandle('_trash'); }catch(e){ return []; }  // 连 _trash 目录都还没有 = 空的
+  const out = [];
+  for await (const h of dir.values()){
+    if(!h || h.kind !== 'file') continue;
+    let size = 0;
+    try{ size = (await h.getFile()).size; }catch(e){}
+    out.push({ name:h.name, size });
+  }
+  return out;
+}
+async function refreshTrashUI(){
+  const el = document.getElementById('trashStatus');
+  const txt = el ? el.querySelector('.fs-text') : null;
+  const set = (mode, html)=>{ if(!el) return; el.className = 'folder-status' + (mode ? (' ' + mode) : ''); if(txt) txt.innerHTML = html; };
+  if(!folderSupported()){ trashInfo = { count:0, bytes:0, known:false }; set('warn', '这个浏览器不支持文件夹读写，回收站用不了 —— 用 Chrome / Edge 打开就有啦～'); renderData(); return; }
+  if(!galleryDir){ trashInfo = { count:0, bytes:0, known:false }; set('warn', '还没设定图库文件夹。选定之后，删掉的原图就会出现在这里～'); renderData(); return; }
+  if(!await verifyPermission(galleryDir, false)){ trashInfo = { count:0, bytes:0, known:false }; set('warn', '图库文件夹需要<b>重新授权</b>才能查看回收站，点上面工作区的「🔓 重新授权」吧～'); renderData(); return; }
+  const list = await listTrashFiles();
+  if(list === null){ trashInfo = { count:0, bytes:0, known:false }; set('warn', '暂时读不到回收站，稍后再点一次数据管理看看～'); renderData(); return; }
+  const bytes = list.reduce((s,f)=>s + (+f.size || 0), 0);
+  trashInfo = { count:list.length, bytes, known:true };
+  if(list.length) set('warn', '回收站里有 <b>' + list.length + '</b> 张原图，共 <b>' + bytesToSize(bytes) + '</b>。还想留着就先「↩️ 恢复」；确定不要了再「🧹 彻底清空」。');
+  else set('', '回收站是空的，很干净 ✨');
+  renderData();
+}
+async function restoreTrash(){
+  if(!galleryDir){ toast('先「选择图库文件夹」吧～'); return; }
+  if(!await verifyPermission(galleryDir, true)){ toast('没有拿到文件夹授权 🥺'); return; }
+  const list = await listTrashFiles();
+  if(!list || !list.length){ toast('回收站是空的，没什么要恢复的哦～'); return; }
+  if(!confirm('把回收站里的 ' + list.length + ' 张原图挪回 images 文件夹？\n\n挪回后回「相册」点一次「🔄 扫描文件夹恢复」，它们就会重新出现（名字 / 标签等信息以 _meta.json 里留存的为准）。')) return;
+  toast('正在把 ' + list.length + ' 张挪回 images…');
+  const dir = await ensureSubdir();
+  const trash = await galleryDir.getDirectoryHandle('_trash', {create:true});
+  let ok = 0, fail = 0;
+  for(const f of list){
+    try{
+      const file = await (await trash.getFileHandle(f.name)).getFile();
+      const dst = await dir.getFileHandle(f.name, {create:true});
+      const w = await dst.createWritable();
+      await w.write(file);
+      await w.close();
+      await trash.removeEntry(f.name);
+      ok++;
+    }catch(e){ console.warn('从回收站恢复失败：', f.name, e); fail++; }
+  }
+  await refreshTrashUI();
+  toast('恢复完成：' + ok + ' 张已挪回 images' + (fail ? (' · ' + fail + ' 张失败') : '') + ' ↩️');
+  if(ok) candyRain(30);
+}
+async function emptyTrash(){
+  if(!galleryDir){ toast('先「选择图库文件夹」吧～'); return; }
+  if(!await verifyPermission(galleryDir, true)){ toast('没有拿到文件夹授权 🥺'); return; }
+  const list = await listTrashFiles();
+  if(!list || !list.length){ toast('回收站本来就是空的哦～'); return; }
+  const bytes = list.reduce((s,f)=>s + (+f.size || 0), 0);
+  if(!confirm('彻底清空回收站？\n\n' + list.length + ' 张原图（' + bytesToSize(bytes) + '）会被永久删除，清空之后无法再恢复。想留的图请先「↩️ 恢复」。')) return;
+  const trash = await galleryDir.getDirectoryHandle('_trash', {create:true});
+  let ok = 0, fail = 0;
+  for(const f of list){
+    try{ await trash.removeEntry(f.name); ok++; }catch(e){ fail++; }
+  }
+  await refreshTrashUI();
+  toast('回收站已清空：释放约 ' + bytesToSize(bytes) + (fail ? (' · ' + fail + ' 张没删掉') : '') + ' 🧹');
+}
+
 /* _meta.json：把标签 / 评分 / 合集这些「数据库里才有」的信息也落到磁盘，扫描时才能完整还原 */
 function scheduleMetaWrite(){
   if(!galleryDir || !folderSupported()) return;
   clearTimeout(metaTimer);
-  metaTimer = setTimeout(()=>{ metaTimer = null; writeMetaFile().catch(()=>{}); }, 900);
+  metaTimer = setTimeout(()=>{ metaTimer = null; writeMetaFile().catch(()=>{}); }, 350);  // 350ms：关页面前丢元数据的窗口越短越好
 }
+/* 关页面 / 切到后台前，把挂着的元数据立刻落盘。
+   pagehide 在移动端比 beforeunload 可靠；visibilitychange 兜住「切到别的标签页」这种情况。 */
+addEventListener('pagehide', ()=>{ flushMeta(); });
+addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'hidden') flushMeta(); });
 /* 把还挂着的防抖写入立刻落盘（删除 / 清空前先存一份，元数据不会跟着消失） */
 async function flushMeta(){
   if(!metaTimer) return;
@@ -1207,7 +1368,7 @@ async function pushAllToFolder(){
   let ok = 0, fail = 0;
   for(const im of targets){
     const good = await archiveToFolder(im);      // 写盘，并把路径记到 im.file
-    if(good){ im.dataUrl = ''; await safePut(im); dropImg(im.id); ok++; } else fail++;
+    if(good){ im.dataUrl = ''; const saved = await safePut(im); dropImg(im.id); if(saved) ok++; else fail++; } else fail++;
   }
   try{ await writeMetaFile(); }catch(e){}
   await refresh(); await refreshFolderUI();
@@ -1247,7 +1408,7 @@ async function scanFolderRestore(){
       const album = (typeof old.album === 'string' && old.album.trim()) ? old.album.trim().slice(0,40) : '未分类';
       if(album !== '未分类' && !albums.includes(album)) albums.push(album);
       const dims = await readDims(dataUrl);
-      await safePut({
+      const saved = await safePut({
         id, file: 'images/' + h.name,
         name: (typeof old.name === 'string' && old.name.trim()) ? old.name.trim().slice(0,80) : (h.name.replace(/^[\w-]{1,64}__/, '').replace(/\.[^.]+$/, '') || '未命名'),
         tags: Array.isArray(old.tags) ? old.tags.filter(t=>typeof t === 'string' && t.trim()).slice(0,30) : [],
@@ -1262,6 +1423,7 @@ async function scanFolderRestore(){
         addedAt: (+old.addedAt > 0 ? +old.addedAt : (f.lastModified || Date.now())),
         hash
       });
+      if(!saved) throw new Error('索引写入失败');   // 写不进索引就不算恢复成功，如实计入失败
       seenId.add(id); seenHash.add(hash); added++;
     }catch(e){ fail++; }
   }
@@ -1402,13 +1564,21 @@ function renderCompressToggle(){
   const b = document.getElementById('compressToggle');
   if(b){ b.textContent = '🗜️ 大图压缩：'+(compressOn?'开':'关'); b.classList.toggle('on', compressOn); }
 }
+/* 写失败绝不能静默：界面照旧报「已保存」比直接报错更危险（配额满 / 无痕 / 授权过期都会走到这里） */
+let storageFailAt = 0;
+function notifyStorageFail(){
+  const now = Date.now();
+  if(now - storageFailAt < 15000) return;   // 15 秒内只提醒一次，不刷屏
+  storageFailAt = now;
+  toast('写入失败：浏览器存储可能已满或被禁用 🥺 建议先「导出全部」备份，再检查存储空间');
+}
 async function safePut(rec){
   try{ await dbPut(rec); return true; }
-  catch(e){ console.warn('存储写入失败：', e); return false; }
+  catch(e){ console.warn('存储写入失败：', e); notifyStorageFail(); return false; }
 }
 async function safePutRaw(rec){
   try{ await dbPutRaw(rec); return true; }
-  catch(e){ console.warn('存储写入失败：', e); return false; }
+  catch(e){ console.warn('存储写入失败：', e); notifyStorageFail(); return false; }
 }
 let searchTimer = null;
 function searchDebounce(){ clearTimeout(searchTimer); searchTimer = setTimeout(renderGallery, 200); }
@@ -1689,10 +1859,10 @@ async function openViewer(id){
     <h2>${escapeHtml(im.name||'未命名')}</h2>
     <div class="viewer-src">📎 来源：${escapeHtml(im.source||'未知')}<br>📐 ${dims} · 💾 ${sizeStr}<br>🗓️ 加入于 ${new Date(im.addedAt).toLocaleString('zh-CN')}</div>
     <div class="star-row" id="starRow">${[1,2,3,4,5].map(n=>`<button class="${Math.min(5,Math.max(0,Math.round(+im.rating)||0))>=n?'on':''}" onclick="setRating(${n})">★</button>`).join('')}</div>
-    <div class="field"><label>名字</label><input type="text" id="vName" value="${escapeHtml(im.name||'')}" /></div>
-    <div class="field"><label>标签（逗号/空格分隔）</label><input type="text" id="vTags" value="${escapeHtml((im.tags||[]).join('、'))}" /></div>
-    <div class="field"><label>合集</label><select id="vAlbum">${albumOptions(im.album)}</select></div>
-    <div class="field"><label>备注</label><textarea id="vNote" rows="3">${escapeHtml(im.note||'')}</textarea></div>
+    <div class="field"><label>名字</label><input type="text" id="vName" aria-label="图片名字" value="${escapeHtml(im.name||'')}" /></div>
+    <div class="field"><label>标签（逗号/空格分隔）</label><input type="text" id="vTags" aria-label="图片标签" value="${escapeHtml((im.tags||[]).join('、'))}" /></div>
+    <div class="field"><label>合集</label><select id="vAlbum" aria-label="归属合集">${albumOptions(im.album)}</select></div>
+    <div class="field"><label>备注</label><textarea id="vNote" aria-label="图片备注" rows="3">${escapeHtml(im.note||'')}</textarea></div>
     <div class="viewer-actions">
       <button class="candy" data-act="vsave"><span class="cb">💾</span>保存</button>
       <button class="candy ${im.fav?'mint':'sky'}" data-act="vfav" data-id="${escapeHtml(im.id)}">${im.fav?'💗 已收藏':'🤍 收藏'}</button>
@@ -1894,28 +2064,100 @@ function toggleSelect(){
 }
 function exitSelect(){ selecting=false; selected.clear(); document.getElementById('selectBtn').innerHTML='<span class="cb">☑️</span>批量选择'; document.getElementById('batchbar').classList.remove('show'); renderGallery(); }
 function updateBatchbar(){ document.getElementById('bbCount').textContent = '已选 '+selected.size+' 张'; }
-async function batchTag(){
-  if(!selected.size) return;
-  const t = prompt('给选中的图片添加什么标签？（逗号分隔）');
-  if(!t) return;
-  const tags = t.split(/[,，、\s]+/).map(s=>s.trim()).filter(Boolean);
-  for(const id of selected){ const im=images.find(x=>x.id===id); if(im){ im.tags = Array.from(new Set([...(im.tags||[]),...tags])); await dbPut(im); } }
-  await refresh(); exitSelect(); toast('标签添加好啦 🏷️');
+/* 批量操作改用站内弹窗选择器：不再退回原生 prompt（跟全站的拖拽式交互保持同一套语言） */
+let pickMode = null, pickTags = new Set(), pickAlbum = '';
+function openPickModal(mode){
+  if(!selected.size){ toast('先选几张图片吧～'); return; }
+  pickMode = mode;
+  const isTag = mode === 'tag';
+  const title = document.getElementById('pickTitle');
+  const hint = document.getElementById('pickHint');
+  const label = document.getElementById('pickInputLabel');
+  const input = document.getElementById('pickInput');
+  if(title) title.textContent = isTag ? '🏷️ 批量加标签' : '📚 批量归合集';
+  if(hint) hint.textContent = isTag
+    ? ('给选中的 ' + selected.size + ' 张图片加标签：下面的标签可以多选，也能在下面新建一个。')
+    : ('把选中的 ' + selected.size + ' 张图片归到一个合集：选一个，或在下面新建一个。');
+  if(label) label.textContent = isTag ? '新建标签' : '新建合集';
+  if(input){ input.value = ''; input.placeholder = isTag ? '例如：壁纸' : '例如：游戏 / 风景'; }
+  pickTags = new Set(); pickAlbum = '';
+  renderPickChips();
+  openModal('pickModal');
 }
-async function batchAlbum(){
-  if(!selected.size) return;
-  const albums = getAlbums();
-  const cur = images.find(x=>selected.has(x.id))?.album || '未分类';
-  const list = ['未分类', ...albums];
-  let opts = list.map((a,i)=>`${i}:${a}`).join('\n');
-  const choice = prompt('归入哪个合集？输入数字序号：\n'+opts+'\n（或直接输入新合集名称）');
-  if(choice===null) return;
-  let target = list[parseInt(choice)] || choice.trim();
-  if(!target) return;
-  if(!list.includes(target) && target!=='未分类'){ albums.push(target); saveAlbums(albums); }
-  for(const id of selected){ const im=images.find(x=>x.id===id); if(im){ im.album=target; await dbPut(im); } }
-  await refresh(); exitSelect(); toast('已归入「'+target+'」📚');
+function pickCandidates(){
+  if(pickMode === 'tag'){
+    const set = new Set();
+    images.forEach(i=>(i.tags||[]).forEach(t=>set.add(t)));
+    return Array.from(set).sort((a,b)=>String(a).localeCompare(String(b),'zh'));
+  }
+  const albums = getAlbums().slice();
+  if(!albums.includes('未分类')) albums.unshift('未分类');
+  return albums;
 }
+function renderPickChips(){
+  const box = document.getElementById('pickChips');
+  if(!box) return;
+  const list = pickCandidates();
+  if(!list.length){ box.innerHTML = '<span class="hint">还没有可选项，直接在下面新建一个吧～</span>'; return; }
+  box.innerHTML = list.map(t=>{
+    const on = pickMode === 'tag' ? pickTags.has(t) : pickAlbum === t;
+    return '<button type="button" class="pill' + (on ? ' on' : '') + '" data-pick="' + escapeHtml(t) + '">' + (pickMode === 'tag' ? '🏷️ ' : '📚 ') + escapeHtml(t) + '</button>';
+  }).join('');
+}
+function pickToggle(name){
+  if(pickMode === 'tag'){ pickTags.has(name) ? pickTags.delete(name) : pickTags.add(name); }
+  else { pickAlbum = (pickAlbum === name) ? '' : name; }
+  renderPickChips();
+}
+function pickAddNew(){
+  const input = document.getElementById('pickInput');
+  const v = String((input && input.value) || '').trim().slice(0,40);
+  if(!v){ toast('先输入名字吧～'); return; }
+  if(pickMode === 'tag') v.split(/[,，、\s]+/).map(s=>s.trim()).filter(Boolean).forEach(t=>pickTags.add(t.slice(0,30)));
+  else pickAlbum = v;
+  if(input) input.value = '';
+  renderPickChips();
+}
+async function pickConfirm(){
+  if(!selected.size){ closeModal('pickModal'); return; }
+  let ok = 0, fail = 0;
+  if(pickMode === 'tag'){
+    const tags = Array.from(pickTags);
+    if(!tags.length){ toast('还没选标签哦～'); return; }
+    for(const id of selected){
+      const im = images.find(x=>x.id===id); if(!im) continue;
+      im.tags = Array.from(new Set([...(im.tags||[]), ...tags]));
+      if(await safePut(im)) ok++; else fail++;
+    }
+  } else {
+    if(!pickAlbum){ toast('还没选合集哦～'); return; }
+    const albums = getAlbums();
+    if(pickAlbum !== '未分类' && !albums.includes(pickAlbum)){ albums.push(pickAlbum); saveAlbums(albums); }
+    for(const id of selected){
+      const im = images.find(x=>x.id===id); if(!im) continue;
+      im.album = pickAlbum;
+      if(await safePut(im)) ok++; else fail++;
+    }
+  }
+  const mode = pickMode;
+  closeModal('pickModal');
+  await refresh(); exitSelect();
+  if(mode === 'tag') toast('给 ' + ok + ' 张加好标签啦 🏷️' + (fail ? (' · ' + fail + ' 张写入失败') : ''));
+  else toast('已把 ' + ok + ' 张归入「' + pickAlbum + '」📚' + (fail ? (' · ' + fail + ' 张写入失败') : ''));
+}
+function batchTag(){ openPickModal('tag'); }
+function batchAlbum(){ openPickModal('album'); }
+/* 弹窗里的标签 / 合集芯片：事件委托，参数走 data 属性 */
+document.addEventListener('click', e=>{
+  const chip = e.target.closest('[data-pick]'); if(!chip) return;
+  pickToggle(chip.dataset.pick);
+});
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Enter') return;
+  const box = document.getElementById('pickModal');
+  if(!box || !box.classList.contains('open')) return;
+  if(e.target && e.target.id === 'pickInput'){ e.preventDefault(); pickAddNew(); }
+});
 async function batchFav(){
   for(const id of selected){ const im=images.find(x=>x.id===id); if(im){ im.fav=true; await dbPut(im); } }
   await refresh(); exitSelect(); candyRain(36); toast('选中的都收藏啦 💗');
@@ -2242,12 +2484,18 @@ function renderData(){
   const tagSet = new Set(); images.forEach(i=>(i.tags||[]).forEach(t=>tagSet.add(t)));
   const albumSet = new Set(); images.forEach(i=>albumSet.add(i.album||'未分类'));
   const bytes = images.reduce((s,i)=> s + imgBytes(i), 0);
+  // 大卡只展示「顶部便签装不下」的信息（便签已经有收录 / 收藏 / 标签 / 合集 / 原图体积，不再重复一遍）
+  const inFolder = images.filter(i=>i.file).length;
+  const inBrowser = total - inFolder;
+  let backupTxt = '还没导出过备份';
+  try{ const t = +localStorage.getItem('last_backup_at') || 0; if(t) backupTxt = new Date(t).toLocaleString('zh-CN'); }catch(e){}
+  const trashTxt = trashInfo.known ? (trashInfo.count + ' 张 · ' + bytesToSize(trashInfo.bytes)) : '待授权后读取';
   document.getElementById('dataGrid').innerHTML = `
     <div class="data-card"><div class="d-emoji">🖼️</div><div class="d-num">${total}</div><div class="d-label">收录图片</div></div>
-    <div class="data-card"><div class="d-emoji">💗</div><div class="d-num">${fav}</div><div class="d-label">收藏数量</div></div>
-    <div class="data-card"><div class="d-emoji">🏷️</div><div class="d-num">${tagSet.size}</div><div class="d-label">标签种类</div></div>
-    <div class="data-card"><div class="d-emoji">📚</div><div class="d-num">${albumSet.size}</div><div class="d-label">合集数量</div></div>
-    <div class="data-card"><div class="d-emoji">📦</div><div class="d-num">${bytesToSize(bytes)}</div><div class="d-label">原图总体积</div></div>`;
+    <div class="data-card"><div class="d-emoji">📁</div><div class="d-num">${inFolder}</div><div class="d-label">原图已在文件夹</div></div>
+    <div class="data-card"><div class="d-emoji">💾</div><div class="d-num">${inBrowser}</div><div class="d-label">仅存在浏览器</div></div>
+    <div class="data-card"><div class="d-emoji">🗑️</div><div class="d-num" style="font-size:17px">${trashTxt}</div><div class="d-label">回收站占用</div></div>
+    <div class="data-card"><div class="d-emoji">🗓️</div><div class="d-num" style="font-size:15px">${backupTxt}</div><div class="d-label">上次备份</div></div>`;
   renderAlbumList(); renderTagList();
 }
 function renderAlbumList(){
@@ -2319,6 +2567,8 @@ async function delTag(t){
   await refresh(); renderData(); toast('标签已删除 🗑️');
 }
 function downloadText(name, text){
+  try{ localStorage.setItem('last_backup_at', String(Date.now())); }catch(e){}   // 页脚要显示「上次备份时间」
+  updateFoot();
   const blob = new Blob([text], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = name;
@@ -2406,13 +2656,39 @@ async function clearAll(){
 }
 
 /* ==================== 弹窗（合集 / 标签 / 小工具） ==================== */
+let lastFocusEl = null;   // 弹窗关掉之后把焦点还给主人（键盘用户不会迷路）
 function openModal(id){
   if(id==='albumModal') renderAlbumList();
   if(id==='tagModal') renderTagList();
   const el = document.getElementById(id);
-  if(el) el.classList.add('open');
+  if(!el) return;
+  lastFocusEl = document.activeElement;   // 关掉之后把焦点还给主人（键盘用户不会迷路）
+  el.classList.add('open');
+  const f = focusables(el);
+  if(f.length){ try{ f[0].focus(); }catch(e){} }
 }
-function closeModal(id){ const el = document.getElementById(id); if(el) el.classList.remove('open'); }
+function closeModal(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.remove('open');
+  if(lastFocusEl && lastFocusEl.focus){ try{ lastFocusEl.focus(); }catch(e){} }
+  lastFocusEl = null;
+}
+/* 弹窗里的可聚焦元素（用来做 Tab 循环，不让 Tab 跑到弹窗背后） */
+function focusables(root){
+  if(!root) return [];
+  return Array.from(root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+    .filter(el=>el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+}
+addEventListener('keydown', e=>{
+  if(e.key !== 'Tab') return;
+  const opened = document.querySelector('.modal.open');
+  if(!opened) return;
+  const f = focusables(opened);
+  if(!f.length) return;
+  const first = f[0], last = f[f.length-1], act = document.activeElement;
+  if(e.shiftKey && (act === first || !opened.contains(act))){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && (act === last || !opened.contains(act))){ e.preventDefault(); first.focus(); }
+});
 function openTool(kind){
   const map = { link:'toolLinkModal', gif:'toolGifModal', mp4:'toolMp4Modal' };
   openModal(map[kind] || kind);
@@ -3318,7 +3594,7 @@ function switchTab(name, btn){
   btn.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
   if(name==='sources') renderSources();
-  if(name==='data'){ renderData(); refreshFolderUI(); }
+  if(name==='data'){ renderData(); refreshFolderUI(); refreshTrashUI(); }
 }
 
 /* ==================== 刷新 ==================== */
@@ -3330,7 +3606,7 @@ function repairAlbums(){
 }
 async function refresh(){
   images = await dbGetAll();
-  renderGallery(); renderAlbumBar(); refreshStats();
+  renderGallery(); renderAlbumBar(); refreshStats(); updateFoot();
 }
 function refreshStats(){
   const total = images.length;
@@ -3344,6 +3620,40 @@ function refreshStats(){
   document.getElementById('stAlbum').textContent = albumSet.size;
   document.getElementById('stSize').textContent = bytesToSize(bytes);
 }
+
+/* ==================== 页脚 / 回顶按钮 ==================== */
+function updateFoot(){
+  const s = document.getElementById('footStats');
+  if(s){
+    const inFolder = images.filter(i=>i.file).length;
+    s.textContent = '收录 ' + images.length + ' 张 · 文件夹 ' + inFolder + ' 张 · 浏览器 ' + (images.length - inFolder) + ' 张';
+  }
+  const b = document.getElementById('footBackup');
+  if(b){
+    let t = 0; try{ t = +localStorage.getItem('last_backup_at') || 0; }catch(e){}
+    b.textContent = t ? ('上次备份 ' + new Date(t).toLocaleString('zh-CN')) : '还没导出过备份';
+  }
+}
+const toTopBtn = document.getElementById('toTop');
+function updateToTop(){ if(toTopBtn) toTopBtn.classList.toggle('show', (window.scrollY || 0) > 480); }
+addEventListener('scroll', updateToTop, {passive:true});
+updateToTop();
+
+/* ==================== 工程兜底：按钮 type ==================== */
+/* 全站几百个按钮都没写 type。今天没有 <form> 所以无害，但一旦以后加了表单，
+   按钮会默认变成 submit 直接把页面提交掉 —— 属于潜伏炸弹。这里一次性兜住（含以后动态生成的卡片按钮）。 */
+function hardenButtons(root){
+  const scope = root || document;
+  if(!scope.querySelectorAll) return;
+  scope.querySelectorAll('button:not([type])').forEach(b=>b.setAttribute('type','button'));
+  if(scope.tagName === 'BUTTON' && !scope.hasAttribute('type')) scope.setAttribute('type','button');
+}
+hardenButtons();
+try{
+  new MutationObserver(muts=>{
+    for(const m of muts){ for(const n of m.addedNodes){ if(n && n.nodeType === 1) hardenButtons(n); } }
+  }).observe(document.body, {childList:true, subtree:true});
+}catch(e){}
 
 /* ==================== 启动 ==================== */
 (async function init(){
@@ -3364,6 +3674,7 @@ function refreshStats(){
   repairAlbums();
   renderSources(); renderData();
   await initFolder(); // 取回上次设定的图库文件夹句柄（授权是否还有效由面板提示）
+  refreshTrashUI();   // 回收站概览（没授权 / 没选文件夹时会给出对应提示）
   setTimeout(()=>{ candyRain(36); toast('欢迎来到噜噜大王の好图收纳屋 🧁'); }, 300);
 })();
 </script>
