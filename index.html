@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>噜噜大王の好图收纳屋 🧁</title>
 <link rel="apple-touch-icon" href="brand_160.png" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧁%3C/text%3E%3C/svg%3E" />
@@ -112,6 +112,7 @@
   --shadow-hover:0 16px 40px rgba(160,120,80,.26);
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}   /* 横屏时 iOS 会擅自放大字号，禁掉 */
 html,body{height:100%}
 body{
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
@@ -121,7 +122,12 @@ body{
   overflow-x:hidden; position:relative;
   -webkit-font-smoothing:antialiased;
   transition:background .5s, color .5s;
+  /* 刘海屏 / 圆角屏：左右安全区直接让位；上下安全区交给各悬浮元素单独吃，正文不会凭空多一大块空白 */
+  padding-left:env(safe-area-inset-left,0px);
+  padding-right:env(safe-area-inset-right,0px);
 }
+/* 手机浏览器地址栏伸缩时 vh 会跟着跳，dvh 兜底；老浏览器直接忽略这一行 */
+@supports (height:100dvh){ body{min-height:100dvh} }
 ::selection{background:var(--accent-soft);color:var(--accent-deep)}
 ::-webkit-scrollbar{width:12px;height:12px}
 ::-webkit-scrollbar-thumb{background:var(--accent-soft);border-radius:8px;border:3px solid var(--bg)}
@@ -137,6 +143,13 @@ body{
 .cloud.c2{width:300px;height:140px;top:30%;right:-8%;background:var(--accent2-soft);animation-duration:55s;animation-delay:-18s}
 .cloud.c3{width:360px;height:150px;bottom:8%;left:30%;background:var(--accent3-soft);animation-duration:48s;animation-delay:-30s}
 @keyframes cloudDrift{from{transform:translateX(-12vw)}to{transform:translateX(112vw)}}
+/* 小屏上云朵按视口收窄：固定定位虽不会撑出滚动条，但 420px 的云在 390px 屏上会糊住半个屏幕 */
+@media(max-width:620px){
+  .cloud{filter:blur(20px);opacity:.42}
+  .cloud.c1{width:230px;height:100px}
+  .cloud.c2{width:180px;height:84px}
+  .cloud.c3{width:210px;height:92px}
+}
 
 #sparkleLayer{position:fixed;inset:0;z-index:9990;pointer-events:none;overflow:hidden}
 
@@ -157,6 +170,7 @@ body{
 /* 换肤栏：单行窄条小圆点（既定约定：一套排版 × 九色皮肤，切换栏只负责换色，不许变高变重） */
 .theme-pick{display:grid;grid-template-columns:repeat(9,18px);gap:7px;margin-left:auto;justify-content:flex-end;align-content:center}
 .theme-dot{width:18px;height:18px;border-radius:50%;border:2px solid #fff;cursor:pointer;box-shadow:var(--shadow);transition:.2s;position:relative;padding:0}
+.theme-dot::before{content:"";position:absolute;inset:-5px;border-radius:50%}   /* 视觉不变，命中区放大到 28px，手指也点得中 */
 .theme-dot:hover{transform:scale(1.25)}
 .theme-dot.on{outline:2px solid var(--accent);outline-offset:2px}
 
@@ -172,7 +186,7 @@ body{
 
 /* ============ 导航 ============ */
 /* 长图库刚需：翻到下面也能切标签，所以导航要能粘住 */
-.nav{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:8px;z-index:60;background:var(--bg);padding:8px;margin:-8px -8px 10px;border-radius:18px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:60;background:var(--bg);padding:8px;margin:-8px -8px 10px;border-radius:18px}
 .nav-item{
   position:relative;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:15px;
   padding:12px 22px;border-radius:16px;background:var(--card);color:var(--ink-soft);
@@ -272,14 +286,39 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .gridview{display:grid;grid-template-columns:repeat(var(--grid-cols,4),var(--card-w,190px));gap:18px;margin-top:18px;justify-content:start}  /* start：网格永远从容器左边线开始，不会因为卡片变小而被居中推开 */
 @media(max-width:620px){
   .gridview{gap:12px}.waterfall{column-gap:12px}
-  .toolbar{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}   /* 手机上整齐两列，不再 2-2-1 锯齿孤行 */
-  .toolbar .candy{justify-content:center;padding:11px 10px}
-  .theme-pick{grid-template-columns:repeat(9,16px);gap:5px}
-  .theme-dot{width:16px;height:16px}
-  .brand h1{font-size:19px}
-  .brand .sub{font-size:11.5px}
-  .topbar{gap:10px;margin-bottom:10px}          /* 手机上顶栏再瘦一点，首屏多留给图片 */
-  .logo{width:46px;height:46px;border-radius:14px;font-size:24px}
+  .toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px}   /* 手机两列起，窄到放不下才掉单列，不再 2-2-1 锯齿孤行 */
+  .toolbar .candy{justify-content:center;padding:12px 8px;min-height:44px;font-size:13.5px}
+  .toolbar .candy .cb{font-size:15px}
+  .filters{gap:6px}.album-bar{gap:6px}
+  .pill,.album-chip{padding:8px 13px;min-height:34px;display:inline-flex;align-items:center}
+  /* 导航与统计条：手机上压缩内边距，但每个可点项都保住 44px 高 */
+  .nav{gap:6px;padding:6px;margin:-6px -6px 8px;top:calc(6px + env(safe-area-inset-top,0px))}
+  .nav-item{padding:10px 14px;font-size:13.5px;border-radius:13px;min-height:44px}
+  .nav-item .nb{font-size:15px;margin-right:3px}
+  .sticky{padding:7px 13px;font-size:12.5px}
+  .sheet{padding:16px 14px}
+  #tab-gallery .sheet{padding-bottom:56px}
+  .brand{flex:1 1 0;min-width:0}              /* basis:0 才能和 logo 挤同一行；basis:auto 会因为内容太宽被挤到单独一行，顶栏变 3 行 */
+  .brand h1{font-size:17px;gap:7px}
+  .brand .sub{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar{gap:8px 10px;margin-bottom:8px}          /* 手机上顶栏再瘦一点，首屏多留给图片 */
+  .logo{width:40px;height:40px;border-radius:12px;font-size:21px}
+  /* 换肤栏独占一行 + 圆点放大到 22px：手指点得中，也不会把品牌行挤成两行 */
+  .theme-pick{grid-template-columns:repeat(9,22px);gap:10px;margin-left:0;justify-content:flex-start;flex:1 0 100%;padding:1px 0}
+  .theme-dot{width:22px;height:22px}
+  /* 输入框字号 <16px 会被 iOS 自动放大整页，这里统一顶到 16px */
+  input[type=text],input[type=search],textarea,select{font-size:16px}
+  .wrap{padding:14px 14px 92px}
+}
+@media(max-width:380px){
+  .brand h1{font-size:16px}
+  .theme-pick{grid-template-columns:repeat(9,20px);gap:8px}
+  .theme-dot{width:20px;height:20px}
+  .nav-item{padding:9px 11px;font-size:13px}
+}
+/* 340px 以下两列真的挤了，才降单列 */
+@media(max-width:340px){
+  .toolbar{grid-template-columns:1fr}
 }
 /* 卡片大小与列数由 applyCardSize() 按窗口宽度 + 用户缩放实时计算 */
 .polaroid{
@@ -324,7 +363,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .empty p{color:var(--ink-soft);font-size:14px;margin-bottom:16px}
 
 /* 批量栏 */
-.batchbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:600;background:var(--toast-bg);color:var(--toast-fg);border-radius:999px;padding:10px 18px;display:none;gap:10px;align-items:center;box-shadow:0 12px 34px rgba(0,0,0,.3);animation:secPop .3s}
+.batchbar{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:600;background:var(--toast-bg);color:var(--toast-fg);border-radius:999px;padding:10px 18px;display:none;gap:10px;align-items:center;box-shadow:0 12px 34px rgba(0,0,0,.3);animation:secPop .3s}
 .batchbar.show{display:flex}
 .batchbar .bb{background:rgba(255,255,255,.16);border:none;color:#fff;font-family:inherit;font-weight:700;font-size:13px;padding:8px 13px;border-radius:999px;cursor:pointer;transition:.2s}
 .batchbar .bb:hover{background:rgba(255,255,255,.3)}
@@ -361,12 +400,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .mgmt-item .mi-count{color:var(--ink-soft);font-size:12px}
 
 /* ============ 查看器 ============ */
-.viewer{position:fixed;inset:0;z-index:9000;background:rgba(30,20,15,.72);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:22px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.viewer{position:fixed;inset:0;z-index:9000;background:rgba(30,20,15,.72);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:calc(22px + env(safe-area-inset-top,0px)) calc(22px + env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) calc(22px + env(safe-area-inset-left,0px));overflow-y:auto;-webkit-overflow-scrolling:touch}
 .viewer.open{display:flex;animation:fadeIn .22s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .viewer-box{background:var(--paper);border-radius:24px;max-width:1080px;width:100%;max-height:92vh;display:grid;grid-template-columns:1.3fr 1fr;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);animation:viewerPop .35s cubic-bezier(.34,1.56,.64,1);margin:auto}
 @keyframes viewerPop{from{transform:scale(.85) rotate(-1deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-@media(max-width:760px){.viewer{padding:12px}.viewer-box{grid-template-columns:1fr;max-height:none;border-radius:20px}.viewer-imgwrap{min-height:auto;max-height:60vh}.viewer-imgwrap img{max-height:60vh}.viewer-info{max-height:none;overflow:visible;padding:18px}}
+@media(max-width:760px){.viewer{padding:calc(12px + env(safe-area-inset-top,0px)) calc(12px + env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) calc(12px + env(safe-area-inset-left,0px))}.viewer-box{grid-template-columns:1fr;max-height:none;border-radius:20px}.viewer-imgwrap{min-height:auto;max-height:60vh}.viewer-imgwrap img{max-height:60vh}.viewer-info{max-height:none;overflow:visible;padding:18px}}
 .viewer-imgwrap{background:var(--bg-deep);display:flex;align-items:center;justify-content:center;min-height:300px;position:relative;overflow:hidden}
 .viewer-imgwrap img{max-width:100%;max-height:88vh;object-fit:contain;transition:transform .2s;cursor:grab}
 .viewer-info{padding:22px;overflow-y:auto;max-height:92vh}
@@ -401,10 +440,10 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .brand h1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.2}
 .brand-logo{height:48px;width:auto;border-radius:14px;display:block;
   filter:drop-shadow(0 6px 14px rgba(180,140,100,.32));animation:logoWiggle 6s ease-in-out infinite}
-@media(max-width:620px){.brand-logo{height:36px}}
+@media(max-width:620px){.brand-logo{height:28px;border-radius:10px}}
 
 /* ============ 弹窗（合集 / 标签 / 小工具） ============ */
-.modal{position:fixed;inset:0;z-index:9200;background:rgba(30,20,15,.62);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal{position:fixed;inset:0;z-index:9200;background:rgba(30,20,15,.62);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) calc(16px + env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) calc(16px + env(safe-area-inset-left,0px));overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal.open{display:flex;animation:fadeIn .22s}
 .modal-box{background:var(--paper);border-radius:22px;max-width:760px;width:100%;box-shadow:0 26px 70px rgba(0,0,0,.45);animation:viewerPop .32s cubic-bezier(.34,1.56,.64,1);margin:auto;overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
 .modal-box.wide{max-width:920px}
@@ -419,10 +458,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .foot{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;align-items:center;font-size:12px;color:var(--ink-soft);padding:24px 12px 6px;line-height:1.7;text-align:center}
 .foot span{background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:5px 13px;box-shadow:var(--shadow)}
 /* 回顶按钮：长图库翻到底部时的救命绳 */
-.to-top{position:fixed;right:22px;bottom:24px;z-index:700;width:46px;height:46px;border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:20px;font-weight:900;font-family:inherit;line-height:1;background:linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 8px 22px var(--shadow-hover);opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .25s,transform .25s}
+.to-top{position:fixed;right:calc(22px + env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:700;width:46px;height:46px;border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:20px;font-weight:900;font-family:inherit;line-height:1;background:linear-gradient(180deg,var(--accent),var(--accent-deep));box-shadow:0 8px 22px var(--shadow-hover);opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .25s,transform .25s}
 .to-top.show{opacity:1;pointer-events:auto;transform:none}
 .to-top:hover{transform:translateY(-3px) scale(1.06)}
-@media(max-width:620px){.to-top{right:14px;bottom:16px;width:42px;height:42px}}
+@media(max-width:620px){.to-top{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:42px;height:42px}}
+/* 小屏上批量栏比屏幕还宽会被截掉两头，允许换行 + 限制最大宽 */
+@media(max-width:620px){.batchbar{left:calc(10px + env(safe-area-inset-left,0px));right:calc(10px + env(safe-area-inset-right,0px));transform:none;width:auto;max-width:none;flex-wrap:wrap;justify-content:center;border-radius:20px;padding:10px 12px}}
 /* 卡片大小：5 档（＋ / － / ↺ / 百分比数字），住在「相册」面板右下角的空白角落，四个控件全部透明底 */
 .size-row{display:flex;flex-wrap:nowrap;gap:2px;align-items:center}
 #tab-gallery .sheet{padding-bottom:52px}                 /* 给右下角留出干净的空白角落 */
@@ -464,7 +505,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .frame-strip .fr .no{position:absolute;left:2px;bottom:2px;background:rgba(0,0,0,.5);color:#fff;font-size:10px;border-radius:5px;padding:0 4px}
 
 /* ============ 气泡提示 ============ */
-#bubbles{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+#bubbles{position:fixed;top:calc(22px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;max-width:calc(100vw - 24px)}
 .bubble{background:var(--toast-bg);color:var(--toast-fg);font-size:14px;font-weight:700;padding:11px 20px;border-radius:18px;box-shadow:0 10px 26px rgba(0,0,0,.3);animation:bubIn .35s cubic-bezier(.34,1.56,.64,1),bubOut .4s ease forwards;animation-delay:0s,2.3s;position:relative}
 .bubble::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:var(--toast-bg);border-radius:0 0 4px 0;transform:translateX(-50%) rotate(45deg)}
 @keyframes bubIn{from{opacity:0;transform:translateY(-20px) scale(.85)}to{opacity:1;transform:none}}
@@ -476,6 +517,29 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 @keyframes sparkleTw{0%{transform:scale(0) rotate(0);opacity:1}100%{transform:scale(1.6) rotate(180deg);opacity:0}}
 /* 系统级「减少动效」偏好：自动关闭常驻动画（晕动症友好 + 省电） */
 @media (prefers-reduced-motion: reduce){.cloud,#sky{display:none}*{animation:none!important;transition:none!important}}
+
+/* ============ 触屏（手机 / 平板）专属 ============ */
+@media (hover:none){
+  *{-webkit-tap-highlight-color:transparent}
+  button,.nav-item,.candy,.pill,.album-chip,.theme-dot,.polaroid,.to-top{touch-action:manipulation}   /* 干掉移动端 300ms 点击延迟 */
+  /* 触屏没有 hover：手指比鼠标粗得多，所有可点项都顶到 38~44px（鼠标端不动，鼠标本来就不需要这么大的靶子） */
+  .pill,.album-chip{min-height:38px;padding:9px 15px;display:inline-flex;align-items:center}
+  .size-row .sbtn{min-width:40px;min-height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:10px}
+  .size-tag{min-height:40px}
+  #tab-gallery .sheet{padding-bottom:60px}   /* 让出放大后的尺寸行，右下角不会压到内容 */
+  /* 触屏没有真 hover：点过之后样式会「粘」在元素上（卡片一直浮着、按钮一直变大），这里把悬停位移全部还回去 */
+  .candy:hover{transform:none}
+  .pill:hover,.album-chip:hover,.nav-item:hover{transform:none}
+  .theme-dot:hover{transform:none}
+  .src-card:hover{transform:none;box-shadow:var(--shadow)}
+  .sticky:hover{transform:rotate(var(--r,0deg))}
+  .to-top:hover{transform:none}
+  .polaroid:hover{transform:rotate(var(--tilt,0deg));box-shadow:var(--shadow);z-index:auto}
+  .v-close:hover,.m-close:hover,.zoom-bar button:hover,.v-nav:hover{transform:none}
+  .fav-pin:hover{transform:rotate(8deg)}
+}
+/* 平板 / 大屏手机横屏：容器留白再宽一点，卡片不至于贴边 */
+@media (min-width:621px) and (max-width:1024px){ .wrap{padding:18px 18px 96px} }
 </style>
 </head>
 <body>
@@ -854,7 +918,7 @@ function resizeSky(){
   sky.style.width = innerWidth + 'px'; sky.style.height = innerHeight + 'px';
   sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-resizeSky(); addEventListener('resize', resizeSky);
+resizeSky();   // 尺寸变化统一交给 onViewportChange()（定义在「卡片大小」一节，函数声明会提升）
 const SKY_SHAPES = ['☁','♡','✦','✿','●','★','🍬'];
 const SKY_COLORS = ['#e8825a','#7fb89a','#7fa8d9','#e8b25a','#e56b8d','#c98fb8'];
 function skySpawn(init){
@@ -1758,7 +1822,10 @@ function applyCardSize(wrap){
   const w = window.innerWidth;
   const base = w<=620 ? 128 : (w<=900 ? 164 : 190);   // 小屏自动用更小的基准，手机上不至于挤成一团
   const gap = w<=620 ? 12 : 18;
-  const inner = wrap.clientWidth > 40 ? wrap.clientWidth : (Math.min(w, 1200) - 40);
+  /* 面板被切到别的标签页时 clientWidth 是 0（section 是 display:none），
+     这时按视口减去 .wrap + .sheet 的左右内边距兜底，否则会拿桌面宽度算列数，切回来卡片就挤成一团 */
+  const padAll = (w<=620 ? 28 : 40) * 2;
+  const inner = wrap.clientWidth > 40 ? wrap.clientWidth : (Math.min(w, 1200) - padAll);
   const avail = Math.max(80, inner - 2);
   let cw = Math.max(56, Math.round(base*cardScale));    // 卡片实际宽度：每一档都真的变化
   const cols = Math.max(1, Math.floor((avail + gap) / (cw + gap)));
@@ -1782,7 +1849,14 @@ function resizeCards(dir){
   sparkleAt(innerWidth/2, 120);
   toast('卡片大小：' + Math.round(cardScale*100) + '% ' + (dir>0?'🔍':(dir<0?'🔎':'↺ 恢复默认')));
 }
-addEventListener('resize', ()=>applyCardSize());
+/* 视口变化统一入口：rAF 合并成一帧一次，手机旋转 / 地址栏伸缩 / 拖动窗口都走这里，不再连环重排 */
+function onViewportChange(){
+  if(onViewportChange._q) return;
+  onViewportChange._q = requestAnimationFrame(()=>{ onViewportChange._q = 0; resizeSky(); applyCardSize(); });
+}
+addEventListener('resize', onViewportChange);
+addEventListener('orientationchange', onViewportChange);
+if(window.visualViewport) visualViewport.addEventListener('resize', onViewportChange);
 
 /* ==================== 上传 / 导入 ==================== */
 function pickFiles(){ document.getElementById('fileInput').click(); }
@@ -3595,6 +3669,8 @@ function switchTab(name, btn){
   document.getElementById('tab-'+name).classList.add('active');
   if(name==='sources') renderSources();
   if(name==='data'){ renderData(); refreshFolderUI(); refreshTrashUI(); }
+  // 面板刚显示出来才量得到真实宽度（隐藏时 clientWidth=0），下一帧补算一次列数
+  if(name==='gallery') requestAnimationFrame(()=>applyCardSize());
 }
 
 /* ==================== 刷新 ==================== */
@@ -3656,6 +3732,11 @@ try{
 }catch(e){}
 
 /* ==================== 启动 ==================== */
+/* 验收探针用：等这个 Promise 再断言。无头 Chrome 的虚拟时钟会把 setTimeout 瞬间跑完，
+   而 IndexedDB 是真实 I/O —— 探针抢跑就会拿到「还没初始化」的空快照（dataGrid 空、footStats 是静态值），
+   于是同一份文件三个窗口宽跑出互相矛盾的 FAIL。 */
+let __albumReadyResolve;
+window.__albumReady = new Promise(res => { __albumReadyResolve = res; });
 (async function init(){
   let savedTheme = '';
   try{ savedTheme = localStorage.getItem('album_theme') || ''; }catch(e){}
@@ -3668,6 +3749,8 @@ try{
     console.warn(e);
     document.getElementById('emptyState').style.display = 'block';
     toast('浏览器限制了本地存储（无痕/隐私模式？），暂时收不了图 🥺');
+    document.documentElement.setAttribute('data-app-ready','error');
+    __albumReadyResolve('error');
     return;
   }
   await refresh();
@@ -3675,6 +3758,9 @@ try{
   renderSources(); renderData();
   await initFolder(); // 取回上次设定的图库文件夹句柄（授权是否还有效由面板提示）
   refreshTrashUI();   // 回收站概览（没授权 / 没选文件夹时会给出对应提示）
+  applyCardSize();    // 数据落地后再量一次真实容器宽度（首次调用时面板可能还没展开）
+  document.documentElement.setAttribute('data-app-ready','1');
+  __albumReadyResolve('ok');
   setTimeout(()=>{ candyRain(36); toast('欢迎来到噜噜大王の好图收纳屋 🧁'); }, 300);
 })();
 </script>
