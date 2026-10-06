@@ -153,6 +153,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}   /* 横屏时 iOS 会擅自放大字号，禁掉 */
 html,body{height:100%}
+/* ============ 字重契约（踩过坑后写在这里） ============
+   中文 Windows 的字重上限是微软雅黑 Bold(700)：请求 800/900 拿不到真字重，
+   只会触发浏览器合成的「伪粗体」，星空这类深底上描边发虚。
+   因此全站加粗文本统一 font-weight:700 —— 这是字体栈里每一套字体的真实 Bold；
+   层级差距交给字号 / 颜色 / 阴影表达。以后若接入思源黑体等可变字重开源中文字体
+   （子集化后放进字体栈最前），再逐档解锁 800/900。 */
 body{
   font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
   color:var(--ink); background:var(--bg);
@@ -216,7 +222,7 @@ body{
 /* 统计便签 */
 .sticky-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .sticky{
-  display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;font-weight:800;
+  display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;font-weight:700;
   background:var(--paper);border:1.5px solid var(--line);border-radius:12px;color:var(--ink-soft);
   box-shadow:var(--shadow);transform:rotate(var(--r,0deg));transition:.25s;
 }
@@ -227,7 +233,7 @@ body{
 /* 长图库刚需：翻到下面也能切标签，所以导航要能粘住 */
 .nav{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:60;background:var(--bg);padding:8px;margin:-8px -8px 10px;border-radius:18px}
 .nav-item{
-  position:relative;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:15px;
+  position:relative;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;
   padding:12px 22px;border-radius:16px;background:var(--card);color:var(--ink-soft);
   box-shadow:var(--shadow);transition:.25s;overflow:hidden;
 }
@@ -248,7 +254,7 @@ section.active{display:block}
 
 /* ============ 糖果按钮 ============ */
 .candy{
-  position:relative;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:14px;
+  position:relative;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;
   padding:11px 18px;border-radius:999px;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
   overflow:hidden;display:inline-flex;align-items:center;gap:7px;color:#fff;
   background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),linear-gradient(180deg,var(--accent-top),var(--accent-bot));box-shadow:0 5px 14px var(--shadow-hover),inset 0 2px 0 rgba(255,255,255,.35);
@@ -263,6 +269,12 @@ section.active{display:block}
 .candy.ghost{background:var(--card);color:var(--pill-ink);border:1.5px solid var(--accent-soft);box-shadow:0 3px 10px var(--shadow);background-image:none}
 .candy.ghost::after{background:rgba(255,255,255,.5)}
 .candy.ghost:hover{background:var(--accent-soft)}
+/* 「更多玩法」溢出菜单：低频动作的家。配色沿用 nav-item 同款「浅纸面 + 主墨字」，九套皮肤下对比度都 ≥4.5 */
+.more-wrap{position:relative;display:inline-flex}
+.more-menu{position:absolute;top:calc(100% + 8px);left:0;z-index:70;display:none;flex-direction:column;gap:6px;min-width:176px;padding:8px;background:var(--paper);border:1.5px solid var(--line);border-radius:16px;box-shadow:var(--shadow-hover)}
+.more-menu.show{display:flex}
+.more-menu button{font-family:inherit;font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px;text-align:left;padding:10px 14px;border:none;border-radius:12px;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 2px 6px var(--shadow);transition:.18s}
+.more-menu button:hover{background:var(--accent-soft);color:var(--pill-ink);transform:translateX(2px)}
 .candy.danger{background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),linear-gradient(180deg,var(--danger-top),var(--danger-bot))}
 /* 危险操作降一档：描边红色比实心红弱，不会跟旁边的实心主按钮抢视线（防误点） */
 .candy.danger-ghost{background:var(--card);color:var(--danger-ink);border:1.5px solid var(--danger-line);background-image:none;box-shadow:0 3px 10px var(--shadow)}
@@ -291,7 +303,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 /* 键盘用户必须看得见焦点在哪（鼠标点击不触发 :focus-visible，不影响原有观感） */
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-.field label{font-size:13px;font-weight:800;color:var(--ink-soft)}
+.field label{font-size:13px;font-weight:700;color:var(--ink-soft)}
 
 /* ============ 上传区 ============ */
 .dropzone{
@@ -307,7 +319,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 /* ============ 相册 ============ */
 .toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
-.pill{position:relative;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,var(--accent-soft),var(--accent2-soft));border:1.5px solid transparent;color:var(--pill-ink);font-size:13px;font-weight:800;padding:7px 14px;border-radius:999px;transition:.2s;font-family:inherit;box-shadow:0 3px 10px var(--shadow)}
+.pill{position:relative;overflow:hidden;cursor:pointer;background:linear-gradient(180deg,var(--accent-soft),var(--accent2-soft));border:1.5px solid transparent;color:var(--pill-ink);font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;transition:.2s;font-family:inherit;box-shadow:0 3px 10px var(--shadow)}
 /* 只有「图源导航」那一行允许白底按钮，其余地方的按钮一律彩色 */
 #tab-sources .pill:not(.on){background:var(--card);border:1.5px solid var(--line);color:var(--ink-soft);box-shadow:0 3px 10px var(--shadow)}
 .pill.on{background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),linear-gradient(135deg,var(--accent-top),var(--accent2-top));color:#fff;border-color:transparent}
@@ -315,7 +327,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 
 /* 合集栏 */
 .album-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
-.album-chip{cursor:pointer;background:linear-gradient(180deg,var(--accent2-soft),var(--accent3-soft));border:1.5px solid transparent;color:var(--ink);font-size:13px;font-weight:800;padding:7px 14px;border-radius:12px;transition:.2s;font-family:inherit;box-shadow:0 3px 10px var(--shadow)}
+.album-chip{cursor:pointer;background:linear-gradient(180deg,var(--accent2-soft),var(--accent3-soft));border:1.5px solid transparent;color:var(--ink);font-size:13px;font-weight:700;padding:7px 14px;border-radius:12px;transition:.2s;font-family:inherit;box-shadow:0 3px 10px var(--shadow)}
 .album-chip.on{background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),var(--accent2-top);color:#fff;border-color:transparent}
 .album-chip:hover{transform:translateY(-2px)}
 
@@ -374,7 +386,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 /* B 方案：原图住在文件夹里，卡片滚到附近才去磁盘取图；还没取到时先给个占位标记 */
 .polaroid .ph-frame:not(.ready)::after{content:'🖼️';position:absolute;inset:0;display:grid;place-items:center;font-size:24px;opacity:.22}
 .polaroid .ph-frame.lock::after{content:'🔒';opacity:.6}
-.polaroid .ph-name{margin-top:9px;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px;text-align:center}
+.polaroid .ph-name{margin-top:9px;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px;text-align:center}
 .polaroid .ph-meta{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;flex-wrap:wrap}
 .stars{color:var(--star-on);font-size:13px;letter-spacing:1px}
 .tape{position:absolute;z-index:3;width:64px;height:22px;background:var(--accent-soft);opacity:.85;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -414,7 +426,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .src-card{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--shadow);transition:.3s;animation:stickerIn .5s both;position:relative;overflow:hidden}
 .src-card:hover{transform:translateY(-5px) rotate(-.5deg);box-shadow:var(--shadow-hover)}
 .src-card .s-emoji{font-size:36px;display:inline-block;animation:bob 3s ease-in-out infinite}
-.src-card .s-name{font-size:16px;font-weight:800;margin:8px 0 4px}
+.src-card .s-name{font-size:16px;font-weight:700;margin:8px 0 4px}
 .src-card .s-desc{font-size:13px;color:var(--ink-soft);min-height:34px;line-height:1.5;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 .src-card .s-actions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
 .src-cat{font-size:14px;font-weight:700;color:var(--accent-deep);margin:24px 0 0;display:flex;align-items:center;gap:8px}
@@ -437,7 +449,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .folder-status .fs-text b{color:var(--ink)}
 .mgmt-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;max-height:280px;overflow-y:auto}
 .mgmt-item{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font-size:13px}
-.mgmt-item .mi-name{font-weight:800;flex:1}
+.mgmt-item .mi-name{font-weight:700;flex:1}
 .mgmt-item .mi-count{color:var(--ink-soft);font-size:12px}
 
 /* ============ 查看器 ============ */
@@ -472,7 +484,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .slideshow.open{display:flex}
 .slideshow img{max-width:92vw;max-height:80vh;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:ssZoom 3.2s linear}
 @keyframes ssZoom{from{transform:scale(1)}to{transform:scale(1.06)}}
-.slideshow .ss-name{margin-top:18px;color:#fff;font-size:18px;font-weight:800}
+.slideshow .ss-name{margin-top:18px;color:#fff;font-size:18px;font-weight:700}
 .slideshow .ss-meta{color:var(--slide-fg);font-size:13px;margin-top:6px}
 .slideshow .ss-ctrl{margin-top:22px;display:flex;gap:10px}
 .slideshow .ss-hint{position:absolute;bottom:18px;color:var(--slide-dim);font-size:12px}
@@ -516,7 +528,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .size-tag{display:inline-flex;align-items:center;justify-content:flex-end;gap:6px;font-size:13px;font-weight:700;color:var(--accent-deep);background:none;border:none;border-radius:0;padding:0 2px 0 6px;min-width:46px;box-shadow:none}
 
 /* ============ 拖拽：图片→合集 / 标签→图片 ============ */
-.drag-ghost{position:fixed;z-index:9999;pointer-events:none;transform:translate(-50%,-50%);padding:7px 14px;border-radius:14px;background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),linear-gradient(180deg,var(--accent-top),var(--accent-bot));color:#fff;font-size:13px;font-weight:800;box-shadow:var(--shadow-hover);opacity:.96;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drag-ghost{position:fixed;z-index:9999;pointer-events:none;transform:translate(-50%,-50%);padding:7px 14px;border-radius:14px;background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),linear-gradient(180deg,var(--accent-top),var(--accent-bot));color:#fff;font-size:13px;font-weight:700;box-shadow:var(--shadow-hover);opacity:.96;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .drag-ghost.tag{background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),linear-gradient(180deg,var(--accent2-top),var(--accent2-bot))}
 .album-chip.hot{background:linear-gradient(0deg,var(--candy-shade),var(--candy-shade)),var(--accent-top);color:#fff;border-color:transparent;transform:scale(1.1) translateY(-2px)}
 .polaroid.hot{outline:3px dashed var(--accent);outline-offset:3px;transform:translateY(-6px) scale(1.03)}
@@ -536,9 +548,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
 .res-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px}
 .res-item img{width:46px;height:46px;object-fit:cover;border-radius:8px;background:var(--bg-deep);flex:none}
 .res-item .r-main{flex:1;min-width:0}
-.res-item .r-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-item .r-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .res-item .r-url{font-size:11.5px;color:var(--ink-soft);word-break:break-all;line-height:1.5}
-.res-item .r-state{font-size:12px;font-weight:800;color:var(--tag-ink);white-space:nowrap}
+.res-item .r-state{font-size:12px;font-weight:700;color:var(--tag-ink);white-space:nowrap}
 .progress-bar{height:9px;border-radius:999px;background:var(--accent-soft);overflow:hidden;margin-top:10px;display:none}
 .progress-bar.show{display:block}
 .progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s}
@@ -651,15 +663,19 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
       <div class="toolbar">
         <button class="candy" onclick="pickFiles()"><span class="cb">📥</span>上传图片</button>
         <button class="candy" onclick="importByUrl()"><span class="cb">🔗</span>链接导入</button>
-        <button class="candy" onclick="randomPick()"><span class="cb">🎲</span>随机宠幸</button>
-        <button class="candy" onclick="startSlideshow()"><span class="cb">🎬</span>幻灯片</button>
         <button class="candy" id="selectBtn" onclick="toggleSelect()"><span class="cb">☑️</span>批量选择</button>
-        <button class="candy" onclick="switchView()" id="viewBtn"><span class="cb">🍱</span>切换视图</button>
-      </div>
-      <div class="toolbar" style="margin-top:9px">
         <button class="candy ghost" id="toolTrayBtn" onclick="toggleToolTray()" aria-expanded="false" aria-controls="toolTray"><span class="cb">🧰</span>工具箱</button>
+        <div class="more-wrap" id="moreWrap">
+          <button class="candy ghost" id="moreBtn" onclick="toggleMoreMenu()" aria-expanded="false" aria-controls="moreMenu"><span class="cb">⋯</span>更多玩法</button>
+          <div class="more-menu" id="moreMenu" role="group" aria-label="更多玩法（低频动作都收在这里）">
+            <button onclick="moreAction(randomPick)"><span class="cb">🎲</span>随机宠幸</button>
+            <button onclick="moreAction(startSlideshow)"><span class="cb">🎬</span>幻灯片</button>
+            <button id="viewBtn" onclick="moreAction(switchView)"><span class="cb">🍱</span>切换视图</button>
+          </div>
+        </div>
         <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files);this.value=''" />
       </div>
+      <!-- 首屏一排只剩「三个高频按钮 + 工具箱 + ⋯」：随机宠幸 / 幻灯片 / 切换视图 折进溢出菜单，首屏留给图片墙 -->
       <!-- 三个小工具默认收起来：相册首屏应该是「图片墙」，不是「控件墙」 -->
       <div class="toolbar" id="toolTray" style="display:none;margin-top:9px">
         <button class="candy sky" onclick="openTool('link')"><span class="cb">🔗</span>图片转直链</button>
@@ -916,7 +932,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 
           <select id="linkKeep" aria-label="直链保存时长"><option value="1h">1 小时</option><option value="12h">12 小时</option><option value="24h" selected>24 小时</option><option value="72h">72 小时</option></select>
         </div>
       </div>
-      <div class="field" id="linkKeyField" style="display:none"><label>imgbb API Key（api.imgbb.com 免费申请，只存在你这台电脑的浏览器里）</label><input type="text" id="linkKey" aria-label="imgbb API Key" placeholder="粘贴 API Key" /></div>
+      <div class="field" id="linkKeyField" style="display:none"><label>imgbb API Key（api.imgbb.com 免费申请，只存在你这台电脑的浏览器里；公用 / 网吧电脑慎填）</label><input type="text" id="linkKey" aria-label="imgbb API Key" placeholder="粘贴 API Key" /></div>
       <div class="tool-grid" id="linkCustomFields" style="display:none">
         <div class="field"><label>接口地址（POST）</label><input type="text" id="linkCustomUrl" aria-label="自定义接口地址" placeholder="https://example.com/api/upload" /></div>
         <div class="field"><label>文件字段名</label><input type="text" id="linkCustomField" aria-label="上传的文件字段名" placeholder="file" /></div>
@@ -2357,7 +2373,9 @@ async function showSs(){
   const im = ssList[ssIdx];
   const url = await loadImg(im.id);
   if(ssList[ssIdx] !== im) return;   // 已经翻到下一张了，别覆盖
-  document.getElementById('ssImg').src = url || '';
+  const el = document.getElementById('ssImg');
+  // 空字符串 src 会让部分浏览器再请求一次页面自身 URL；和 openViewer 保持同一写法，显式摘掉属性
+  if(url){ el.src = url; } else { el.removeAttribute('src'); }
   document.getElementById('ssName').textContent = im.name || '未命名';
   document.getElementById('ssMeta').textContent = `${(im.tags||[]).join(' · ')||'无标签'}  ·  ${im.album||'未分类'}`;
 }
@@ -3149,6 +3167,23 @@ function toggleToolTray(force){
   if(btn) btn.setAttribute('aria-expanded', show ? 'true' : 'false');
   try{ localStorage.setItem('tool_tray', show ? '1' : '0'); }catch(e){}
 }
+/* 「更多玩法」溢出菜单：随机宠幸 / 幻灯片 / 切换视图 这三个低频动作收进 ⋯，
+   点开即聚焦第一项，Esc / 点外面 / 选完都自动收起并把焦点还回入口按钮 */
+function toggleMoreMenu(force){
+  const menu = document.getElementById('moreMenu');
+  const btn = document.getElementById('moreBtn');
+  if(!menu || !btn) return;
+  const show = (typeof force === 'boolean') ? force : !menu.classList.contains('show');
+  menu.classList.toggle('show', show);
+  btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+  if(show){ const f = menu.querySelector('button'); if(f) f.focus(); }
+}
+function moreAction(fn){ toggleMoreMenu(false); fn(); }
+addEventListener('click', e=>{
+  const wrap = document.getElementById('moreWrap');
+  const menu = document.getElementById('moreMenu');
+  if(wrap && menu && menu.classList.contains('show') && !wrap.contains(e.target)) toggleMoreMenu(false);
+});
 function openTool(kind){
   const map = { link:'toolLinkModal', gif:'toolGifModal', mp4:'toolMp4Modal' };
   openModal(map[kind] || kind);
@@ -3156,6 +3191,13 @@ function openTool(kind){
 function closeToolModal(){ ['toolLinkModal','toolGifModal','toolMp4Modal'].forEach(closeModal); }
 addEventListener('keydown', e=>{
   if(e.key !== 'Escape') return;
+  // 溢出菜单叠在弹窗层之外，Esc 要先收它、并把焦点还给入口按钮，再轮到弹窗栈
+  const mm = document.getElementById('moreMenu');
+  if(mm && mm.classList.contains('show')){
+    toggleMoreMenu(false);
+    const mb = document.getElementById('moreBtn'); if(mb) mb.focus();
+    return;
+  }
   const opened = topModal();
   if(opened) closeModal(opened.id);
 });
@@ -4080,14 +4122,21 @@ let lastDelete = null;
 async function undoLastDelete(){
   const snap = lastDelete; lastDelete = null;
   if(!snap || !snap.items.length){ toast('没有可以撤销的删除啦～'); return; }
-  if(!galleryDir){ toast('撤销需要图库文件夹还在（先在「数据管理」里选一个）🥺'); return; }
-  if(!await verifyPermission(galleryDir, true)){ toast('没有拿到文件夹授权 🥺'); return; }
+  /* 只有「原图住在文件夹里」的记录才需要图库文件夹参与：
+     纯浏览器模式收的图，快照 rec 里自带 dataUrl，safePut 就能原样写回 IndexedDB。
+     原来在这里一刀切拒绝，会让没选文件夹的用户看到「7 秒内可撤销」的承诺又点空 —— 失信比没有更糟。 */
+  const needDir = snap.items.some(it=>!!it.file);
+  let dir = null;
+  if(needDir){
+    if(!galleryDir){ toast('这批原图在图库文件夹里，撤销需要文件夹还在（先在「数据管理」里选一个）🥺'); return; }
+    if(!await verifyPermission(galleryDir, true)){ toast('没有拿到文件夹授权 🥺'); return; }
+    dir = await ensureSubdir();
+  }
   toast('正在把 ' + snap.items.length + ' 张捞回来…');
-  const dir = await ensureSubdir();
   let ok = 0, fail = 0;
   for(const it of snap.items){
     try{
-      if(it.file){
+      if(it.file && dir){
         const base = String(it.file).split('/').pop();
         const trash = await galleryDir.getDirectoryHandle('_trash', {create:true});
         const f = await (await trash.getFileHandle(base)).getFile();
